@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Added `fixture-gallery` CLI command for comparing multiple local case fixture directories under `examples/cases`.
+- Added gallery Markdown and JSON output covering tickers, event counts, stale sources, high attention scores, post-event availability, supported demo commands, and safety boundaries.
+- Added synthetic software, retail, and semiconductor case folders with checked-in per-case demo playbooks, optional post-event comparisons, docs, release evidence, manifest updates, and tests.
+
 ## 0.4.0
 
 - Added `export-handoff` CLI command for cross-asset Markdown and JSON handoff packs.

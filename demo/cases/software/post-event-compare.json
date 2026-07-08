@@ -1,0 +1,136 @@
+{
+  "artifact": "post-event-compare",
+  "comparisons": [
+    {
+      "actual": {
+        "actual_eps": 0.72,
+        "actual_move_percent": 7.6,
+        "actual_revenue": 958.0,
+        "fiscal_period": "FY2026 Q2",
+        "notes": "Subscription revenue exceeded consensus while services remained mixed.",
+        "report_date": "2026-07-23",
+        "source_date": "2026-07-23",
+        "source_name": "Synthetic software actuals fixture",
+        "ticker": "CLDW"
+      },
+      "as_of": "2026-08-07",
+      "eps": {
+        "actual": 0.72,
+        "band": "beat",
+        "consensus": 0.64,
+        "delta": 0.08,
+        "delta_percent": 12.5,
+        "metric": "eps"
+      },
+      "event": {
+        "company": "CloudWorks Software Inc.",
+        "consensus_eps": 0.64,
+        "consensus_revenue": 920.0,
+        "date": "2026-07-23",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 8.4,
+        "source_date": "2026-07-02",
+        "source_name": "Synthetic software consensus fixture",
+        "ticker": "CLDW"
+      },
+      "move": {
+        "actual_move_percent": 7.6,
+        "delta_percent": -0.8,
+        "implied_move_percent": 8.4,
+        "matched_scenario": "beat"
+      },
+      "revenue": {
+        "actual": 958.0,
+        "band": "base",
+        "consensus": 920.0,
+        "delta": 38.0,
+        "delta_percent": 4.13,
+        "metric": "revenue"
+      },
+      "review_queue": [
+        "Attach actuals source for CLDW FY2026 Q2 to the thesis ledger.",
+        "EPS and revenue landed in different bands; document which thesis sensitivity changed.",
+        "Answer after-call question: Did management separate seat expansion from price increases?",
+        "Answer after-call question: Was guidance raised by recurring demand or one-time services pull-forward?"
+      ],
+      "review_status": "needs-review",
+      "safety_notice": "Educational post-event review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "thesis_ledger_handoff": [
+        "CLDW FY2026 Q2: EPS classified as beat; revenue classified as base; post-event move matched beat.",
+        "Source handoff: Synthetic software actuals fixture dated 2026-07-23; report date 2026-07-23.",
+        "Actuals note for ledger: Subscription revenue exceeded consensus while services remained mixed.",
+        "Review thesis sensitivity topics before closing ledger: net revenue retention, security demand."
+      ]
+    },
+    {
+      "actual": {
+        "actual_eps": 1.01,
+        "actual_move_percent": -10.8,
+        "actual_revenue": 1375.0,
+        "fiscal_period": "FY2026 Q2",
+        "notes": "Renewal timing and enterprise sales cycles drove the variance.",
+        "report_date": "2026-08-06",
+        "source_date": "2026-08-06",
+        "source_name": "Synthetic software actuals fixture",
+        "ticker": "SECX"
+      },
+      "as_of": "2026-08-07",
+      "eps": {
+        "actual": 1.01,
+        "band": "miss",
+        "consensus": 1.18,
+        "delta": -0.17,
+        "delta_percent": -14.41,
+        "metric": "eps"
+      },
+      "event": {
+        "company": "SecureExchange Platforms",
+        "consensus_eps": 1.18,
+        "consensus_revenue": 1410.0,
+        "date": "2026-08-06",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 11.2,
+        "source_date": "2026-05-10",
+        "source_name": "Synthetic software calendar fixture",
+        "ticker": "SECX"
+      },
+      "move": {
+        "actual_move_percent": -10.8,
+        "delta_percent": -22.0,
+        "implied_move_percent": 11.2,
+        "matched_scenario": "miss"
+      },
+      "revenue": {
+        "actual": 1375.0,
+        "band": "base",
+        "consensus": 1410.0,
+        "delta": -35.0,
+        "delta_percent": -2.48,
+        "metric": "revenue"
+      },
+      "review_queue": [
+        "Attach actuals source for SECX FY2026 Q2 to the thesis ledger.",
+        "EPS and revenue landed in different bands; document which thesis sensitivity changed.",
+        "Answer after-call question: Did management separate seat expansion from price increases?",
+        "Answer after-call question: Was guidance raised by recurring demand or one-time services pull-forward?"
+      ],
+      "review_status": "needs-review",
+      "safety_notice": "Educational post-event review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "thesis_ledger_handoff": [
+        "SECX FY2026 Q2: EPS classified as miss; revenue classified as base; post-event move matched miss.",
+        "Source handoff: Synthetic software actuals fixture dated 2026-08-06; report date 2026-08-06.",
+        "Actuals note for ledger: Renewal timing and enterprise sales cycles drove the variance.",
+        "Review thesis sensitivity topics before closing ledger: net revenue retention, security demand."
+      ]
+    }
+  ],
+  "generated_by": "earnings-event-playbook",
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0"
+}

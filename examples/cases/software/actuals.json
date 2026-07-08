@@ -1,0 +1,27 @@
+{
+  "as_of": "2026-08-07",
+  "actuals": [
+    {
+      "ticker": "CLDW",
+      "fiscal_period": "FY2026 Q2",
+      "report_date": "2026-07-23",
+      "actual_eps": 0.72,
+      "actual_revenue": 958.0,
+      "actual_move_percent": 7.6,
+      "source_date": "2026-07-23",
+      "source_name": "Synthetic software actuals fixture",
+      "notes": "Subscription revenue exceeded consensus while services remained mixed."
+    },
+    {
+      "ticker": "SECX",
+      "fiscal_period": "FY2026 Q2",
+      "report_date": "2026-08-06",
+      "actual_eps": 1.01,
+      "actual_revenue": 1375.0,
+      "actual_move_percent": -10.8,
+      "source_date": "2026-08-06",
+      "source_name": "Synthetic software actuals fixture",
+      "notes": "Renewal timing and enterprise sales cycles drove the variance."
+    }
+  ]
+}

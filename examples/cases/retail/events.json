@@ -1,0 +1,54 @@
+{
+  "as_of": "2026-07-08",
+  "events": [
+    {
+      "date": "2026-08-14",
+      "ticker": "HOME",
+      "company": "HomeMarket Stores",
+      "fiscal_period": "FY2026 Q2",
+      "consensus_eps": 2.08,
+      "consensus_revenue": 8450.0,
+      "implied_move_percent": 5.9,
+      "source_date": "2026-06-24",
+      "source_name": "Synthetic retail consensus fixture"
+    },
+    {
+      "date": "2026-08-21",
+      "ticker": "FASH",
+      "company": "FashionLoop Brands",
+      "fiscal_period": "FY2026 Q2",
+      "consensus_eps": 0.42,
+      "consensus_revenue": 1195.0,
+      "implied_move_percent": 13.6,
+      "source_date": "2026-07-07",
+      "source_name": "Synthetic retail consensus fixture"
+    },
+    {
+      "date": "2026-09-03",
+      "ticker": "GROC",
+      "company": "GrocerLane Holdings",
+      "fiscal_period": "FY2026 Q3",
+      "consensus_eps": 0.88,
+      "consensus_revenue": 5220.0,
+      "implied_move_percent": 4.1,
+      "source_date": "2026-04-29",
+      "source_name": "Synthetic retail calendar fixture"
+    }
+  ],
+  "thesis_sensitivities": [
+    {
+      "topic": "inventory discipline",
+      "note": "Markdown cadence and shrink commentary can change margin confidence.",
+      "risk_weight": 5
+    },
+    {
+      "topic": "traffic quality",
+      "note": "Comparable traffic and basket mix should be separated from promotional lift.",
+      "risk_weight": 3
+    }
+  ],
+  "risk_questions": [
+    "Did management identify promotional pressure by category?",
+    "Were full-year margin assumptions changed after the quarter?"
+  ]
+}

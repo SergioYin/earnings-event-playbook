@@ -38,6 +38,14 @@ PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/
 
 `--visual-receipt` is optional. When provided, the command carries evidence artifact hashes from the receipt into each handoff pack. The handoff schema includes ticker, fiscal period, source freshness, open review items, thesis note draft, risk map prompts, catalyst follow-up, and evidence artifact hashes. Output is descriptive handoff material and does not recommend any action.
 
+`fixture-gallery` scans one or more local case directories under `examples/cases`. Each case must contain `events.json` and `portfolio.json`; `actuals.json` is optional.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json
+```
+
+The gallery compares cases by tickers, event count, stale source labels, high attention scores, post-event availability, supported demo commands, and safety boundaries.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -53,6 +61,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Post-event compare output is descriptive and does not provide action recommendations.
 - Visual receipt output is deterministic and records file hashes for local demo review evidence.
 - Handoff output is deterministic and carries optional receipt hashes for local evidence traceability.
+- Fixture gallery output is deterministic and only scans local public case fixture directories.
 
 ## Boundary
 

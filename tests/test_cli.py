@@ -57,6 +57,40 @@ def test_cli_build_playbook(tmp_path):
     assert json.loads(json_out.read_text(encoding="utf-8"))["playbooks"]
 
 
+def test_cli_fixture_gallery(tmp_path):
+    out = tmp_path / "fixture-gallery.md"
+    json_out = tmp_path / "fixture-gallery.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "fixture-gallery",
+            "--cases",
+            "examples/cases/software",
+            "examples/cases/retail",
+            "examples/cases/semiconductor",
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert "Fixture Case Gallery" in text
+    assert data["artifact"] == "fixture-gallery"
+    assert data["summary"]["case_count"] == 3
+    assert data["summary"]["event_count"] == 7
+    assert data["summary"]["post_event_case_count"] == 2
+    assert data["cases"][0]["case_id"] == "retail"
+    assert data["cases"][0]["post_event_available"] is False
+    assert all("fixture-gallery" not in command for case in data["cases"] for command in case["supported_demo_commands"])
+
+
 def test_cli_compare_post_event(tmp_path):
     playbook_json = tmp_path / "playbook.json"
     subprocess.run(

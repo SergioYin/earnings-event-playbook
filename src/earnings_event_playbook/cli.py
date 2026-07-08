@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Sequence
 
 from . import __version__
-from .core import build_handoff_packs, build_playbooks, compare_post_event
+from .core import build_fixture_gallery, build_handoff_packs, build_playbooks, compare_post_event
 from .io import read_json, write_text
 from .models import (
     FixtureError,
@@ -21,6 +21,8 @@ from .render import (
     render_handoff_json,
     render_handoff_markdown,
     render_html_index,
+    render_fixture_gallery_json,
+    render_fixture_gallery_markdown,
     render_json,
     render_markdown,
     render_post_event_json,
@@ -72,6 +74,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     handoff.add_argument("--json-out", required=True, type=Path)
     handoff.add_argument("--visual-receipt", type=Path)
 
+    gallery = subparsers.add_parser(
+        "fixture-gallery", help="Compare one or more local examples/cases fixture directories."
+    )
+    gallery.add_argument("--cases", required=True, nargs="+", type=Path)
+    gallery.add_argument("--out", required=True, type=Path)
+    gallery.add_argument("--json-out", required=True, type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -86,6 +95,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _visual_receipt(args.artifacts, args.out, args.json_out)
         if args.command == "export-handoff":
             return _export_handoff(args.playbook, args.post_event_compare, args.out, args.json_out, args.visual_receipt)
+        if args.command == "fixture-gallery":
+            return _fixture_gallery(args.cases, args.out, args.json_out)
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -162,6 +173,43 @@ def _export_handoff(
     packs = build_handoff_packs(playbooks, comparisons, hashes)
     write_text(out_path, render_handoff_markdown(packs))
     write_text(json_path, render_handoff_json(packs))
+    return 0
+
+
+def _fixture_gallery(case_dirs: Sequence[Path], out_path: Path, json_path: Path) -> int:
+    if not case_dirs:
+        raise ValueError("at least one case directory is required")
+    project_root = _project_root()
+    cases_root = (project_root / "examples" / "cases").resolve()
+    case_inputs = []
+    for case_dir in case_dirs:
+        resolved = case_dir.resolve()
+        if not resolved.is_dir():
+            raise ValueError(f"{case_dir} must be a case directory")
+        try:
+            resolved.relative_to(cases_root)
+        except ValueError as exc:
+            raise ValueError(f"{case_dir} must be under examples/cases") from exc
+        events_path = resolved / "events.json"
+        portfolio_path = resolved / "portfolio.json"
+        actuals_path = resolved / "actuals.json"
+        if not events_path.exists():
+            raise ValueError(f"{case_dir} is missing events.json")
+        if not portfolio_path.exists():
+            raise ValueError(f"{case_dir} is missing portfolio.json")
+        actuals = parse_actuals_fixture(read_json(actuals_path)) if actuals_path.exists() else None
+        case_inputs.append(
+            (
+                resolved.name,
+                resolved.relative_to(project_root).as_posix(),
+                parse_events_fixture(read_json(events_path)),
+                parse_portfolio_fixture(read_json(portfolio_path)),
+                actuals,
+            )
+        )
+    gallery = build_fixture_gallery(case_inputs)
+    write_text(out_path, render_fixture_gallery_markdown(gallery))
+    write_text(json_path, render_fixture_gallery_json(gallery))
     return 0
 
 

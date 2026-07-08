@@ -1,0 +1,120 @@
+{
+  "artifact": "post-event-compare",
+  "comparisons": [
+    {
+      "actual": {
+        "actual_eps": 3.68,
+        "actual_move_percent": 10.6,
+        "actual_revenue": 13590.0,
+        "fiscal_period": "FY2026 Q2",
+        "notes": "Accelerator backlog improved while supply remained tight.",
+        "report_date": "2026-07-30",
+        "source_date": "2026-07-30",
+        "source_name": "Synthetic semiconductor actuals fixture",
+        "ticker": "AICH"
+      },
+      "as_of": "2026-07-31",
+      "eps": {
+        "actual": 3.68,
+        "band": "beat",
+        "consensus": 3.34,
+        "delta": 0.34,
+        "delta_percent": 10.18,
+        "metric": "eps"
+      },
+      "event": {
+        "company": "AI Chip Systems",
+        "consensus_eps": 3.34,
+        "consensus_revenue": 12800.0,
+        "date": "2026-07-30",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 9.8,
+        "source_date": "2026-07-01",
+        "source_name": "Synthetic semiconductor consensus fixture",
+        "ticker": "AICH"
+      },
+      "move": {
+        "actual_move_percent": 10.6,
+        "delta_percent": 0.8,
+        "implied_move_percent": 9.8,
+        "matched_scenario": "beat"
+      },
+      "revenue": {
+        "actual": 13590.0,
+        "band": "beat",
+        "consensus": 12800.0,
+        "delta": 790.0,
+        "delta_percent": 6.17,
+        "metric": "revenue"
+      },
+      "review_queue": [
+        "Attach actuals source for AICH FY2026 Q2 to the thesis ledger.",
+        "Answer after-call question: Did capacity commentary imply supply constraints or demand softness?",
+        "Answer after-call question: Were China-related shipment assumptions changed in guidance?"
+      ],
+      "review_status": "ready-for-ledger",
+      "safety_notice": "Educational post-event review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "thesis_ledger_handoff": [
+        "AICH FY2026 Q2: EPS classified as beat; revenue classified as beat; post-event move matched beat.",
+        "Source handoff: Synthetic semiconductor actuals fixture dated 2026-07-30; report date 2026-07-30.",
+        "Actuals note for ledger: Accelerator backlog improved while supply remained tight.",
+        "Review thesis sensitivity topics before closing ledger: accelerator backlog, memory pricing."
+      ]
+    },
+    {
+      "actual": null,
+      "as_of": "2026-07-31",
+      "eps": {
+        "actual": null,
+        "band": "not-comparable",
+        "consensus": 1.52,
+        "delta": null,
+        "delta_percent": null,
+        "metric": "eps"
+      },
+      "event": {
+        "company": "MemoryWorks Devices",
+        "consensus_eps": 1.52,
+        "consensus_revenue": 6830.0,
+        "date": "2026-08-12",
+        "fiscal_period": "FY2026 Q3",
+        "implied_move_percent": 12.4,
+        "source_date": "2026-05-18",
+        "source_name": "Synthetic semiconductor calendar fixture",
+        "ticker": "MEMR"
+      },
+      "move": {
+        "actual_move_percent": null,
+        "delta_percent": null,
+        "implied_move_percent": 12.4,
+        "matched_scenario": "not-comparable"
+      },
+      "revenue": {
+        "actual": null,
+        "band": "not-comparable",
+        "consensus": 6830.0,
+        "delta": null,
+        "delta_percent": null,
+        "metric": "revenue"
+      },
+      "review_queue": [
+        "Attach actuals source for MEMR FY2026 Q3 to the thesis ledger.",
+        "Add a matching actuals fixture entry before marking the review complete."
+      ],
+      "review_status": "blocked-missing-actuals",
+      "safety_notice": "Educational post-event review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "thesis_ledger_handoff": [
+        "MEMR: no matching actuals fixture; keep pre-event thesis ledger open for data capture."
+      ]
+    }
+  ],
+  "generated_by": "earnings-event-playbook",
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0"
+}

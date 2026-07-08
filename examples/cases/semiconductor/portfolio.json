@@ -1,0 +1,20 @@
+{
+  "as_of": "2026-07-08",
+  "base_currency": "USD",
+  "positions": [
+    {
+      "ticker": "AICH",
+      "shares": 80,
+      "exposure": 44800.0,
+      "portfolio_weight_percent": 11.2,
+      "notes": "Largest semiconductor exposure; review concentration risk."
+    },
+    {
+      "ticker": "MEMR",
+      "shares": 180,
+      "exposure": 17100.0,
+      "portfolio_weight_percent": 4.4,
+      "notes": "Cyclical memory exposure with pricing sensitivity."
+    }
+  ]
+}

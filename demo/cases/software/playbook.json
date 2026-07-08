@@ -1,0 +1,184 @@
+{
+  "generated_by": "earnings-event-playbook",
+  "playbooks": [
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 53,
+      "event": {
+        "company": "CloudWorks Software Inc.",
+        "consensus_eps": 0.64,
+        "consensus_revenue": 920.0,
+        "date": "2026-07-23",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 8.4,
+        "source_date": "2026-07-02",
+        "source_name": "Synthetic software consensus fixture",
+        "ticker": "CLDW"
+      },
+      "freshness": "fresh<=14d",
+      "position": {
+        "exposure": 16800.0,
+        "notes": "Core software holding with margin expansion thesis.",
+        "portfolio_weight_percent": 5.8,
+        "shares": 140.0,
+        "ticker": "CLDW"
+      },
+      "review_queue": [
+        "Confirm CLDW report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for CloudWorks Software Inc. FY2026 Q2.",
+        "Portfolio weight is elevated; document exposure-specific risk questions.",
+        "Did management separate seat expansion from price increases?",
+        "Was guidance raised by recurring demand or one-time services pull-forward?"
+      ],
+      "risk_questions": [
+        "Did management separate seat expansion from price increases?",
+        "Was guidance raised by recurring demand or one-time services pull-forward?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 1411.2,
+          "name": "beat",
+          "price_move_percent": 8.4,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -1411.2,
+          "name": "miss",
+          "price_move_percent": -8.4,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Expansion rate commentary can change confidence in durable software growth.",
+          "risk_weight": 5,
+          "topic": "net revenue retention"
+        },
+        {
+          "note": "Budget scrutiny and renewal timing should be reviewed after the call.",
+          "risk_weight": 4,
+          "topic": "security demand"
+        }
+      ]
+    },
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 71,
+      "event": {
+        "company": "SecureExchange Platforms",
+        "consensus_eps": 1.18,
+        "consensus_revenue": 1410.0,
+        "date": "2026-08-06",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 11.2,
+        "source_date": "2026-05-10",
+        "source_name": "Synthetic software calendar fixture",
+        "ticker": "SECX"
+      },
+      "freshness": "stale>45d",
+      "position": {
+        "exposure": 21375.0,
+        "notes": "Higher-volatility security platform position.",
+        "portfolio_weight_percent": 7.1,
+        "shares": 95.0,
+        "ticker": "SECX"
+      },
+      "review_queue": [
+        "Confirm SECX report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for SecureExchange Platforms FY2026 Q2.",
+        "Portfolio weight is elevated; document exposure-specific risk questions.",
+        "Refresh static source fields before using the playbook in review.",
+        "Did management separate seat expansion from price increases?",
+        "Was guidance raised by recurring demand or one-time services pull-forward?"
+      ],
+      "risk_questions": [
+        "Did management separate seat expansion from price increases?",
+        "Was guidance raised by recurring demand or one-time services pull-forward?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 2394.0,
+          "name": "beat",
+          "price_move_percent": 11.2,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -2394.0,
+          "name": "miss",
+          "price_move_percent": -11.2,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Expansion rate commentary can change confidence in durable software growth.",
+          "risk_weight": 5,
+          "topic": "net revenue retention"
+        },
+        {
+          "note": "Budget scrutiny and renewal timing should be reviewed after the call.",
+          "risk_weight": 4,
+          "topic": "security demand"
+        }
+      ]
+    }
+  ],
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0"
+}

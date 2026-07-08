@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Iterable, List
 
-from .models import EventPlaybook, HandoffPack, PostEventComparison
+from .models import CaseGallery, EventPlaybook, HandoffPack, PostEventComparison
 
 
 VISUAL_RECEIPT_SAFETY_BOUNDARIES = [
@@ -67,6 +67,57 @@ def playbooks_to_dict(playbooks: Iterable[EventPlaybook]) -> dict:
 
 def render_json(playbooks: Iterable[EventPlaybook]) -> str:
     return json.dumps(playbooks_to_dict(playbooks), indent=2, sort_keys=True) + "\n"
+
+
+def render_fixture_gallery_json(gallery: CaseGallery) -> str:
+    return json.dumps(gallery.to_dict(), indent=2, sort_keys=True) + "\n"
+
+
+def render_fixture_gallery_markdown(gallery: CaseGallery) -> str:
+    data = gallery.to_dict()
+    summary = data["summary"]
+    lines: List[str] = [
+        "# Fixture Case Gallery",
+        "",
+        "> Educational fixture comparison only. Local static fixtures only; no live data, broker connection, orders, or investment advice.",
+        "",
+        "## Summary",
+        "",
+        f"- Cases: {summary['case_count']}",
+        f"- Events: {summary['event_count']}",
+        f"- Tickers: {', '.join(summary['tickers']) if summary['tickers'] else 'None'}",
+        f"- Stale source flags: {summary['stale_source_count']}",
+        f"- High attention flags: {summary['high_attention_count']}",
+        f"- Cases with post-event actuals: {summary['post_event_case_count']}",
+        "",
+        "## Case Comparison",
+        "",
+        "| Case | Tickers | Events | Stale sources | High attention | Post-event availability |",
+        "| --- | --- | ---: | --- | --- | --- |",
+    ]
+    for case in data["cases"]:
+        lines.append(
+            "| "
+            + " | ".join(
+                [
+                    f"`{case['case_id']}`",
+                    ", ".join(case["tickers"]) or "None",
+                    str(case["event_count"]),
+                    _gallery_list(case["stale_sources"]),
+                    _gallery_attention(case["high_attention_scores"]),
+                    _gallery_post_event(case),
+                ]
+            )
+            + " |"
+        )
+    lines.extend(["", "## Supported Demo Commands", ""])
+    for case in data["cases"]:
+        lines.extend([f"### {case['case_id']}", ""])
+        for command in case["supported_demo_commands"]:
+            lines.extend(["```bash", command, "```", ""])
+    lines.extend(["## Safety Boundaries", ""])
+    lines.extend(f"- {item}" for item in data["safety_boundaries"])
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def post_event_to_dict(comparisons: Iterable[PostEventComparison]) -> dict:
@@ -527,6 +578,22 @@ def _fmt_date_or_none(value) -> str:
     if value is None:
         return "not provided"
     return value.isoformat()
+
+
+def _gallery_list(items: List[str]) -> str:
+    return ", ".join(items) if items else "None"
+
+
+def _gallery_attention(items: List[dict]) -> str:
+    if not items:
+        return "None"
+    return ", ".join(f"{item['ticker']} {item['score']}" for item in items)
+
+
+def _gallery_post_event(case: dict) -> str:
+    if not case["post_event_available"]:
+        return "No actuals fixture"
+    return f"{case['post_event_match_count']}/{case['event_count']} matched"
 
 
 def _metric_row(label: str, comparison) -> str:

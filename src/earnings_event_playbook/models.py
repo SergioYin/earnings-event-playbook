@@ -115,6 +115,61 @@ class ActualsFixture:
 
 
 @dataclass(frozen=True)
+class CaseGalleryItem:
+    case_id: str
+    case_path: str
+    tickers: List[str]
+    event_count: int
+    stale_sources: List[str]
+    high_attention_scores: List[Dict[str, Any]]
+    post_event_available: bool
+    post_event_match_count: int
+    supported_demo_commands: List[str]
+    safety_boundaries: List[str]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "case_id": self.case_id,
+            "case_path": self.case_path,
+            "tickers": list(self.tickers),
+            "event_count": self.event_count,
+            "stale_sources": list(self.stale_sources),
+            "high_attention_scores": [dict(item) for item in self.high_attention_scores],
+            "post_event_available": self.post_event_available,
+            "post_event_match_count": self.post_event_match_count,
+            "supported_demo_commands": list(self.supported_demo_commands),
+            "safety_boundaries": list(self.safety_boundaries),
+        }
+
+
+@dataclass(frozen=True)
+class CaseGallery:
+    cases_root: str
+    cases: List[CaseGalleryItem]
+    safety_boundaries: List[str]
+
+    def to_dict(self) -> Dict[str, Any]:
+        all_tickers = sorted({ticker for case in self.cases for ticker in case.tickers})
+        return {
+            "schema_version": "1.0",
+            "generated_by": "earnings-event-playbook",
+            "artifact": "fixture-gallery",
+            "cases_root": self.cases_root,
+            "summary": {
+                "case_count": len(self.cases),
+                "event_count": sum(case.event_count for case in self.cases),
+                "ticker_count": len(all_tickers),
+                "tickers": all_tickers,
+                "stale_source_count": sum(len(case.stale_sources) for case in self.cases),
+                "high_attention_count": sum(len(case.high_attention_scores) for case in self.cases),
+                "post_event_case_count": sum(1 for case in self.cases if case.post_event_available),
+            },
+            "safety_boundaries": list(self.safety_boundaries),
+            "cases": [case.to_dict() for case in self.cases],
+        }
+
+
+@dataclass(frozen=True)
 class MetricComparison:
     metric: str
     consensus: Optional[float]

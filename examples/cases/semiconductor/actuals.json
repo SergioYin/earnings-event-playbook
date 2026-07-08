@@ -1,0 +1,16 @@
+{
+  "as_of": "2026-07-31",
+  "actuals": [
+    {
+      "ticker": "AICH",
+      "fiscal_period": "FY2026 Q2",
+      "report_date": "2026-07-30",
+      "actual_eps": 3.68,
+      "actual_revenue": 13590.0,
+      "actual_move_percent": 10.6,
+      "source_date": "2026-07-30",
+      "source_name": "Synthetic semiconductor actuals fixture",
+      "notes": "Accelerator backlog improved while supply remained tight."
+    }
+  ]
+}

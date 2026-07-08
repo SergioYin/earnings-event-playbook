@@ -11,10 +11,94 @@
     },
     {
       "media_type": "application/json",
+      "path": "demo/cases/retail/playbook.json",
+      "role": "playbook-json",
+      "sha256": "78cb5e6b591e764b6c9f9dd9e64acaf1345e54620f1cd5243a6e47d040917571",
+      "size_bytes": 9147
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/cases/retail/playbook.md",
+      "role": "playbook-markdown",
+      "sha256": "b3b0c1af8af86678541eccf62634ff2901948e8e9f5b2e779f24fe9f37068e52",
+      "size_bytes": 4187
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/cases/semiconductor/playbook.json",
+      "role": "playbook-json",
+      "sha256": "9c0c42158b3da6d4fc346a876028ea7393c104c833b530a1c938197a415a5e69",
+      "size_bytes": 6420
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/cases/semiconductor/playbook.md",
+      "role": "playbook-markdown",
+      "sha256": "5ba36bc34a19570bd8e04f545649e2b0596953da81fe01ece1bb025bdf874d46",
+      "size_bytes": 3003
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/cases/semiconductor/post-event-compare.json",
+      "role": "post-event-json",
+      "sha256": "06035cbe0d994fb5cb454af738fe395275a789b60d314bb98ae9783d9ff9d156",
+      "size_bytes": 4173
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/cases/semiconductor/post-event-compare.md",
+      "role": "post-event-markdown",
+      "sha256": "f22106635dd8d70908d3cacf8b76adb22c923a8069b578581a542cde4eedcc82",
+      "size_bytes": 2423
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/cases/software/playbook.json",
+      "role": "playbook-json",
+      "sha256": "285e03d8221afbe224ec8a089144417717378a26d7f8a271a8df9f4c87c1dbf9",
+      "size_bytes": 6557
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/cases/software/playbook.md",
+      "role": "playbook-markdown",
+      "sha256": "829fea4fe415e3ee0b075489e1916c193b55da08e6fad02a11dd29bc6604d093",
+      "size_bytes": 3131
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/cases/software/post-event-compare.json",
+      "role": "post-event-json",
+      "sha256": "b5f98980982b8f653844e08816803ab6773b01dc696fbd3ea7fdd4df901684a8",
+      "size_bytes": 5186
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/cases/software/post-event-compare.md",
+      "role": "post-event-markdown",
+      "sha256": "107cdaafe21a4260e8bce5380c7ca031af8f3a3a608395255cfacf1313c2fa22",
+      "size_bytes": 3097
+    },
+    {
+      "media_type": "application/json",
       "path": "demo/events.json",
       "role": "input-fixture",
       "sha256": "972654c17ac4816435cbf28207f69822a5acff8db7ef352d7677b3ccb93827cc",
       "size_bytes": 1211
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/fixture-gallery.json",
+      "role": "json-artifact",
+      "sha256": "3965bf845ee22791be53507c37fe709cebc83111960b10b6614144a1a6c8c35d",
+      "size_bytes": 4139
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/fixture-gallery.md",
+      "role": "markdown-artifact",
+      "sha256": "85245a266cacca9861b74e9b9fa097f0982c97bcfebbf140b0fa55326d81f607",
+      "size_bytes": 2308
     },
     {
       "media_type": "text/html",
@@ -83,15 +167,17 @@
   ],
   "schema_version": "1.0",
   "summary": {
-    "file_count": 8,
+    "file_count": 20,
     "roles": {
       "input-fixture": 3,
-      "playbook-json": 1,
-      "playbook-markdown": 1,
-      "post-event-json": 1,
-      "post-event-markdown": 1,
+      "json-artifact": 1,
+      "markdown-artifact": 1,
+      "playbook-json": 4,
+      "playbook-markdown": 4,
+      "post-event-json": 3,
+      "post-event-markdown": 3,
       "static-html-preview": 1
     },
-    "total_bytes": 23744
+    "total_bytes": 77515
   }
 }

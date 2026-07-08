@@ -1,0 +1,183 @@
+{
+  "generated_by": "earnings-event-playbook",
+  "playbooks": [
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 70,
+      "event": {
+        "company": "AI Chip Systems",
+        "consensus_eps": 3.34,
+        "consensus_revenue": 12800.0,
+        "date": "2026-07-30",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 9.8,
+        "source_date": "2026-07-01",
+        "source_name": "Synthetic semiconductor consensus fixture",
+        "ticker": "AICH"
+      },
+      "freshness": "fresh<=14d",
+      "position": {
+        "exposure": 44800.0,
+        "notes": "Largest semiconductor exposure; review concentration risk.",
+        "portfolio_weight_percent": 11.2,
+        "shares": 80.0,
+        "ticker": "AICH"
+      },
+      "review_queue": [
+        "Confirm AICH report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for AI Chip Systems FY2026 Q2.",
+        "Portfolio weight is elevated; document exposure-specific risk questions.",
+        "Did capacity commentary imply supply constraints or demand softness?",
+        "Were China-related shipment assumptions changed in guidance?"
+      ],
+      "risk_questions": [
+        "Did capacity commentary imply supply constraints or demand softness?",
+        "Were China-related shipment assumptions changed in guidance?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 4390.4,
+          "name": "beat",
+          "price_move_percent": 9.8,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -4390.4,
+          "name": "miss",
+          "price_move_percent": -9.8,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Visibility into hyperscale orders is the primary setup risk.",
+          "risk_weight": 5,
+          "topic": "accelerator backlog"
+        },
+        {
+          "note": "Contract price commentary should be compared against utilization comments.",
+          "risk_weight": 4,
+          "topic": "memory pricing"
+        }
+      ]
+    },
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 70,
+      "event": {
+        "company": "MemoryWorks Devices",
+        "consensus_eps": 1.52,
+        "consensus_revenue": 6830.0,
+        "date": "2026-08-12",
+        "fiscal_period": "FY2026 Q3",
+        "implied_move_percent": 12.4,
+        "source_date": "2026-05-18",
+        "source_name": "Synthetic semiconductor calendar fixture",
+        "ticker": "MEMR"
+      },
+      "freshness": "stale>45d",
+      "position": {
+        "exposure": 17100.0,
+        "notes": "Cyclical memory exposure with pricing sensitivity.",
+        "portfolio_weight_percent": 4.4,
+        "shares": 180.0,
+        "ticker": "MEMR"
+      },
+      "review_queue": [
+        "Confirm MEMR report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for MemoryWorks Devices FY2026 Q3.",
+        "Refresh static source fields before using the playbook in review.",
+        "Did capacity commentary imply supply constraints or demand softness?",
+        "Were China-related shipment assumptions changed in guidance?"
+      ],
+      "risk_questions": [
+        "Did capacity commentary imply supply constraints or demand softness?",
+        "Were China-related shipment assumptions changed in guidance?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 2120.4,
+          "name": "beat",
+          "price_move_percent": 12.4,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -2120.4,
+          "name": "miss",
+          "price_move_percent": -12.4,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Visibility into hyperscale orders is the primary setup risk.",
+          "risk_weight": 5,
+          "topic": "accelerator backlog"
+        },
+        {
+          "note": "Contract price commentary should be compared against utilization comments.",
+          "risk_weight": 4,
+          "topic": "memory pricing"
+        }
+      ]
+    }
+  ],
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0"
+}

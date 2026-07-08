@@ -5,6 +5,8 @@ from typing import List
 
 from .models import (
     ActualsFixture,
+    CaseGallery,
+    CaseGalleryItem,
     EvidenceArtifactHash,
     EarningsEvent,
     EventFixture,
@@ -18,6 +20,17 @@ from .models import (
     find_actual,
     find_position,
 )
+
+
+GALLERY_SAFETY_BOUNDARIES = [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice",
+]
+
+HIGH_ATTENTION_THRESHOLD = 70
 
 
 def freshness_label(as_of: date, source_date: date) -> str:
@@ -104,6 +117,62 @@ def build_playbooks(events_fixture: EventFixture, portfolio_fixture: PortfolioFi
     return playbooks
 
 
+def build_fixture_gallery(case_inputs: List[tuple[str, str, EventFixture, PortfolioFixture, ActualsFixture | None]]) -> CaseGallery:
+    cases = []
+    for case_id, case_path, events_fixture, portfolio_fixture, actuals_fixture in sorted(
+        case_inputs, key=lambda item: item[0]
+    ):
+        playbooks = build_playbooks(events_fixture, portfolio_fixture)
+        actuals = actuals_fixture.actuals if actuals_fixture is not None else []
+        commands = [
+            (
+                "PYTHONPATH=src python -m earnings_event_playbook build-playbook "
+                f"--events {case_path}/events.json --portfolio {case_path}/portfolio.json "
+                f"--out demo/cases/{case_id}/playbook.md --json-out demo/cases/{case_id}/playbook.json"
+            )
+        ]
+        if actuals_fixture is not None:
+            commands.append(
+                (
+                    "PYTHONPATH=src python -m earnings_event_playbook compare-post-event "
+                    f"--before-playbook demo/cases/{case_id}/playbook.json --actuals {case_path}/actuals.json "
+                    f"--out demo/cases/{case_id}/post-event-compare.md "
+                    f"--json-out demo/cases/{case_id}/post-event-compare.json"
+                )
+            )
+        cases.append(
+            CaseGalleryItem(
+                case_id=case_id,
+                case_path=case_path,
+                tickers=sorted({item.event.ticker for item in playbooks}),
+                event_count=len(playbooks),
+                stale_sources=[
+                    f"{item.event.ticker}:{item.freshness}"
+                    for item in playbooks
+                    if item.freshness.startswith("stale") or item.freshness == "source-after-as-of"
+                ],
+                high_attention_scores=[
+                    {
+                        "ticker": item.event.ticker,
+                        "score": item.attention_score,
+                        "fiscal_period": item.event.fiscal_period,
+                    }
+                    for item in playbooks
+                    if item.attention_score >= HIGH_ATTENTION_THRESHOLD
+                ],
+                post_event_available=actuals_fixture is not None,
+                post_event_match_count=sum(
+                    1 for item in playbooks if find_actual(actuals, item.event.ticker, item.event.fiscal_period)
+                ),
+                supported_demo_commands=commands,
+                safety_boundaries=GALLERY_SAFETY_BOUNDARIES,
+            )
+        )
+
+    common_root = _common_case_root([item[1] for item in case_inputs])
+    return CaseGallery(cases_root=common_root, cases=cases, safety_boundaries=GALLERY_SAFETY_BOUNDARIES)
+
+
 def compare_post_event(playbooks: List[EventPlaybook], actuals_fixture: ActualsFixture) -> List[PostEventComparison]:
     comparisons = []
     for playbook in playbooks:
@@ -142,6 +211,18 @@ def compare_post_event(playbooks: List[EventPlaybook], actuals_fixture: ActualsF
             )
         )
     return comparisons
+
+
+def _common_case_root(case_paths: List[str]) -> str:
+    if not case_paths:
+        return ""
+    split_paths = [path.strip("/").split("/") for path in case_paths]
+    common = []
+    for parts in zip(*split_paths):
+        if len(set(parts)) != 1:
+            break
+        common.append(parts[0])
+    return "/".join(common)
 
 
 def build_handoff_packs(

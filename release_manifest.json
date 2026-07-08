@@ -1,6 +1,6 @@
 {
   "project": "earnings-event-playbook",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "runtime_dependencies": 0,
   "workflow_files": "none",
   "generated_artifacts": [
@@ -15,12 +15,24 @@
     "demo/visual-receipt.md",
     "demo/visual-receipt.json",
     "demo/handoff.md",
-    "demo/handoff.json"
+    "demo/handoff.json",
+    "demo/fixture-gallery.md",
+    "demo/fixture-gallery.json",
+    "demo/cases/software/playbook.md",
+    "demo/cases/software/playbook.json",
+    "demo/cases/software/post-event-compare.md",
+    "demo/cases/software/post-event-compare.json",
+    "demo/cases/retail/playbook.md",
+    "demo/cases/retail/playbook.json",
+    "demo/cases/semiconductor/playbook.md",
+    "demo/cases/semiconductor/playbook.json",
+    "demo/cases/semiconductor/post-event-compare.md",
+    "demo/cases/semiconductor/post-event-compare.json"
   ],
   "verification_commands": [
     {
       "command": "PYTHONPATH=src python -m pytest",
-      "result": "23 passed"
+      "result": "25 passed"
     },
     {
       "command": "PYTHONPATH=src python -m unittest discover",
@@ -47,12 +59,16 @@
       "result": "passed"
     },
     {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json",
+      "result": "passed"
+    },
+    {
       "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok; scanned 39 public files"
+      "result": "selfcheck ok; scanned 59 public files"
     },
     {
       "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
-      "result": "built dist/earnings_event_playbook-0.4.0.tar.gz and dist/earnings_event_playbook-0.4.0-py3-none-any.whl"
+      "result": "built dist/earnings_event_playbook-0.5.0.tar.gz and dist/earnings_event_playbook-0.5.0-py3-none-any.whl"
     }
   ],
   "safety_boundaries": [

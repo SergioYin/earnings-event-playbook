@@ -1,0 +1,43 @@
+{
+  "as_of": "2026-07-08",
+  "events": [
+    {
+      "date": "2026-07-30",
+      "ticker": "AICH",
+      "company": "AI Chip Systems",
+      "fiscal_period": "FY2026 Q2",
+      "consensus_eps": 3.34,
+      "consensus_revenue": 12800.0,
+      "implied_move_percent": 9.8,
+      "source_date": "2026-07-01",
+      "source_name": "Synthetic semiconductor consensus fixture"
+    },
+    {
+      "date": "2026-08-12",
+      "ticker": "MEMR",
+      "company": "MemoryWorks Devices",
+      "fiscal_period": "FY2026 Q3",
+      "consensus_eps": 1.52,
+      "consensus_revenue": 6830.0,
+      "implied_move_percent": 12.4,
+      "source_date": "2026-05-18",
+      "source_name": "Synthetic semiconductor calendar fixture"
+    }
+  ],
+  "thesis_sensitivities": [
+    {
+      "topic": "accelerator backlog",
+      "note": "Visibility into hyperscale orders is the primary setup risk.",
+      "risk_weight": 5
+    },
+    {
+      "topic": "memory pricing",
+      "note": "Contract price commentary should be compared against utilization comments.",
+      "risk_weight": 4
+    }
+  ],
+  "risk_questions": [
+    "Did capacity commentary imply supply constraints or demand softness?",
+    "Were China-related shipment assumptions changed in guidance?"
+  ]
+}

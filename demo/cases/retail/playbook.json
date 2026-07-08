@@ -1,0 +1,261 @@
+{
+  "generated_by": "earnings-event-playbook",
+  "playbooks": [
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 49,
+      "event": {
+        "company": "HomeMarket Stores",
+        "consensus_eps": 2.08,
+        "consensus_revenue": 8450.0,
+        "date": "2026-08-14",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 5.9,
+        "source_date": "2026-06-24",
+        "source_name": "Synthetic retail consensus fixture",
+        "ticker": "HOME"
+      },
+      "freshness": "fresh<=14d",
+      "position": {
+        "exposure": 17600.0,
+        "notes": "Stable retail exposure with housing-cycle sensitivity.",
+        "portfolio_weight_percent": 4.9,
+        "shares": 55.0,
+        "ticker": "HOME"
+      },
+      "review_queue": [
+        "Confirm HOME report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for HomeMarket Stores FY2026 Q2.",
+        "Did management identify promotional pressure by category?",
+        "Were full-year margin assumptions changed after the quarter?"
+      ],
+      "risk_questions": [
+        "Did management identify promotional pressure by category?",
+        "Were full-year margin assumptions changed after the quarter?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 1038.4,
+          "name": "beat",
+          "price_move_percent": 5.9,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -1038.4,
+          "name": "miss",
+          "price_move_percent": -5.9,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Markdown cadence and shrink commentary can change margin confidence.",
+          "risk_weight": 5,
+          "topic": "inventory discipline"
+        },
+        {
+          "note": "Comparable traffic and basket mix should be separated from promotional lift.",
+          "risk_weight": 3,
+          "topic": "traffic quality"
+        }
+      ]
+    },
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 56,
+      "event": {
+        "company": "FashionLoop Brands",
+        "consensus_eps": 0.42,
+        "consensus_revenue": 1195.0,
+        "date": "2026-08-21",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 13.6,
+        "source_date": "2026-07-07",
+        "source_name": "Synthetic retail consensus fixture",
+        "ticker": "FASH"
+      },
+      "freshness": "fresh<=14d",
+      "position": {
+        "exposure": 9360.0,
+        "notes": "Smaller position tied to turnaround execution.",
+        "portfolio_weight_percent": 2.7,
+        "shares": 260.0,
+        "ticker": "FASH"
+      },
+      "review_queue": [
+        "Confirm FASH report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for FashionLoop Brands FY2026 Q2.",
+        "Did management identify promotional pressure by category?",
+        "Were full-year margin assumptions changed after the quarter?"
+      ],
+      "risk_questions": [
+        "Did management identify promotional pressure by category?",
+        "Were full-year margin assumptions changed after the quarter?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 1272.96,
+          "name": "beat",
+          "price_move_percent": 13.6,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -1272.96,
+          "name": "miss",
+          "price_move_percent": -13.6,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Markdown cadence and shrink commentary can change margin confidence.",
+          "risk_weight": 5,
+          "topic": "inventory discipline"
+        },
+        {
+          "note": "Comparable traffic and basket mix should be separated from promotional lift.",
+          "risk_weight": 3,
+          "topic": "traffic quality"
+        }
+      ]
+    },
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 36,
+      "event": {
+        "company": "GrocerLane Holdings",
+        "consensus_eps": 0.88,
+        "consensus_revenue": 5220.0,
+        "date": "2026-09-03",
+        "fiscal_period": "FY2026 Q3",
+        "implied_move_percent": 4.1,
+        "source_date": "2026-04-29",
+        "source_name": "Synthetic retail calendar fixture",
+        "ticker": "GROC"
+      },
+      "freshness": "stale>45d",
+      "position": null,
+      "review_queue": [
+        "Confirm GROC report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for GrocerLane Holdings FY2026 Q3.",
+        "No matching portfolio position; confirm whether this is watchlist-only.",
+        "Refresh static source fields before using the playbook in review.",
+        "Did management identify promotional pressure by category?",
+        "Were full-year margin assumptions changed after the quarter?"
+      ],
+      "risk_questions": [
+        "Did management identify promotional pressure by category?",
+        "Were full-year margin assumptions changed after the quarter?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 0.0,
+          "name": "beat",
+          "price_move_percent": 4.1,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -0.0,
+          "name": "miss",
+          "price_move_percent": -4.1,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Markdown cadence and shrink commentary can change margin confidence.",
+          "risk_weight": 5,
+          "topic": "inventory discipline"
+        },
+        {
+          "note": "Comparable traffic and basket mix should be separated from promotional lift.",
+          "risk_weight": 3,
+          "topic": "traffic quality"
+        }
+      ]
+    }
+  ],
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0"
+}

@@ -1,0 +1,20 @@
+{
+  "as_of": "2026-07-08",
+  "base_currency": "USD",
+  "positions": [
+    {
+      "ticker": "HOME",
+      "shares": 55,
+      "exposure": 17600.0,
+      "portfolio_weight_percent": 4.9,
+      "notes": "Stable retail exposure with housing-cycle sensitivity."
+    },
+    {
+      "ticker": "FASH",
+      "shares": 260,
+      "exposure": 9360.0,
+      "portfolio_weight_percent": 2.7,
+      "notes": "Smaller position tied to turnaround execution."
+    }
+  ]
+}

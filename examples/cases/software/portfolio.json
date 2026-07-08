@@ -1,0 +1,20 @@
+{
+  "as_of": "2026-07-08",
+  "base_currency": "USD",
+  "positions": [
+    {
+      "ticker": "CLDW",
+      "shares": 140,
+      "exposure": 16800.0,
+      "portfolio_weight_percent": 5.8,
+      "notes": "Core software holding with margin expansion thesis."
+    },
+    {
+      "ticker": "SECX",
+      "shares": 95,
+      "exposure": 21375.0,
+      "portfolio_weight_percent": 7.1,
+      "notes": "Higher-volatility security platform position."
+    }
+  ]
+}

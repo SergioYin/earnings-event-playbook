@@ -9,7 +9,8 @@ Zero-dependency Python package and CLI. No API keys, no live market data, no bro
 ## First Look
 
 - Target user: a research operator who wants a local, deterministic checklist before earnings events.
-- Value in 2 minutes: open `demo/index.html`, `demo/playbook.md`, `demo/post-event-compare.md`, or `demo/handoff.md` to see scenario bands, source freshness, attention scores, actuals comparisons, thesis sensitivities, review queues, and cross-asset handoff packs.
+- Value in 2 minutes: open `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, or open `demo/index.html`, `demo/playbook.md`, `demo/post-event-compare.md`, and `demo/handoff.md` to see the generated review artifacts.
+- Tutorial CTA: run `earnings-event-playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json` to regenerate the ordered software case packet.
 - Multi-case fixture gallery: open `demo/fixture-gallery.md` or `demo/fixture-gallery.json` to compare the software, retail, and semiconductor case fixtures.
 - Star reason: useful as a public, dependency-free template for finance research artifacts with explicit safety boundaries and release evidence.
 
@@ -23,6 +24,7 @@ earnings-event-playbook compare-post-event --before-playbook demo/playbook.json 
 earnings-event-playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 earnings-event-playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json
 earnings-event-playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json
+earnings-event-playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json
 earnings-event-playbook selfcheck
 ```
 
@@ -35,9 +37,10 @@ PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-pla
 PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json
 PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json
+PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json
 ```
 
-Open `demo/index.html` in a browser for the static preview, or read `demo/playbook.md`, `demo/playbook.json`, `demo/post-event-compare.md`, `demo/post-event-compare.json`, `demo/visual-receipt.md`, `demo/visual-receipt.json`, `demo/handoff.md`, and `demo/handoff.json`.
+Open `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, open `demo/index.html` in a browser for the static preview, or read `demo/playbook.md`, `demo/playbook.json`, `demo/post-event-compare.md`, `demo/post-event-compare.json`, `demo/visual-receipt.md`, `demo/visual-receipt.json`, `demo/handoff.md`, and `demo/handoff.json`.
 
 Expected output: a review packet for the bundled EXM and NXT example events with beat/base/miss exposure bands, stale-source warnings, risk questions, and deterministic JSON for downstream local tooling.
 
@@ -56,6 +59,7 @@ Expected output: a review packet for the bundled EXM and NXT example events with
 - Cross-asset handoff packs for thesis-ledger and earnings-call-risk-map style workflows.
 - Optional evidence artifact hashes carried from a local visual receipt.
 - Multi-case fixture gallery summaries for checked-in case directories.
+- Deterministic tutorial packets with ordered commands, expected artifact paths, reviewer checklist, maturity rubric evidence, and safety boundaries.
 
 ## Examples
 
@@ -125,6 +129,17 @@ PYTHONPATH=src python -m earnings_event_playbook fixture-gallery \
 
 The gallery summarizes tickers, event counts, stale sources, high attention scores, post-event fixture availability, supported demo commands, and safety boundaries for each case.
 
+Generate the software case tutorial packet:
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle \
+  --case examples/cases/software \
+  --out demo/tutorial-bundle.md \
+  --json-out demo/tutorial-bundle.json
+```
+
+The packet lists the tutorial article, static fixtures, ordered commands from playbook through fixture gallery, expected artifact paths, reviewer checklist, maturity rubric evidence, and no-advice safety boundaries.
+
 ## Safety Boundaries
 
 This project is a local research organization tool.
@@ -149,6 +164,8 @@ It is intentionally not a trading bot, data vendor client, portfolio optimizer, 
 `handoff.json` contains `schema_version`, `artifact`, `workflows`, safety boundaries, and `handoff_packs` with ticker, company, fiscal period, source freshness, event source, actual source, review status, open review items, thesis note draft, risk map prompts, catalyst follow-up, and evidence artifact hashes when `--visual-receipt` is provided.
 
 `fixture-gallery.json` contains `schema_version`, `artifact`, summary counts, root-level safety boundaries, and `cases` with tickers, event count, stale source labels, high attention scores, post-event availability, supported demo commands, and per-case safety boundaries.
+
+`tutorial-bundle.json` contains `schema_version`, `artifact`, `case_id`, fixture paths, ordered commands, expected artifacts, reviewer checklist, maturity rubric evidence, and safety boundaries.
 
 The parser is intentionally small and strict so fixture errors fail early.
 

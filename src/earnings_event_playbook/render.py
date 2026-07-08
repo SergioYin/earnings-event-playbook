@@ -48,6 +48,62 @@ VISUAL_RECEIPT_REGENERATION_COMMANDS = [
 
 VISUAL_RECEIPT_SUFFIXES = {".html", ".md", ".json"}
 
+TUTORIAL_REVIEWER_CHECKLIST = [
+    "Confirm the static fixture paths are local files under examples/cases.",
+    "Regenerate the case playbook and compare Markdown against the JSON outputs.",
+    "Open the visual receipt and confirm expected artifact roles, sizes, and SHA-256 hashes are present.",
+    "Review the handoff pack for open review items, thesis-note draft language, risk-map prompts, and evidence hashes.",
+    "Refresh the fixture gallery and confirm the software case is represented with post-event actuals available.",
+    "Confirm all outputs remain descriptive research review artifacts with no buy, sell, hold, allocation, or order language.",
+]
+
+TUTORIAL_MATURITY_RUBRIC = [
+    {
+        "area": "cold-user path",
+        "evidence": [
+            "one tutorial article",
+            "one deterministic tutorial bundle",
+            "ordered commands from fixtures through review artifacts",
+        ],
+    },
+    {
+        "area": "artifact traceability",
+        "evidence": [
+            "Markdown and JSON playbook outputs",
+            "post-event comparison outputs",
+            "visual receipt hashes",
+            "handoff evidence references",
+        ],
+    },
+    {
+        "area": "public package boundary",
+        "evidence": [
+            "zero runtime dependencies",
+            "local static fixtures only",
+            "no workflow files",
+            "selfcheck private-marker scan",
+        ],
+    },
+    {
+        "area": "safety language",
+        "evidence": [
+            "no live market data",
+            "no broker connection",
+            "no order placement",
+            "no personalized investment, legal, tax, accounting, buy, sell, or hold advice",
+        ],
+    },
+]
+
+TUTORIAL_SAFETY_BOUNDARIES = [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, or hold advice",
+    "descriptive research review only",
+]
+
 
 def playbooks_to_dict(playbooks: Iterable[EventPlaybook]) -> dict:
     items = [item.to_dict() for item in playbooks]
@@ -117,6 +173,155 @@ def render_fixture_gallery_markdown(gallery: CaseGallery) -> str:
             lines.extend(["```bash", command, "```", ""])
     lines.extend(["## Safety Boundaries", ""])
     lines.extend(f"- {item}" for item in data["safety_boundaries"])
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def build_tutorial_bundle(case_id: str, case_path: str, output_root: str, has_actuals: bool) -> dict:
+    case_output_root = f"{output_root}/cases/{case_id}"
+    static_fixtures = [
+        f"{case_path}/events.json",
+        f"{case_path}/portfolio.json",
+    ]
+    if has_actuals:
+        static_fixtures.append(f"{case_path}/actuals.json")
+    commands = [
+        {
+            "step": 1,
+            "name": "build case playbook",
+            "command": (
+                "PYTHONPATH=src python -m earnings_event_playbook build-playbook "
+                f"--events {case_path}/events.json --portfolio {case_path}/portfolio.json "
+                f"--out {case_output_root}/playbook.md --json-out {case_output_root}/playbook.json"
+            ),
+            "expected_artifacts": [
+                f"{case_output_root}/playbook.md",
+                f"{case_output_root}/playbook.json",
+            ],
+        },
+        {
+            "step": 2,
+            "name": "compare post-event actuals",
+            "command": (
+                "PYTHONPATH=src python -m earnings_event_playbook compare-post-event "
+                f"--before-playbook {case_output_root}/playbook.json --actuals {case_path}/actuals.json "
+                f"--out {case_output_root}/post-event-compare.md "
+                f"--json-out {case_output_root}/post-event-compare.json"
+            ),
+            "expected_artifacts": [
+                f"{case_output_root}/post-event-compare.md",
+                f"{case_output_root}/post-event-compare.json",
+            ],
+            "requires_actuals_fixture": True,
+        },
+        {
+            "step": 3,
+            "name": "create visual receipt",
+            "command": (
+                "PYTHONPATH=src python -m earnings_event_playbook visual-receipt "
+                f"--artifacts {case_output_root} --out {case_output_root}/visual-receipt.md "
+                f"--json-out {case_output_root}/visual-receipt.json"
+            ),
+            "expected_artifacts": [
+                f"{case_output_root}/visual-receipt.md",
+                f"{case_output_root}/visual-receipt.json",
+            ],
+        },
+        {
+            "step": 4,
+            "name": "export handoff pack",
+            "command": (
+                "PYTHONPATH=src python -m earnings_event_playbook export-handoff "
+                f"--playbook {case_output_root}/playbook.json "
+                f"--post-event-compare {case_output_root}/post-event-compare.json "
+                f"--visual-receipt {case_output_root}/visual-receipt.json "
+                f"--out {case_output_root}/handoff.md --json-out {case_output_root}/handoff.json"
+            ),
+            "expected_artifacts": [
+                f"{case_output_root}/handoff.md",
+                f"{case_output_root}/handoff.json",
+            ],
+        },
+        {
+            "step": 5,
+            "name": "refresh fixture gallery",
+            "command": (
+                "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery "
+                "--cases examples/cases/software examples/cases/retail examples/cases/semiconductor "
+                f"--out {output_root}/fixture-gallery.md --json-out {output_root}/fixture-gallery.json"
+            ),
+            "expected_artifacts": [
+                f"{output_root}/fixture-gallery.md",
+                f"{output_root}/fixture-gallery.json",
+            ],
+        },
+    ]
+    if not has_actuals:
+        commands[1]["status"] = "skipped-until-actuals-fixture-exists"
+        commands[3]["status"] = "skipped-until-post-event-compare-exists"
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "tutorial-bundle",
+        "case_id": case_id,
+        "case_path": case_path,
+        "output_root": output_root,
+        "tutorial_article": "docs/tutorial-software-case.md",
+        "static_fixtures": static_fixtures,
+        "ordered_commands": commands,
+        "reviewer_checklist": TUTORIAL_REVIEWER_CHECKLIST,
+        "maturity_rubric_evidence": TUTORIAL_MATURITY_RUBRIC,
+        "safety_boundaries": TUTORIAL_SAFETY_BOUNDARIES,
+    }
+
+
+def render_tutorial_bundle_json(bundle: dict) -> str:
+    return json.dumps(bundle, indent=2, sort_keys=True) + "\n"
+
+
+def render_tutorial_bundle_markdown(bundle: dict) -> str:
+    lines: List[str] = [
+        f"# Tutorial Bundle: {bundle['case_id']}",
+        "",
+        "> Deterministic tutorial packet for local static fixtures. Descriptive research review only; no live data, broker connection, orders, or personalized investment, legal, tax, accounting, buy, sell, or hold advice.",
+        "",
+        "## Scope",
+        "",
+        f"- Case: `{bundle['case_id']}`",
+        f"- Case fixtures: `{bundle['case_path']}`",
+        f"- Output root: `{bundle['output_root']}`",
+        f"- Tutorial article: `{bundle['tutorial_article']}`",
+        "",
+        "## Static Fixtures",
+        "",
+    ]
+    lines.extend(f"- `{path}`" for path in bundle["static_fixtures"])
+    lines.extend(["", "## Ordered Commands", ""])
+    for command in bundle["ordered_commands"]:
+        lines.extend(
+            [
+                f"### {command['step']}. {command['name']}",
+                "",
+                "```bash",
+                command["command"],
+                "```",
+                "",
+                "Expected artifacts:",
+            ]
+        )
+        lines.extend(f"- `{path}`" for path in command["expected_artifacts"])
+        if "status" in command:
+            lines.append(f"- Status: `{command['status']}`")
+        lines.append("")
+    lines.extend(["## Reviewer Checklist", ""])
+    lines.extend(f"- [ ] {item}" for item in bundle["reviewer_checklist"])
+    lines.extend(["", "## Maturity Rubric Evidence", ""])
+    for item in bundle["maturity_rubric_evidence"]:
+        lines.append(f"### {item['area']}")
+        lines.append("")
+        lines.extend(f"- {evidence}" for evidence in item["evidence"])
+        lines.append("")
+    lines.extend(["## Safety Boundaries", ""])
+    lines.extend(f"- {item}" for item in bundle["safety_boundaries"])
     return "\n".join(lines).rstrip() + "\n"
 
 

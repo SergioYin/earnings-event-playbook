@@ -46,6 +46,14 @@ PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases example
 
 The gallery compares cases by tickers, event count, stale source labels, high attention scores, post-event availability, supported demo commands, and safety boundaries.
 
+`tutorial-bundle` writes a deterministic Markdown and JSON reviewer packet for one checked-in case under `examples/cases`.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json
+```
+
+The tutorial bundle records the tutorial article path, static fixture paths, ordered commands from case playbook through fixture gallery, expected artifact paths, reviewer checklist, maturity rubric evidence, and no-advice safety boundaries. It is a planning and review packet; it does not execute the ordered commands.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -62,6 +70,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Visual receipt output is deterministic and records file hashes for local demo review evidence.
 - Handoff output is deterministic and carries optional receipt hashes for local evidence traceability.
 - Fixture gallery output is deterministic and only scans local public case fixture directories.
+- Tutorial bundle output is deterministic and only references local public case fixture directories.
 
 ## Boundary
 

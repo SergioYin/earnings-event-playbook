@@ -6,7 +6,7 @@
 
 - Handoff packs: 2
 - Open review items: 9
-- Evidence hashes attached: 40
+- Evidence hashes attached: 44
 
 ## Workflows
 
@@ -71,6 +71,8 @@ EXM FY2026 Q2 handoff: review status needs-review. EPS band beat; revenue band b
 | `demo/portfolio.json` | input-fixture | 442 | `552f2e7c3fec4cd7bc32b642eec760706200adb3d567225dcb15fa981f299e00` |
 | `demo/post-event-compare.json` | post-event-json | 5099 | `72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79` |
 | `demo/post-event-compare.md` | post-event-markdown | 3035 | `a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb` |
+| `demo/tutorial-bundle.json` | json-artifact | 4704 | `08b39909a94d0b96c347f5b60186681c9a892644177eb230683c0e4786fb6b63` |
+| `demo/tutorial-bundle.md` | markdown-artifact | 4002 | `7f5cd3d252e0ec61bfe07762f023bed72dc029200fd9ac461e33dc74170aedfc` |
 
 ## NXT - Next Retail Group
 
@@ -131,3 +133,5 @@ NXT FY2026 Q1 handoff: review status needs-review. EPS band base; revenue band b
 | `demo/portfolio.json` | input-fixture | 442 | `552f2e7c3fec4cd7bc32b642eec760706200adb3d567225dcb15fa981f299e00` |
 | `demo/post-event-compare.json` | post-event-json | 5099 | `72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79` |
 | `demo/post-event-compare.md` | post-event-markdown | 3035 | `a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb` |
+| `demo/tutorial-bundle.json` | json-artifact | 4704 | `08b39909a94d0b96c347f5b60186681c9a892644177eb230683c0e4786fb6b63` |
+| `demo/tutorial-bundle.md` | markdown-artifact | 4002 | `7f5cd3d252e0ec61bfe07762f023bed72dc029200fd9ac461e33dc74170aedfc` |

@@ -158,6 +158,20 @@
           "role": "post-event-markdown",
           "sha256": "a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb",
           "size_bytes": 3035
+        },
+        {
+          "media_type": "application/json",
+          "path": "demo/tutorial-bundle.json",
+          "role": "json-artifact",
+          "sha256": "08b39909a94d0b96c347f5b60186681c9a892644177eb230683c0e4786fb6b63",
+          "size_bytes": 4704
+        },
+        {
+          "media_type": "text/markdown",
+          "path": "demo/tutorial-bundle.md",
+          "role": "markdown-artifact",
+          "sha256": "7f5cd3d252e0ec61bfe07762f023bed72dc029200fd9ac461e33dc74170aedfc",
+          "size_bytes": 4002
         }
       ],
       "fiscal_period": "FY2026 Q2",
@@ -336,6 +350,20 @@
           "role": "post-event-markdown",
           "sha256": "a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb",
           "size_bytes": 3035
+        },
+        {
+          "media_type": "application/json",
+          "path": "demo/tutorial-bundle.json",
+          "role": "json-artifact",
+          "sha256": "08b39909a94d0b96c347f5b60186681c9a892644177eb230683c0e4786fb6b63",
+          "size_bytes": 4704
+        },
+        {
+          "media_type": "text/markdown",
+          "path": "demo/tutorial-bundle.md",
+          "role": "markdown-artifact",
+          "sha256": "7f5cd3d252e0ec61bfe07762f023bed72dc029200fd9ac461e33dc74170aedfc",
+          "size_bytes": 4002
         }
       ],
       "fiscal_period": "FY2026 Q1",

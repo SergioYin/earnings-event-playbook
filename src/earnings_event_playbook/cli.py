@@ -17,6 +17,7 @@ from .models import (
     parse_visual_receipt_hashes,
 )
 from .render import (
+    build_tutorial_bundle,
     build_visual_receipt,
     render_handoff_json,
     render_handoff_markdown,
@@ -27,6 +28,8 @@ from .render import (
     render_markdown,
     render_post_event_json,
     render_post_event_markdown,
+    render_tutorial_bundle_json,
+    render_tutorial_bundle_markdown,
     render_visual_receipt_json,
     render_visual_receipt_markdown,
 )
@@ -81,6 +84,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     gallery.add_argument("--out", required=True, type=Path)
     gallery.add_argument("--json-out", required=True, type=Path)
 
+    tutorial = subparsers.add_parser(
+        "tutorial-bundle", help="Build a deterministic tutorial packet for one local case fixture."
+    )
+    tutorial.add_argument("--case", required=True, type=Path)
+    tutorial.add_argument("--out", required=True, type=Path)
+    tutorial.add_argument("--json-out", required=True, type=Path)
+    tutorial.add_argument("--output-root", default="demo", help="Artifact root shown in ordered tutorial commands.")
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -97,6 +108,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _export_handoff(args.playbook, args.post_event_compare, args.out, args.json_out, args.visual_receipt)
         if args.command == "fixture-gallery":
             return _fixture_gallery(args.cases, args.out, args.json_out)
+        if args.command == "tutorial-bundle":
+            return _tutorial_bundle(args.case, args.out, args.json_out, args.output_root)
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -210,6 +223,35 @@ def _fixture_gallery(case_dirs: Sequence[Path], out_path: Path, json_path: Path)
     gallery = build_fixture_gallery(case_inputs)
     write_text(out_path, render_fixture_gallery_markdown(gallery))
     write_text(json_path, render_fixture_gallery_json(gallery))
+    return 0
+
+
+def _tutorial_bundle(case_dir: Path, out_path: Path, json_path: Path, output_root: str) -> int:
+    project_root = _project_root()
+    cases_root = (project_root / "examples" / "cases").resolve()
+    resolved = case_dir.resolve()
+    if not resolved.is_dir():
+        raise ValueError(f"{case_dir} must be a case directory")
+    try:
+        case_path = resolved.relative_to(project_root).as_posix()
+        resolved.relative_to(cases_root)
+    except ValueError as exc:
+        raise ValueError(f"{case_dir} must be under examples/cases") from exc
+    events_path = resolved / "events.json"
+    portfolio_path = resolved / "portfolio.json"
+    actuals_path = resolved / "actuals.json"
+    if not events_path.exists():
+        raise ValueError(f"{case_dir} is missing events.json")
+    if not portfolio_path.exists():
+        raise ValueError(f"{case_dir} is missing portfolio.json")
+    parse_events_fixture(read_json(events_path))
+    parse_portfolio_fixture(read_json(portfolio_path))
+    has_actuals = actuals_path.exists()
+    if has_actuals:
+        parse_actuals_fixture(read_json(actuals_path))
+    bundle = build_tutorial_bundle(resolved.name, case_path, output_root.rstrip("/"), has_actuals)
+    write_text(out_path, render_tutorial_bundle_markdown(bundle))
+    write_text(json_path, render_tutorial_bundle_json(bundle))
     return 0
 
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- Added `tutorial-bundle` CLI command for deterministic case-study reviewer packets with ordered commands, expected artifact paths, reviewer checklist, maturity rubric evidence, and no-advice safety boundaries.
+- Added `docs/tutorial-software-case.md` walkthrough from static software fixtures to playbook, post-event compare, visual receipt, handoff, fixture gallery, and tutorial packet.
+- Added checked-in `demo/tutorial-bundle.md` and `demo/tutorial-bundle.json`, README first-screen tutorial CTA, docs, release evidence, manifest updates, agent skill updates, and CLI tests.
+
 ## 0.5.0
 
 - Added `fixture-gallery` CLI command for comparing multiple local case fixture directories under `examples/cases`.

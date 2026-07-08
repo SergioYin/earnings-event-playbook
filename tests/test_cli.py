@@ -91,6 +91,46 @@ def test_cli_fixture_gallery(tmp_path):
     assert all("fixture-gallery" not in command for case in data["cases"] for command in case["supported_demo_commands"])
 
 
+def test_cli_tutorial_bundle(tmp_path):
+    out = tmp_path / "tutorial-bundle.md"
+    json_out = tmp_path / "tutorial-bundle.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "tutorial-bundle",
+            "--case",
+            "examples/cases/software",
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert "Tutorial Bundle: software" in text
+    assert data["artifact"] == "tutorial-bundle"
+    assert data["case_id"] == "software"
+    assert data["tutorial_article"] == "docs/tutorial-software-case.md"
+    assert [item["step"] for item in data["ordered_commands"]] == [1, 2, 3, 4, 5]
+    assert data["ordered_commands"][0]["expected_artifacts"] == [
+        "demo/cases/software/playbook.md",
+        "demo/cases/software/playbook.json",
+    ]
+    assert "compare-post-event" in data["ordered_commands"][1]["command"]
+    assert "visual-receipt" in data["ordered_commands"][2]["command"]
+    assert "export-handoff" in data["ordered_commands"][3]["command"]
+    assert "fixture-gallery" in data["ordered_commands"][4]["command"]
+    assert data["reviewer_checklist"]
+    assert data["maturity_rubric_evidence"]
+    assert any("no broker connection" == item for item in data["safety_boundaries"])
+
+
 def test_cli_compare_post_event(tmp_path):
     playbook_json = tmp_path / "playbook.json"
     subprocess.run(

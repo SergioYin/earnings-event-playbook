@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.0
+
+- Added `portfolio-drift-bridge` CLI command for bridging portfolio fixture exposure, scenario notebook JSON, post-event compare JSON, and optional static risk thresholds into Markdown and JSON drift packets.
+- Added checked-in `examples/risk-thresholds.json`, `demo/portfolio-drift-bridge.md`, and `demo/portfolio-drift-bridge.json` covering exposure concentration, event-linked tickers, scenario mismatch alerts, post-event drift watchlist, next risk review prompts, and no-trade safety boundaries.
+- Updated README, usage docs, showcase docs, release evidence, release manifest, agent skill, demo bundle generation, version metadata, and tests.
+
 ## 0.8.0
 
 - Added `scenario-notebook` CLI command for combining playbook JSON, handoff JSON, fixture gallery JSON, and optional tutorial/showcase manifests into Markdown and JSON reviewer notebooks.

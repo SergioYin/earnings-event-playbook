@@ -12,7 +12,7 @@ PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showca
 
 `demo-bundle --out demo` also writes the showcase artifacts before creating the visual receipt, so receipt hashes include the landing page and manifest.
 
-The same demo bundle also writes `demo/scenario-notebook.md` and `demo/scenario-notebook.json` after the playbook, handoff, fixture gallery, tutorial bundle, and showcase manifest exist.
+The same demo bundle also writes `demo/scenario-notebook.md`, `demo/scenario-notebook.json`, `demo/portfolio-drift-bridge.md`, and `demo/portfolio-drift-bridge.json` after the playbook, handoff, fixture gallery, tutorial bundle, and showcase manifest exist.
 
 ## Manifest Coverage
 
@@ -21,7 +21,7 @@ The same demo bundle also writes `demo/scenario-notebook.md` and `demo/scenario-
 - Value proposition for local earnings-event review artifacts.
 - Quickstart commands for demo bundle, showcase, fixture gallery, tutorial bundle, and selfcheck.
 - Demo artifact links for showcase, playbook, post-event compare, visual receipt, handoff, gallery, and tutorial outputs.
-- Scenario notebook link and release evidence for the combined reviewer packet.
+- Scenario notebook and portfolio drift bridge links with release evidence for the combined reviewer and exposure-drift packets.
 - Release evidence for docs, manifest, public hygiene, tests, and package boundary.
 - Maturity rubric entries for cold-user clarity, artifact completeness, package hygiene, and safety posture.
 - Case gallery highlights for software, retail, and semiconductor fixtures.
@@ -39,6 +39,16 @@ PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook de
 
 The notebook contains thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, fixture gallery snapshot, optional manifest snapshot, risk boundary checklist, reusable agent prompts, and safety boundaries.
 
+## Portfolio Drift Bridge
+
+`portfolio-drift-bridge` turns the static portfolio fixture, scenario notebook JSON, post-event compare JSON, and optional static thresholds into one bridge packet.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
+```
+
+The bridge contains exposure concentration, event-linked tickers, scenario mismatch alerts, post-event drift watchlist rows, next risk review prompts, threshold values, no-trade safety boundaries, and local-only safety boundaries.
+
 ## Safety Boundaries
 
 - Local static fixtures only.
@@ -53,6 +63,7 @@ The notebook contains thesis assumptions, scenario bands, source freshness, evid
 - Open `demo/showcase.html` directly in a browser and confirm it renders without JavaScript.
 - Compare `demo/showcase.json` against the page sections.
 - Compare `demo/scenario-notebook.json` against the notebook sections.
+- Compare `demo/portfolio-drift-bridge.json` against the bridge sections.
 - Confirm links point only at checked-in docs and demo artifacts.
 - Run `PYTHONPATH=src python -m earnings_event_playbook selfcheck`.
 - Run the test suite before release.

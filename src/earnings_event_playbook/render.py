@@ -140,6 +140,12 @@ def build_showcase_manifest() -> dict:
             "--manifest demo/tutorial-bundle.json demo/showcase.json "
             "--out demo/scenario-notebook.md --json-out demo/scenario-notebook.json"
         ),
+        (
+            "PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge "
+            "--portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json "
+            "--post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json "
+            "--out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json"
+        ),
         "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
     ]
     return {
@@ -150,7 +156,7 @@ def build_showcase_manifest() -> dict:
         "tagline": "Zero-dependency local earnings-event research artifacts with static demo evidence.",
         "value_proposition": [
             "Turns local earnings-calendar, consensus, portfolio, and actuals fixtures into Markdown, JSON, and static HTML review artifacts.",
-            "Gives a cold reviewer a complete path from fixtures to playbook, post-event compare, visual receipt, handoff pack, case gallery, and tutorial packet.",
+            "Gives a cold reviewer a complete path from fixtures to playbook, post-event compare, visual receipt, handoff pack, case gallery, tutorial packet, scenario notebook, and portfolio drift bridge.",
             "Keeps the package auditable: no runtime dependencies, no network clients, no workflow files, and deterministic outputs.",
         ],
         "quickstart_commands": quickstart,
@@ -166,12 +172,14 @@ def build_showcase_manifest() -> dict:
             {"label": "Fixture gallery", "path": "demo/fixture-gallery.md", "role": "multi-case comparison"},
             {"label": "Tutorial bundle", "path": "demo/tutorial-bundle.md", "role": "ordered reviewer packet"},
             {"label": "Scenario notebook", "path": "demo/scenario-notebook.md", "role": "combined reviewer notebook"},
+            {"label": "Portfolio drift bridge", "path": "demo/portfolio-drift-bridge.md", "role": "exposure and post-event drift bridge"},
         ],
         "release_evidence": [
             "README first screen names the target user, quickstart, demo path, and star reason.",
             "docs/release-readiness.md records verification commands, asset inventory, risk boundaries, and maturity status.",
             "release_manifest.json lists generated artifacts, verification commands, zero runtime dependencies, and workflow absence.",
             "demo/scenario-notebook.md and demo/scenario-notebook.json combine playbook, handoff, gallery, tutorial, and showcase evidence for reviewers.",
+            "demo/portfolio-drift-bridge.md and demo/portfolio-drift-bridge.json bridge portfolio exposure, scenario notebook mismatches, post-event drift, risk prompts, and no-trade boundaries.",
             "selfcheck scans public package files for private markers and verifies workflow absence.",
             "pytest and unittest cover parsing, scoring, rendering, CLI outputs, public hygiene, and smoke import behavior.",
         ],
@@ -203,12 +211,14 @@ def build_showcase_manifest() -> dict:
             "Run tutorial-bundle for examples/cases/software.",
             "Regenerate the software playbook, post-event compare, visual receipt, handoff, and fixture gallery commands listed in the bundle.",
             "Run scenario-notebook to combine playbook, handoff, gallery, tutorial, and showcase artifacts.",
+            "Run portfolio-drift-bridge to connect scenario mismatches and post-event drift back to static portfolio exposure.",
             "Use demo/tutorial-bundle.json as the machine-readable reviewer checklist.",
         ],
         "risk_boundaries": SHOWCASE_SAFETY_BOUNDARIES,
         "star_worthy_differentiation": [
             "A small public package that demonstrates release-grade evidence around a domain-specific CLI, not just a one-off script.",
             "Every major artifact has a human-readable form and a deterministic JSON form for local downstream tooling.",
+            "The portfolio drift bridge adds exposure concentration and post-event watchlists without crossing into trading advice or order workflows.",
             "The showcase page is self-contained HTML with no JavaScript, server, network, database, credentials, or data-vendor setup.",
             "The repository models a careful public boundary for finance-adjacent tooling without presenting itself as a trading system.",
         ],
@@ -435,6 +445,90 @@ def render_scenario_notebook_markdown(notebook: dict) -> str:
         lines.extend([f"### {item['name']}", "", item["prompt"], ""])
     lines.extend(["## Safety Boundaries", ""])
     lines.extend(f"- {item}" for item in notebook["safety_boundaries"])
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def render_portfolio_drift_bridge_json(packet: dict) -> str:
+    return json.dumps(packet, indent=2, sort_keys=True) + "\n"
+
+
+def render_portfolio_drift_bridge_markdown(packet: dict) -> str:
+    summary = packet["summary"]
+    lines: List[str] = [
+        "# Portfolio Drift Bridge",
+        "",
+        "> Local static portfolio drift review packet. No live data, broker connection, order placement, or personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice.",
+        "",
+        "## Summary",
+        "",
+        f"- Positions: {summary['position_count']}",
+        f"- Event-linked tickers: {summary['event_linked_ticker_count']}",
+        f"- Scenario mismatch alerts: {summary['scenario_mismatch_alert_count']}",
+        f"- Post-event drift watchlist: {summary['post_event_drift_watch_count']}",
+        f"- Total absolute exposure: {_fmt_number(summary['total_abs_exposure'])}",
+        f"- Top exposure ticker: {summary['top_exposure_ticker'] or 'None'}",
+        "",
+        "## Thresholds",
+        "",
+    ]
+    for key, value in packet["thresholds"].items():
+        lines.append(f"- `{key}`: {value}")
+    lines.extend(
+        [
+            "",
+            "## Exposure Concentration",
+            "",
+            "| Ticker | Exposure | Weight | Exposure share | Event-linked | Flags |",
+            "| --- | ---: | ---: | ---: | --- | --- |",
+        ]
+    )
+    for item in packet["exposure_concentration"]:
+        lines.append(
+            f"| {item['ticker']} | {item['exposure']:.2f} | {item['portfolio_weight_percent']:.2f}% | "
+            f"{item['exposure_share_percent']:.2f}% | {_yes_no(item['event_linked'])} | {_bridge_list(item['flags'])} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Event-Linked Tickers",
+            "",
+            "| Ticker | Company | Fiscal period | Exposure | Weight | Freshness | Review status |",
+            "| --- | --- | --- | ---: | ---: | --- | --- |",
+        ]
+    )
+    for item in packet["event_linked_tickers"]:
+        lines.append(
+            f"| {item['ticker']} | {item['company']} | {item['fiscal_period']} | {item['exposure']:.2f} | "
+            f"{item['portfolio_weight_percent']:.2f}% | {item['source_freshness'] or 'not provided'} | "
+            f"{item['review_status']} |"
+        )
+    lines.extend(["", "## Scenario Mismatch Alerts", ""])
+    if packet["scenario_mismatch_alerts"]:
+        lines.extend(["| Ticker | Fiscal period | EPS | Revenue | Move | Review status | Reasons |", "| --- | --- | --- | --- | --- | --- | --- |"])
+        for item in packet["scenario_mismatch_alerts"]:
+            lines.append(
+                f"| {item['ticker']} | {item['fiscal_period']} | {item['eps_band']} | {item['revenue_band']} | "
+                f"{item['move_scenario']} | {item['review_status']} | {_bridge_list(item['reasons'])} |"
+            )
+    else:
+        lines.append("- None.")
+    lines.extend(["", "## Post-Event Drift Watchlist", ""])
+    if packet["post_event_drift_watchlist"]:
+        lines.extend(["| Ticker | Fiscal period | Actual move | Exposure | Estimated drift | Scenario | Triggers |", "| --- | --- | ---: | ---: | ---: | --- | --- |"])
+        for item in packet["post_event_drift_watchlist"]:
+            lines.append(
+                f"| {item['ticker']} | {item['fiscal_period']} | {item['actual_move_percent']:.2f}% | "
+                f"{item['position_exposure']:.2f} | {item['estimated_exposure_drift']:.2f} | "
+                f"{item['matched_scenario']} | {_bridge_list(item['triggers'])} |"
+            )
+    else:
+        lines.append("- None.")
+    lines.extend(["", "## Next Risk Review Prompts", ""])
+    lines.extend(f"- [ ] {item}" for item in packet["next_risk_review_prompts"])
+    lines.extend(["", "## No-Trade Safety Boundaries", ""])
+    lines.extend(f"- {item}" for item in packet["no_trade_safety_boundaries"])
+    lines.extend(["", "## Safety Boundaries", ""])
+    lines.extend(f"- {item}" for item in packet["safety_boundaries"])
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -934,6 +1028,7 @@ def _is_visual_artifact(path: Path) -> bool:
         and not path.name.startswith("visual-receipt.")
         and not path.name.startswith("handoff.")
         and not path.name.startswith("scenario-notebook.")
+        and not path.name.startswith("portfolio-drift-bridge.")
     )
 
 
@@ -1199,6 +1294,14 @@ def _fmt_date_or_none(value) -> str:
     if value is None:
         return "not provided"
     return value.isoformat()
+
+
+def _yes_no(value: bool) -> str:
+    return "yes" if value else "no"
+
+
+def _bridge_list(items: List[str]) -> str:
+    return ", ".join(items) if items else "None"
 
 
 def _gallery_list(items: List[str]) -> str:

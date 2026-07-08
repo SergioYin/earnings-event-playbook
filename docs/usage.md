@@ -28,7 +28,7 @@ PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 ```
 
-Receipt, handoff, and scenario notebook outputs are excluded from the receipt inventory so repeated runs remain deterministic and avoid circular hashes.
+Receipt, handoff, scenario notebook, and portfolio drift bridge outputs are excluded from the receipt inventory so repeated runs remain deterministic and avoid circular hashes.
 
 `export-handoff` reads generated playbook JSON and post-event compare JSON, then writes thesis-ledger and earnings-call-risk-map style Markdown and JSON handoff packs.
 
@@ -70,6 +70,14 @@ PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook de
 
 The notebook covers thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, fixture gallery summary, optional manifest summary, risk boundary checklist, reusable agent prompts, and safety boundaries. It is a reviewer artifact; it does not fetch data, execute manifests, or provide action recommendations.
 
+`portfolio-drift-bridge` reads a portfolio fixture, scenario notebook JSON, post-event compare JSON, and optional static risk threshold JSON, then writes Markdown and JSON portfolio drift bridge packets.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
+```
+
+`--risk-thresholds` is optional. When provided, it must be a local static JSON object with a `thresholds` object such as `examples/risk-thresholds.json`. The output covers exposure concentration, event-linked tickers, scenario mismatch alerts, post-event drift watchlist rows, next risk review prompts, threshold values, and no-trade safety boundaries. It does not fetch data, connect to brokers, place orders, or provide action recommendations.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -89,6 +97,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Tutorial bundle output is deterministic and only references local public case fixture directories.
 - Showcase output is deterministic, self-contained, and does not require JavaScript or a server.
 - Scenario notebook output is deterministic and combines existing local generated artifacts without executing external workflows.
+- Portfolio drift bridge output is deterministic and combines local portfolio, scenario notebook, post-event compare, and optional static threshold artifacts without executing trades or external workflows.
 
 ## Boundary
 

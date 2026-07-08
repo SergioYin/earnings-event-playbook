@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import List
+from typing import Any, Mapping, List
 
 from .models import (
     ActualsFixture,
@@ -31,6 +31,30 @@ GALLERY_SAFETY_BOUNDARIES = [
 ]
 
 HIGH_ATTENTION_THRESHOLD = 70
+
+PORTFOLIO_DRIFT_BRIDGE_SAFETY_BOUNDARIES = [
+    "local static fixtures and generated artifacts only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice",
+    "descriptive portfolio drift review only",
+]
+
+PORTFOLIO_DRIFT_BRIDGE_NO_TRADE_BOUNDARIES = [
+    "Do not treat concentration flags as trade instructions.",
+    "Do not convert scenario mismatch alerts into buy, sell, hold, hedge, rebalance, or allocation actions.",
+    "Do not place, route, stage, or simulate orders from this packet.",
+    "Do not use this packet without independent source review and suitability review outside this package.",
+]
+
+DEFAULT_PORTFOLIO_DRIFT_THRESHOLDS = {
+    "max_position_weight_percent": 5.0,
+    "max_exposure_share_percent": 35.0,
+    "post_event_move_watch_percent": 6.0,
+    "post_event_exposure_drift_amount": 1000.0,
+    "max_open_review_items": 6,
+}
 
 
 def freshness_label(as_of: date, source_date: date) -> str:
@@ -281,6 +305,283 @@ def build_handoff_packs(
             )
         )
     return packs
+
+
+def build_portfolio_drift_bridge(
+    portfolio_fixture: PortfolioFixture,
+    scenario_notebook: Mapping[str, Any],
+    post_event_compare: Mapping[str, Any],
+    thresholds: Mapping[str, Any] | None = None,
+) -> dict:
+    threshold_values = _portfolio_drift_thresholds(thresholds)
+    positions = sorted(portfolio_fixture.positions, key=lambda item: abs(item.exposure), reverse=True)
+    total_abs_exposure = sum(abs(item.exposure) for item in positions)
+    event_tickers = _bridge_event_tickers(scenario_notebook, post_event_compare)
+    comparisons = list(post_event_compare.get("comparisons", []))
+    comparison_by_ticker = {
+        str(item.get("event", {}).get("ticker", "")).upper(): item for item in comparisons if isinstance(item, Mapping)
+    }
+
+    exposure_concentration = [
+        _bridge_concentration_item(position, total_abs_exposure, event_tickers, threshold_values)
+        for position in positions
+    ]
+    event_linked_tickers = [
+        _bridge_event_linked_ticker(
+            ticker,
+            scenario_notebook,
+            comparison_by_ticker.get(ticker),
+            next((item for item in exposure_concentration if item["ticker"] == ticker), None),
+        )
+        for ticker in event_tickers
+    ]
+    mismatch_alerts = _bridge_scenario_mismatch_alerts(comparisons)
+    drift_watchlist = _bridge_post_event_drift_watchlist(
+        comparisons,
+        {item.ticker: item for item in portfolio_fixture.positions},
+        threshold_values,
+    )
+    next_prompts = _bridge_next_review_prompts(
+        scenario_notebook, event_linked_tickers, mismatch_alerts, drift_watchlist, threshold_values
+    )
+
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "portfolio-drift-bridge",
+        "inputs": {
+            "portfolio_as_of": portfolio_fixture.as_of.isoformat(),
+            "portfolio_base_currency": portfolio_fixture.base_currency,
+            "scenario_notebook_artifact": scenario_notebook.get("artifact", "scenario-notebook"),
+            "post_event_compare_artifact": post_event_compare.get("artifact", "post-event-compare"),
+            "threshold_source": "provided-static-json" if thresholds else "defaults",
+        },
+        "thresholds": threshold_values,
+        "summary": {
+            "position_count": len(positions),
+            "event_linked_ticker_count": len(event_linked_tickers),
+            "scenario_mismatch_alert_count": len(mismatch_alerts),
+            "post_event_drift_watch_count": len(drift_watchlist),
+            "total_abs_exposure": round(total_abs_exposure, 2),
+            "top_exposure_ticker": positions[0].ticker if positions else "",
+        },
+        "exposure_concentration": exposure_concentration,
+        "event_linked_tickers": event_linked_tickers,
+        "scenario_mismatch_alerts": mismatch_alerts,
+        "post_event_drift_watchlist": drift_watchlist,
+        "next_risk_review_prompts": next_prompts,
+        "no_trade_safety_boundaries": PORTFOLIO_DRIFT_BRIDGE_NO_TRADE_BOUNDARIES,
+        "safety_boundaries": PORTFOLIO_DRIFT_BRIDGE_SAFETY_BOUNDARIES,
+    }
+
+
+def _portfolio_drift_thresholds(thresholds: Mapping[str, Any] | None) -> dict:
+    values = dict(DEFAULT_PORTFOLIO_DRIFT_THRESHOLDS)
+    if thresholds is None:
+        return values
+    raw = thresholds.get("thresholds", thresholds)
+    if not isinstance(raw, Mapping):
+        raise ValueError("risk threshold JSON must be an object or contain a thresholds object")
+    for key in values:
+        if key not in raw:
+            continue
+        value = raw[key]
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"risk threshold {key} must be numeric")
+        values[key] = float(value)
+    values["max_open_review_items"] = int(values["max_open_review_items"])
+    return values
+
+
+def _bridge_event_tickers(scenario_notebook: Mapping[str, Any], post_event_compare: Mapping[str, Any]) -> List[str]:
+    tickers = {
+        str(item.get("ticker", "")).upper()
+        for item in scenario_notebook.get("thesis_assumptions", [])
+        if isinstance(item, Mapping) and item.get("ticker")
+    }
+    tickers.update(
+        str(item.get("ticker", "")).upper()
+        for item in scenario_notebook.get("scenario_bands", [])
+        if isinstance(item, Mapping) and item.get("ticker")
+    )
+    tickers.update(
+        str(item.get("event", {}).get("ticker", "")).upper()
+        for item in post_event_compare.get("comparisons", [])
+        if isinstance(item, Mapping) and isinstance(item.get("event"), Mapping) and item.get("event", {}).get("ticker")
+    )
+    return sorted(tickers)
+
+
+def _bridge_concentration_item(
+    position: Position,
+    total_abs_exposure: float,
+    event_tickers: List[str],
+    thresholds: Mapping[str, Any],
+) -> dict:
+    exposure_share = 0.0 if total_abs_exposure == 0 else abs(position.exposure) / total_abs_exposure * 100.0
+    flags = []
+    if position.portfolio_weight_percent >= thresholds["max_position_weight_percent"]:
+        flags.append("weight-threshold")
+    if exposure_share >= thresholds["max_exposure_share_percent"]:
+        flags.append("exposure-share-threshold")
+    if position.ticker in event_tickers:
+        flags.append("event-linked")
+    return {
+        "ticker": position.ticker,
+        "shares": position.shares,
+        "exposure": round(position.exposure, 2),
+        "portfolio_weight_percent": round(position.portfolio_weight_percent, 2),
+        "exposure_share_percent": round(exposure_share, 2),
+        "event_linked": position.ticker in event_tickers,
+        "flags": flags,
+        "notes": position.notes,
+    }
+
+
+def _bridge_event_linked_ticker(
+    ticker: str,
+    scenario_notebook: Mapping[str, Any],
+    comparison: Mapping[str, Any] | None,
+    concentration: Mapping[str, Any] | None,
+) -> dict:
+    assumption = next(
+        (
+            item
+            for item in scenario_notebook.get("thesis_assumptions", [])
+            if isinstance(item, Mapping) and str(item.get("ticker", "")).upper() == ticker
+        ),
+        {},
+    )
+    freshness = next(
+        (
+            item
+            for item in scenario_notebook.get("source_freshness", [])
+            if isinstance(item, Mapping) and str(item.get("ticker", "")).upper() == ticker
+        ),
+        {},
+    )
+    event_raw = comparison.get("event", {}) if isinstance(comparison, Mapping) else {}
+    return {
+        "ticker": ticker,
+        "company": assumption.get("company", event_raw.get("company", "")),
+        "fiscal_period": assumption.get("fiscal_period", event_raw.get("fiscal_period", "")),
+        "portfolio_weight_percent": concentration.get("portfolio_weight_percent", 0.0) if concentration else 0.0,
+        "exposure": concentration.get("exposure", 0.0) if concentration else 0.0,
+        "source_freshness": freshness.get("freshness", ""),
+        "review_status": comparison.get("review_status", "missing-post-event-compare") if comparison else "missing-post-event-compare",
+        "risk_questions": list(assumption.get("risk_questions", [])) if isinstance(assumption, Mapping) else [],
+    }
+
+
+def _bridge_scenario_mismatch_alerts(comparisons: List[Any]) -> List[dict]:
+    alerts = []
+    for item in comparisons:
+        if not isinstance(item, Mapping):
+            continue
+        event = item.get("event", {})
+        ticker = str(event.get("ticker", "")).upper() if isinstance(event, Mapping) else ""
+        fiscal_period = str(event.get("fiscal_period", "")) if isinstance(event, Mapping) else ""
+        eps_band = str(item.get("eps", {}).get("band", "not-comparable"))
+        revenue_band = str(item.get("revenue", {}).get("band", "not-comparable"))
+        move_band = str(item.get("move", {}).get("matched_scenario", "not-comparable"))
+        reasons = []
+        if "not-comparable" in {eps_band, revenue_band, move_band}:
+            reasons.append("comparison-not-comparable")
+        if eps_band != revenue_band and "not-comparable" not in {eps_band, revenue_band}:
+            reasons.append("eps-revenue-band-divergence")
+        if move_band not in {eps_band, revenue_band, "not-comparable"}:
+            reasons.append("move-fundamental-band-divergence")
+        if item.get("review_status") not in {"ready-for-ledger", "complete"}:
+            reasons.append(f"review-status:{item.get('review_status', 'missing')}")
+        if reasons:
+            alerts.append(
+                {
+                    "ticker": ticker,
+                    "fiscal_period": fiscal_period,
+                    "eps_band": eps_band,
+                    "revenue_band": revenue_band,
+                    "move_scenario": move_band,
+                    "review_status": item.get("review_status", ""),
+                    "reasons": reasons,
+                }
+            )
+    return alerts
+
+
+def _bridge_post_event_drift_watchlist(
+    comparisons: List[Any],
+    positions_by_ticker: Mapping[str, Position],
+    thresholds: Mapping[str, Any],
+) -> List[dict]:
+    watchlist = []
+    for item in comparisons:
+        if not isinstance(item, Mapping):
+            continue
+        event = item.get("event", {})
+        ticker = str(event.get("ticker", "")).upper() if isinstance(event, Mapping) else ""
+        position = positions_by_ticker.get(ticker)
+        move = item.get("move", {})
+        actual_move = move.get("actual_move_percent") if isinstance(move, Mapping) else None
+        if not isinstance(actual_move, (int, float)):
+            continue
+        exposure = position.exposure if position else 0.0
+        estimated_drift = round(exposure * float(actual_move) / 100.0, 2)
+        triggers = []
+        if abs(float(actual_move)) >= thresholds["post_event_move_watch_percent"]:
+            triggers.append("move-threshold")
+        if abs(estimated_drift) >= thresholds["post_event_exposure_drift_amount"]:
+            triggers.append("exposure-drift-threshold")
+        if triggers:
+            watchlist.append(
+                {
+                    "ticker": ticker,
+                    "fiscal_period": event.get("fiscal_period", "") if isinstance(event, Mapping) else "",
+                    "actual_move_percent": round(float(actual_move), 2),
+                    "position_exposure": round(exposure, 2),
+                    "estimated_exposure_drift": estimated_drift,
+                    "matched_scenario": move.get("matched_scenario", "") if isinstance(move, Mapping) else "",
+                    "triggers": triggers,
+                    "review_status": item.get("review_status", ""),
+                }
+            )
+    return watchlist
+
+
+def _bridge_next_review_prompts(
+    scenario_notebook: Mapping[str, Any],
+    event_linked_tickers: List[dict],
+    mismatch_alerts: List[dict],
+    drift_watchlist: List[dict],
+    thresholds: Mapping[str, Any],
+) -> List[str]:
+    prompts = []
+    for alert in mismatch_alerts:
+        prompts.append(
+            f"Review {alert['ticker']} {alert['fiscal_period']} mismatch reasons before closing the event packet: {', '.join(alert['reasons'])}."
+        )
+    for item in drift_watchlist:
+        prompts.append(
+            f"Check {item['ticker']} post-event drift evidence against portfolio exposure and source notes before the next risk review."
+        )
+    for item in event_linked_tickers:
+        if item["risk_questions"]:
+            prompts.append(f"Carry forward {item['ticker']} risk questions: {'; '.join(item['risk_questions'])}")
+    queue_items = [item for item in scenario_notebook.get("next_action_queue", []) if isinstance(item, Mapping)]
+    max_queue_items = int(thresholds["max_open_review_items"])
+    if len(queue_items) > max_queue_items:
+        prompts.append(
+            f"Notebook has {len(queue_items)} open review items; triage before the next risk review packet is archived."
+        )
+    for item in queue_items[:max_queue_items]:
+        if isinstance(item, Mapping) and item.get("item"):
+            prompts.append(f"Open notebook queue item for {item.get('ticker', '')}: {item['item']}")
+    if not prompts:
+        prompts.append("Confirm source attachments, review status, and no-trade boundaries before archiving the packet.")
+    deduped = []
+    for prompt in prompts:
+        if prompt not in deduped:
+            deduped.append(prompt)
+    return deduped
 
 
 def _scenario_thresholds(bands: List[ScenarioBand], attr: str) -> dict:

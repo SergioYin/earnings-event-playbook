@@ -13,8 +13,9 @@ Use this skill when a user wants to build or review a local earnings event playb
 7. Use `earnings-event-playbook tutorial-bundle --case <case-dir> --out <tutorial.md> --json-out <tutorial.json>` when the user needs a deterministic tutorial packet with ordered commands, expected artifact paths, reviewer checklist, maturity rubric evidence, and safety boundaries.
 8. Use `earnings-event-playbook showcase-page --out <showcase.html> --json-out <showcase.json>` when the user needs a no-JavaScript landing page and manifest summarizing value proposition, quickstart commands, demo links, release evidence, maturity rubric, case highlights, tutorial path, risk boundaries, and star-worthy differentiation.
 9. Use `earnings-event-playbook scenario-notebook --playbook <playbook.json> --handoff <handoff.json> --fixture-gallery <gallery.json> --manifest <manifest.json>... --out <notebook.md> --json-out <notebook.json>` when the user needs one reviewer notebook covering thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, risk boundary checklist, and reusable agent prompts.
-10. Use `earnings-event-playbook demo-bundle --out <dir>` when the user needs a complete example bundle.
-11. Keep all language framed as research review, not advice.
+10. Use `earnings-event-playbook portfolio-drift-bridge --portfolio <portfolio.json> --scenario-notebook <notebook.json> --post-event-compare <compare.json> --risk-thresholds <thresholds.json> --out <bridge.md> --json-out <bridge.json>` when the user needs exposure concentration, event-linked tickers, scenario mismatch alerts, post-event drift watchlist rows, next risk review prompts, and no-trade safety boundaries from local artifacts. `--risk-thresholds` is optional and must be static JSON when used.
+11. Use `earnings-event-playbook demo-bundle --out <dir>` when the user needs a complete example bundle.
+12. Keep all language framed as research review, not advice.
 
 ## Boundaries
 

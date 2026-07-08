@@ -5,7 +5,13 @@ from pathlib import Path
 from typing import Sequence
 
 from . import __version__
-from .core import build_fixture_gallery, build_handoff_packs, build_playbooks, compare_post_event
+from .core import (
+    build_fixture_gallery,
+    build_handoff_packs,
+    build_playbooks,
+    build_portfolio_drift_bridge,
+    compare_post_event,
+)
 from .io import read_json, write_text
 from .models import (
     FixtureError,
@@ -28,6 +34,8 @@ from .render import (
     render_fixture_gallery_markdown,
     render_json,
     render_markdown,
+    render_portfolio_drift_bridge_json,
+    render_portfolio_drift_bridge_markdown,
     render_post_event_json,
     render_post_event_markdown,
     render_scenario_notebook_json,
@@ -114,6 +122,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     notebook.add_argument("--out", required=True, type=Path)
     notebook.add_argument("--json-out", required=True, type=Path)
 
+    drift = subparsers.add_parser(
+        "portfolio-drift-bridge",
+        help="Bridge portfolio exposure, scenario notebook, and post-event compare artifacts into drift review packets.",
+    )
+    drift.add_argument("--portfolio", required=True, type=Path)
+    drift.add_argument("--scenario-notebook", required=True, type=Path)
+    drift.add_argument("--post-event-compare", required=True, type=Path)
+    drift.add_argument("--risk-thresholds", type=Path)
+    drift.add_argument("--out", required=True, type=Path)
+    drift.add_argument("--json-out", required=True, type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -137,6 +156,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.command == "scenario-notebook":
             return _scenario_notebook(
                 args.playbook, args.handoff, args.fixture_gallery, args.manifest, args.out, args.json_out
+            )
+        if args.command == "portfolio-drift-bridge":
+            return _portfolio_drift_bridge(
+                args.portfolio,
+                args.scenario_notebook,
+                args.post_event_compare,
+                args.risk_thresholds,
+                args.out,
+                args.json_out,
             )
         if args.command == "selfcheck":
             return _selfcheck()
@@ -213,6 +241,14 @@ def _demo_bundle(out_dir: Path) -> int:
         [out_dir / "tutorial-bundle.json", out_dir / "showcase.json"],
         out_dir / "scenario-notebook.md",
         out_dir / "scenario-notebook.json",
+    )
+    _portfolio_drift_bridge(
+        out_dir / "portfolio.json",
+        out_dir / "scenario-notebook.json",
+        out_dir / "post-event-compare.json",
+        _project_root() / "examples" / "risk-thresholds.json",
+        out_dir / "portfolio-drift-bridge.md",
+        out_dir / "portfolio-drift-bridge.json",
     )
     return 0
 
@@ -330,6 +366,27 @@ def _scenario_notebook(
     )
     write_text(out_path, render_scenario_notebook_markdown(notebook))
     write_text(json_path, render_scenario_notebook_json(notebook))
+    return 0
+
+
+def _portfolio_drift_bridge(
+    portfolio_path: Path,
+    scenario_notebook_path: Path,
+    post_event_compare_path: Path,
+    thresholds_path: Path | None,
+    out_path: Path,
+    json_path: Path,
+) -> int:
+    portfolio = parse_portfolio_fixture(read_json(portfolio_path))
+    thresholds = read_json(thresholds_path) if thresholds_path is not None else None
+    packet = build_portfolio_drift_bridge(
+        portfolio,
+        read_json(scenario_notebook_path),
+        read_json(post_event_compare_path),
+        thresholds,
+    )
+    write_text(out_path, render_portfolio_drift_bridge_markdown(packet))
+    write_text(json_path, render_portfolio_drift_bridge_json(packet))
     return 0
 
 

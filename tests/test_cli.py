@@ -29,6 +29,8 @@ def test_cli_demo_bundle(tmp_path):
     assert (tmp_path / "tutorial-bundle.json").exists()
     assert (tmp_path / "scenario-notebook.md").exists()
     assert (tmp_path / "scenario-notebook.json").exists()
+    assert (tmp_path / "portfolio-drift-bridge.md").exists()
+    assert (tmp_path / "portfolio-drift-bridge.json").exists()
     data = json.loads((tmp_path / "playbook.json").read_text(encoding="utf-8"))
     assert data["generated_by"] == "earnings-event-playbook"
     receipt = json.loads((tmp_path / "visual-receipt.json").read_text(encoding="utf-8"))
@@ -41,6 +43,9 @@ def test_cli_demo_bundle(tmp_path):
     notebook = json.loads((tmp_path / "scenario-notebook.json").read_text(encoding="utf-8"))
     assert notebook["artifact"] == "scenario-notebook"
     assert notebook["summary"]["optional_manifest_count"] == 2
+    bridge = json.loads((tmp_path / "portfolio-drift-bridge.json").read_text(encoding="utf-8"))
+    assert bridge["artifact"] == "portfolio-drift-bridge"
+    assert bridge["summary"]["event_linked_ticker_count"] == 2
 
 
 def test_cli_build_playbook(tmp_path):
@@ -234,6 +239,49 @@ def test_cli_scenario_notebook(tmp_path):
     assert data["next_action_queue"]
     assert data["risk_boundary_checklist"]
     assert data["reusable_agent_prompts"]
+
+
+def test_cli_portfolio_drift_bridge(tmp_path):
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "demo-bundle", "--out", str(tmp_path)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    out = tmp_path / "bridge-rerun.md"
+    json_out = tmp_path / "bridge-rerun.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "portfolio-drift-bridge",
+            "--portfolio",
+            str(tmp_path / "portfolio.json"),
+            "--scenario-notebook",
+            str(tmp_path / "scenario-notebook.json"),
+            "--post-event-compare",
+            str(tmp_path / "post-event-compare.json"),
+            "--risk-thresholds",
+            "examples/risk-thresholds.json",
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert "Portfolio Drift Bridge" in text
+    assert data["artifact"] == "portfolio-drift-bridge"
+    assert data["inputs"]["threshold_source"] == "provided-static-json"
+    assert data["exposure_concentration"][0]["ticker"] == "EXM"
+    assert data["scenario_mismatch_alerts"]
+    assert data["post_event_drift_watchlist"]
+    assert data["no_trade_safety_boundaries"]
 
 
 def test_cli_compare_post_event(tmp_path):

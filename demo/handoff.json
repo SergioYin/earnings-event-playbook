@@ -163,15 +163,15 @@
           "media_type": "text/html",
           "path": "demo/showcase.html",
           "role": "html-artifact",
-          "sha256": "e32783a6885a5121d82dd4c1ef2cc047b65a3cbae93dd5451dc35f9d83acc587",
-          "size_bytes": 9851
+          "sha256": "8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca",
+          "size_bytes": 10879
         },
         {
           "media_type": "application/json",
           "path": "demo/showcase.json",
           "role": "json-artifact",
-          "sha256": "7a203f7bddeeb1c3a21df3c8c1de9f8c7273742244a879e80c54449fee34e8dd",
-          "size_bytes": 6356
+          "sha256": "e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a",
+          "size_bytes": 7351
         },
         {
           "media_type": "application/json",
@@ -369,15 +369,15 @@
           "media_type": "text/html",
           "path": "demo/showcase.html",
           "role": "html-artifact",
-          "sha256": "e32783a6885a5121d82dd4c1ef2cc047b65a3cbae93dd5451dc35f9d83acc587",
-          "size_bytes": 9851
+          "sha256": "8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca",
+          "size_bytes": 10879
         },
         {
           "media_type": "application/json",
           "path": "demo/showcase.json",
           "role": "json-artifact",
-          "sha256": "7a203f7bddeeb1c3a21df3c8c1de9f8c7273742244a879e80c54449fee34e8dd",
-          "size_bytes": 6356
+          "sha256": "e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a",
+          "size_bytes": 7351
         },
         {
           "media_type": "application/json",

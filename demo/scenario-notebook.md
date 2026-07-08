@@ -7,7 +7,7 @@
 - Playbooks: 2
 - Handoff packs: 2
 - Fixture cases: 3
-- Optional manifests: 1
+- Optional manifests: 2
 - Open review items: 9
 - Evidence hashes: 24
 
@@ -84,8 +84,8 @@
 | EXM, NXT | `demo/portfolio.json` | input-fixture | 442 | `552f2e7c3fec4cd7bc32b642eec760706200adb3d567225dcb15fa981f299e00` |
 | EXM, NXT | `demo/post-event-compare.json` | post-event-json | 5099 | `72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79` |
 | EXM, NXT | `demo/post-event-compare.md` | post-event-markdown | 3035 | `a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb` |
-| EXM, NXT | `demo/showcase.html` | html-artifact | 9851 | `e32783a6885a5121d82dd4c1ef2cc047b65a3cbae93dd5451dc35f9d83acc587` |
-| EXM, NXT | `demo/showcase.json` | json-artifact | 6356 | `7a203f7bddeeb1c3a21df3c8c1de9f8c7273742244a879e80c54449fee34e8dd` |
+| EXM, NXT | `demo/showcase.html` | html-artifact | 10879 | `8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca` |
+| EXM, NXT | `demo/showcase.json` | json-artifact | 7351 | `e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a` |
 | EXM, NXT | `demo/tutorial-bundle.json` | json-artifact | 4704 | `08b39909a94d0b96c347f5b60186681c9a892644177eb230683c0e4786fb6b63` |
 | EXM, NXT | `demo/tutorial-bundle.md` | markdown-artifact | 4002 | `7f5cd3d252e0ec61bfe07762f023bed72dc029200fd9ac461e33dc74170aedfc` |
 
@@ -129,7 +129,8 @@
 
 ## Optional Manifest Snapshot
 
-- `showcase-page`: Earnings Event Playbook Showcase (11 paths/commands)
+- `tutorial-bundle`: tutorial-bundle (5 paths/commands)
+- `showcase-page`: Earnings Event Playbook Showcase (12 paths/commands)
 
 ## Risk Boundary Checklist
 

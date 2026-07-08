@@ -1,6 +1,6 @@
 {
   "project": "earnings-event-playbook",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "runtime_dependencies": 0,
   "workflow_files": "none",
   "generated_artifacts": [
@@ -24,6 +24,8 @@
     "demo/tutorial-bundle.json",
     "demo/scenario-notebook.md",
     "demo/scenario-notebook.json",
+    "demo/portfolio-drift-bridge.md",
+    "demo/portfolio-drift-bridge.json",
     "demo/cases/software/playbook.md",
     "demo/cases/software/playbook.json",
     "demo/cases/software/post-event-compare.md",
@@ -38,7 +40,7 @@
   "verification_commands": [
     {
       "command": "PYTHONPATH=src python -m pytest",
-      "result": "29 passed"
+      "result": "31 passed"
     },
     {
       "command": "PYTHONPATH=src python -m unittest discover",
@@ -81,12 +83,16 @@
       "result": "passed"
     },
     {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json",
+      "result": "passed"
+    },
+    {
       "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok; scanned 67 public files"
+      "result": "selfcheck ok; scanned 70 public files"
     },
     {
       "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
-      "result": "built dist/earnings_event_playbook-0.8.0.tar.gz and dist/earnings_event_playbook-0.8.0-py3-none-any.whl"
+      "result": "built dist/earnings_event_playbook-0.9.0.tar.gz and dist/earnings_event_playbook-0.9.0-py3-none-any.whl"
     }
   ],
   "safety_boundaries": [

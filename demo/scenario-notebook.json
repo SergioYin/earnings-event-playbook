@@ -308,8 +308,8 @@
       "media_type": "text/html",
       "path": "demo/showcase.html",
       "role": "html-artifact",
-      "sha256": "e32783a6885a5121d82dd4c1ef2cc047b65a3cbae93dd5451dc35f9d83acc587",
-      "size_bytes": 9851,
+      "sha256": "8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca",
+      "size_bytes": 10879,
       "ticker": "EXM, NXT",
       "tickers": [
         "EXM",
@@ -321,8 +321,8 @@
       "media_type": "application/json",
       "path": "demo/showcase.json",
       "role": "json-artifact",
-      "sha256": "7a203f7bddeeb1c3a21df3c8c1de9f8c7273742244a879e80c54449fee34e8dd",
-      "size_bytes": 6356,
+      "sha256": "e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a",
+      "size_bytes": 7351,
       "ticker": "EXM, NXT",
       "tickers": [
         "EXM",
@@ -442,6 +442,7 @@
     "fixture_gallery_artifact": "fixture-gallery",
     "handoff_artifact": "cross-asset-handoff",
     "optional_manifest_artifacts": [
+      "tutorial-bundle",
       "showcase-page"
     ],
     "playbook_artifact": "playbook"
@@ -504,8 +505,28 @@
   ],
   "optional_manifests": [
     {
+      "artifact": "tutorial-bundle",
+      "path_count": 5,
+      "paths_or_commands": [
+        "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/cases/software/events.json --portfolio examples/cases/software/portfolio.json --out demo/cases/software/playbook.md --json-out demo/cases/software/playbook.json",
+        "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/cases/software/playbook.json --actuals examples/cases/software/actuals.json --out demo/cases/software/post-event-compare.md --json-out demo/cases/software/post-event-compare.json",
+        "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo/cases/software --out demo/cases/software/visual-receipt.md --json-out demo/cases/software/visual-receipt.json",
+        "PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/cases/software/playbook.json --post-event-compare demo/cases/software/post-event-compare.json --visual-receipt demo/cases/software/visual-receipt.json --out demo/cases/software/handoff.md --json-out demo/cases/software/handoff.json",
+        "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json"
+      ],
+      "risk_boundaries": [
+        "local static fixtures only",
+        "no live market data",
+        "no broker connection",
+        "no order placement",
+        "no personalized investment, legal, tax, accounting, buy, sell, or hold advice",
+        "descriptive research review only"
+      ],
+      "title": "tutorial-bundle"
+    },
+    {
       "artifact": "showcase-page",
-      "path_count": 11,
+      "path_count": 12,
       "paths_or_commands": [
         "demo/showcase.html",
         "demo/showcase.json",
@@ -517,7 +538,8 @@
         "demo/handoff.md",
         "demo/fixture-gallery.md",
         "demo/tutorial-bundle.md",
-        "demo/scenario-notebook.md"
+        "demo/scenario-notebook.md",
+        "demo/portfolio-drift-bridge.md"
       ],
       "risk_boundaries": [
         "local static fixtures only",
@@ -671,7 +693,7 @@
     "handoff_pack_count": 2,
     "mismatched_handoff_keys": [],
     "open_review_item_count": 9,
-    "optional_manifest_count": 1,
+    "optional_manifest_count": 2,
     "playbook_count": 2
   },
   "thesis_assumptions": [

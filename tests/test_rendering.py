@@ -2,6 +2,7 @@ import json
 
 from earnings_event_playbook.core import build_fixture_gallery, build_playbooks, compare_post_event
 from earnings_event_playbook.core import build_handoff_packs
+from earnings_event_playbook.core import build_portfolio_drift_bridge
 from earnings_event_playbook.models import (
     EvidenceArtifactHash,
     parse_actuals_fixture,
@@ -17,6 +18,8 @@ from earnings_event_playbook.render import (
     render_html_index,
     render_json,
     render_markdown,
+    render_portfolio_drift_bridge_json,
+    render_portfolio_drift_bridge_markdown,
     render_post_event_json,
     render_post_event_markdown,
     render_scenario_notebook_json,
@@ -254,3 +257,90 @@ def test_render_scenario_notebook_combines_artifacts():
     assert data["reusable_agent_prompts"]
     assert "Scenario Reviewer Notebook" in markdown
     assert "Reusable Agent Prompts" in markdown
+
+
+def test_render_portfolio_drift_bridge_flags_mismatch_and_drift():
+    actuals = parse_actuals_fixture(
+        {
+            "as_of": "2026-07-27",
+            "actuals": [
+                {
+                    "ticker": "EXM",
+                    "fiscal_period": "Q2",
+                    "report_date": "2026-07-24",
+                    "actual_eps": 1.3,
+                    "actual_revenue": 3040,
+                    "actual_move_percent": 7.0,
+                    "source_date": "2026-07-24",
+                    "source_name": "Fixture",
+                }
+            ],
+        }
+    )
+    comparisons = compare_post_event(_playbooks(), actuals)
+    packs = build_handoff_packs(_playbooks(), comparisons)
+    gallery = build_fixture_gallery(
+        [
+            (
+                "sample",
+                "examples/cases/sample",
+                parse_events_fixture(
+                    {
+                        "as_of": "2026-07-08",
+                        "events": [
+                            {
+                                "date": "2026-08-01",
+                                "ticker": "EXM",
+                                "company": "Example Machines",
+                                "fiscal_period": "Q2",
+                                "consensus_eps": 1.0,
+                                "consensus_revenue": 1000,
+                                "implied_move_percent": 6,
+                                "source_date": "2026-07-01",
+                                "source_name": "Fixture",
+                            }
+                        ],
+                    }
+                ),
+                parse_portfolio_fixture(
+                    {
+                        "as_of": "2026-07-08",
+                        "base_currency": "USD",
+                        "positions": [],
+                    }
+                ),
+                None,
+            )
+        ]
+    )
+    notebook = build_scenario_notebook(
+        json.loads(render_json(_playbooks())),
+        json.loads(render_handoff_json(packs)),
+        json.loads(render_fixture_gallery_json(gallery)),
+    )
+    portfolio = parse_portfolio_fixture(
+        {
+            "as_of": "2026-07-08",
+            "base_currency": "USD",
+            "positions": [{"ticker": "EXM", "shares": 10, "exposure": 1000, "portfolio_weight_percent": 6}],
+        }
+    )
+    packet = build_portfolio_drift_bridge(
+        portfolio,
+        notebook,
+        json.loads(render_post_event_json(comparisons)),
+        {"thresholds": {"max_position_weight_percent": 5, "post_event_move_watch_percent": 6}},
+    )
+    data = json.loads(render_portfolio_drift_bridge_json(packet))
+    markdown = render_portfolio_drift_bridge_markdown(packet)
+    assert data["artifact"] == "portfolio-drift-bridge"
+    assert data["exposure_concentration"][0]["flags"] == [
+        "weight-threshold",
+        "exposure-share-threshold",
+        "event-linked",
+    ]
+    assert data["scenario_mismatch_alerts"][0]["ticker"] == "EXM"
+    assert data["post_event_drift_watchlist"][0]["triggers"] == ["move-threshold"]
+    assert data["no_trade_safety_boundaries"]
+    assert "Portfolio Drift Bridge" in markdown
+    assert "No-Trade Safety Boundaries" in markdown

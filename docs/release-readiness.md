@@ -14,6 +14,7 @@ Concise evidence for the GitHub asset maturity rubric. This project is positione
 - Scenario reviewer notebook output is checked in at `demo/scenario-notebook.md` and `demo/scenario-notebook.json`.
 - Portfolio drift bridge output is checked in at `demo/portfolio-drift-bridge.md` and `demo/portfolio-drift-bridge.json`.
 - Review packet docs live at `docs/review-packet.md`; the checked-in release packet and manifest live under `demo/review-packet`.
+- Cold-Start Audit docs live at `docs/coldstart-audit.md`; checked-in audit artifacts live at `demo/coldstart-audit.md` and `demo/coldstart-audit.json`.
 - Promotion checklist lives at `docs/promote.md`.
 
 ## Asset Evidence
@@ -30,6 +31,7 @@ Concise evidence for the GitHub asset maturity rubric. This project is positione
 - Scenario notebook outputs: `demo/scenario-notebook.md` and `demo/scenario-notebook.json`
 - Portfolio drift bridge outputs: `demo/portfolio-drift-bridge.md` and `demo/portfolio-drift-bridge.json`
 - Review packet outputs: `demo/review-packet` and `demo/review-packet/review-packet-manifest.json`
+- Cold-start audit outputs: `demo/coldstart-audit.md`, `demo/coldstart-audit.json`, and `docs/coldstart-audit.md`
 - Agent skill: `skills/agent/earnings-event-playbook/SKILL.md`
 - License: `LICENSE`
 - Changelog: `CHANGELOG.md`
@@ -52,11 +54,12 @@ PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showca
 PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json
 PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
 PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet
+PYTHONPATH=src python -m earnings_event_playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json
 PYTHONPATH=src python -m earnings_event_playbook selfcheck
 UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation
 ```
 
-Latest local run on 2026-07-08: pytest passed, demo regeneration completed, documented build-playbook completed, documented post-event compare completed, visual receipt regeneration completed, handoff export completed, fixture gallery regeneration completed, tutorial bundle regeneration completed, showcase page regeneration completed, scenario notebook regeneration completed, portfolio drift bridge regeneration completed, review packet regeneration completed, selfcheck passed, and `UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation` produced v1.1.0 sdist and wheel artifacts.
+Latest local run on 2026-07-08: pytest passed, demo regeneration completed, documented build-playbook completed, documented post-event compare completed, visual receipt regeneration completed, handoff export completed, fixture gallery regeneration completed, tutorial bundle regeneration completed, showcase page regeneration completed, scenario notebook regeneration completed, portfolio drift bridge regeneration completed, review packet regeneration completed, cold-start audit regeneration completed, selfcheck passed, and `UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation` produced v1.2.0 sdist and wheel artifacts.
 
 ## Risk Boundaries
 
@@ -73,6 +76,7 @@ Latest local run on 2026-07-08: pytest passed, demo regeneration completed, docu
 - Scenario notebook output combines local generated artifacts into a descriptive reviewer packet only and does not rank or recommend securities.
 - Portfolio drift bridge output connects local portfolio exposure, scenario mismatches, post-event drift rows, risk review prompts, and no-trade boundaries; it does not rank or recommend securities.
 - Review packet output is deterministic release evidence with relative paths and local artifact hashes only; it does not fetch data, connect to brokers, place orders, or provide action recommendations.
+- Cold-start audit output is deterministic release-readiness evidence with docs checks, exact quickstart commands, artifact hashes, and promotion blockers only; it does not fetch data, connect to brokers, place orders, or provide action recommendations.
 - Fixture outputs must be checked against source materials before use.
 - Visual receipts record local demo artifact roles, sizes, and SHA-256 hashes; handoff packs can carry those hashes as local evidence references. They are release evidence, not an audit or compliance system.
 - GitHub Actions workflows are intentionally not included.

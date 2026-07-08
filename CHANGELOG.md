@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- Added `coldstart-audit` CLI command for deterministic clone-read-run-trust-promote readiness scoring from README, docs, demo paths, and the review packet manifest.
+- Added checked-in `demo/coldstart-audit.md`, `demo/coldstart-audit.json`, and `docs/coldstart-audit.md` covering missing-doc checks, exact quickstart commands, artifact existence and SHA-256 checks, release gate checks, and promotion blockers.
+- Updated README, usage docs, release evidence, promotion checklist, release manifest, agent skill, package version metadata, and tests.
+
 ## 1.1.0
 
 - Added review packet release docs and promotion checklist for deterministic packet review, screenshots/GIF capture, manifest evidence, and risk copy.

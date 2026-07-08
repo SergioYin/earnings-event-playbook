@@ -1,6 +1,6 @@
 {
   "project": "earnings-event-playbook",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "runtime_dependencies": 0,
   "workflow_files": "none",
   "generated_artifacts": [
@@ -26,6 +26,8 @@
     "demo/scenario-notebook.json",
     "demo/portfolio-drift-bridge.md",
     "demo/portfolio-drift-bridge.json",
+    "demo/coldstart-audit.md",
+    "demo/coldstart-audit.json",
     "demo/review-packet/inputs/events.json",
     "demo/review-packet/inputs/portfolio.json",
     "demo/review-packet/inputs/actuals.json",
@@ -63,19 +65,23 @@
   "verification_commands": [
     {
       "command": "PYTHONPATH=src python -m pytest",
-      "result": "33 passed"
+      "result": "35 passed"
     },
     {
       "command": "PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet",
       "result": "passed"
     },
     {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json",
+      "result": "score 100/100, status pass, promotion blockers none"
+    },
+    {
       "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok: version=1.1.0, scanned=95, runtime_dependencies=0"
+      "result": "selfcheck ok: version=1.2.0, scanned=98, runtime_dependencies=0"
     },
     {
       "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
-      "result": "built dist/earnings_event_playbook-1.1.0.tar.gz and dist/earnings_event_playbook-1.1.0-py3-none-any.whl"
+      "result": "built dist/earnings_event_playbook-1.2.0.tar.gz and dist/earnings_event_playbook-1.2.0-py3-none-any.whl"
     }
   ],
   "safety_boundaries": [

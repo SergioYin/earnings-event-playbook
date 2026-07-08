@@ -76,7 +76,7 @@
       "media_type": "application/json",
       "path": "review-packet/review-packet-manifest.json",
       "role": "json-artifact",
-      "sha256": "bf3ef3d3be70e74e26deb4eaff7ff343326b0cf049775011bcf0a9a4701f0b9d",
+      "sha256": "111d32cffec8267667d431ac18edd8fd965ab271145a126576df3aa937f428eb",
       "size_bytes": 13198
     },
     {

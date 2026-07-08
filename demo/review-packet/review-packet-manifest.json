@@ -43,14 +43,14 @@
       "media_type": "application/json",
       "path": "review-packet/handoff.json",
       "role": "cross-asset-handoff-artifact",
-      "sha256": "b0a0c392daccc33785056520879774e4957dd224da9ef3bd92558e2618e71a57",
+      "sha256": "efd9cdcf94735ccd3a68699b7f12898e1bc0aee7a9a99c24723ce95eb47239d8",
       "size_bytes": 13119
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/handoff.md",
       "role": "cross-asset-handoff-artifact",
-      "sha256": "057b993db5b46725896a7bf84f6655e239acd67b550400a0a1f0a00edd130f2e",
+      "sha256": "35085f5d76bcb55a4e9ded9121dfd375a20d40601fa9754d9728415b8a2a55f4",
       "size_bytes": 7936
     },
     {
@@ -127,14 +127,14 @@
       "media_type": "application/json",
       "path": "review-packet/scenario-notebook.json",
       "role": "scenario-review-artifact",
-      "sha256": "272ebf161df2d0ad36a7548a46ad27e51f74a6f9c1d359cb47c764ff58737503",
+      "sha256": "f06bcecb89ce7ad5d5c2ea9e3c5518a5d2820d16e88fde34024e59ddf81ecd05",
       "size_bytes": 21181
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/scenario-notebook.md",
       "role": "scenario-review-artifact",
-      "sha256": "740cb3b4ffa91b0c6dbe3a91a8e78f49fa76775c958d4fa659e4b1b71620808c",
+      "sha256": "3d76640c3d268a3f079f9686b732a17f4ba4153705790a13ac88ccf68fbd83e3",
       "size_bytes": 9655
     },
     {
@@ -169,14 +169,14 @@
       "media_type": "application/json",
       "path": "review-packet/visual-receipt.json",
       "role": "hash-receipt-artifact",
-      "sha256": "79c9ecbd7fe93bc9069477285bc76fb6ccf22c246fd0ab146866d8d29be5d298",
+      "sha256": "e08885c8feef1330760e0fe984bde5b68ac194b307bb42bcde00b7ac72fc4df1",
       "size_bytes": 5864
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/visual-receipt.md",
       "role": "hash-receipt-artifact",
-      "sha256": "575b598c4926d635a2e937112fc4b56483fd3b280639e0bdce49ab18a7860534",
+      "sha256": "cac329fd268ae1767e4b3640510370dfd3637d2f2ee7a880e8e4b4ef37a5bc0a",
       "size_bytes": 4231
     }
   ],
@@ -281,7 +281,7 @@
     "Are docs, changelog, package version, and release manifest aligned for the release candidate?"
   ],
   "output_root": "review-packet",
-  "package_version": "1.1.0",
+  "package_version": "1.2.0",
   "promotion_gate_notes": [
     "Promote only after pytest, unittest discovery, selfcheck, and build pass in the release environment.",
     "Confirm checked-in demo/review-packet manifest hashes match regenerated artifacts before tagging.",

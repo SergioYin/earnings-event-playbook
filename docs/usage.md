@@ -86,6 +86,14 @@ PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review
 
 See `docs/review-packet.md` for the manifest contract and reproducibility check. The command uses local static fixtures only and does not fetch data, connect to brokers, place orders, or provide action recommendations.
 
+`coldstart-audit` reads README, docs, demo paths, and a review packet manifest, then writes Markdown plus JSON readiness evidence.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json
+```
+
+The audit scores clone, read, run, trust, and promote readiness. It records missing-doc checks, exact README quickstart commands, artifact existence and SHA-256 checks, release gate checks, and promotion blockers. It does not fetch data, execute workflows, connect to brokers, place orders, or provide action recommendations.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -107,6 +115,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Scenario notebook output is deterministic and combines existing local generated artifacts without executing external workflows.
 - Portfolio drift bridge output is deterministic and combines local portfolio, scenario notebook, post-event compare, and optional static threshold artifacts without executing trades or external workflows.
 - Review packet output is deterministic and records relative paths plus SHA-256 hashes for local release evidence.
+- Cold-start audit output is deterministic and records docs coverage, exact quickstart commands, manifest artifact hash checks, and promotion blockers without external validation.
 
 ## Boundary
 

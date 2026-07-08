@@ -296,7 +296,7 @@ def test_cli_review_packet_manifest_schema_and_roles(tmp_path):
     assert manifest["schema_version"] == "1.0"
     assert manifest["artifact"] == "review-packet-manifest"
     assert manifest["generated_by"] == "earnings-event-playbook"
-    assert manifest["package_version"] == "1.1.0"
+    assert manifest["package_version"] == "1.2.0"
     assert manifest["output_root"] == "review-packet"
     assert [command["step"] for command in manifest["commands"]] == list(range(1, 10))
     assert all(command["status"] == "completed" for command in manifest["commands"])
@@ -312,6 +312,82 @@ def test_cli_review_packet_manifest_schema_and_roles(tmp_path):
     assert roles["review-packet/inputs/events.json"] == "input-fixture"
     expected_paths = {path for command in manifest["commands"] for path in command["artifact_paths"]}
     assert expected_paths.issubset(set(manifest["artifact_paths"]))
+
+
+def test_cli_coldstart_audit_scores_review_packet(tmp_path):
+    out_dir = tmp_path / "review-packet"
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "review-packet", "--out", str(out_dir)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    out = tmp_path / "coldstart-audit.md"
+    json_out = tmp_path / "coldstart-audit.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "coldstart-audit",
+            "--manifest",
+            str(out_dir / "review-packet-manifest.json"),
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert "Cold-Start Audit" in text
+    assert data["artifact"] == "coldstart-audit"
+    assert data["package_version"] == "1.2.0"
+    assert data["score"]["total"] == 100
+    assert data["score"]["status"] == "pass"
+    assert [item["name"] for item in data["score"]["categories"]] == ["clone", "read", "run", "trust", "promote"]
+    assert not data["promotion_blockers"]
+    assert any("review-packet --out demo/review-packet" in command for command in data["exact_quickstart_commands"])
+    assert any("coldstart-audit" in command for command in data["exact_quickstart_commands"])
+    assert all(item["status"] == "pass" for item in data["missing_doc_checks"])
+    assert all(item["status"] == "pass" for item in data["artifact_checks"])
+    assert all(len(item["actual_sha256"]) == 64 for item in data["artifact_checks"])
+
+
+def test_cli_coldstart_audit_reports_hash_blocker(tmp_path):
+    out_dir = tmp_path / "review-packet"
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "review-packet", "--out", str(out_dir)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    (out_dir / "playbook.md").write_text("changed\n", encoding="utf-8")
+    json_out = tmp_path / "coldstart-audit.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "coldstart-audit",
+            "--manifest",
+            str(out_dir / "review-packet-manifest.json"),
+            "--out",
+            str(tmp_path / "coldstart-audit.md"),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert data["score"]["status"] == "blocked"
+    assert any("artifact missing or hash mismatch: review-packet/playbook.md" == item for item in data["promotion_blockers"])
+    assert any(item["path"] == "review-packet/playbook.md" and item["status"] == "fail" for item in data["artifact_checks"])
 
 
 def test_cli_review_packet_manifest_is_deterministic_and_public(tmp_path):

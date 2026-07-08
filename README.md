@@ -16,6 +16,7 @@ Zero-dependency Python package and CLI. No API keys, no live market data, no bro
 - Scenario notebook: open `demo/scenario-notebook.md` or `demo/scenario-notebook.json` for the combined reviewer packet across playbook, handoff, gallery, tutorial, and showcase artifacts.
 - Portfolio drift bridge: open `demo/portfolio-drift-bridge.md` or `demo/portfolio-drift-bridge.json` for exposure concentration, event-linked tickers, scenario mismatches, post-event drift watchlist, next risk review prompts, and no-trade boundaries.
 - Review packet: open `docs/review-packet.md` and `demo/review-packet/review-packet-manifest.json` for the deterministic release packet, manifest schema, file roles, and SHA-256 hash inventory.
+- Cold-start audit: open `docs/coldstart-audit.md`, `demo/coldstart-audit.md`, and `demo/coldstart-audit.json` for clone-read-run-trust-promote readiness scoring across README, docs, demo artifacts, and the review packet manifest.
 - Star reason: useful as a public, dependency-free template for finance research artifacts with explicit safety boundaries and release evidence.
 
 ## Quickstart
@@ -33,6 +34,7 @@ earnings-event-playbook showcase-page --out demo/showcase.html --json-out demo/s
 earnings-event-playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json
 earnings-event-playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
 earnings-event-playbook review-packet --out demo/review-packet
+earnings-event-playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json
 earnings-event-playbook selfcheck
 ```
 
@@ -50,9 +52,10 @@ PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showca
 PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json
 PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
 PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet
+PYTHONPATH=src python -m earnings_event_playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json
 ```
 
-Open `demo/showcase.html` for the no-JavaScript landing page, `demo/showcase.json` for the manifest, `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, `demo/scenario-notebook.md` for the combined reviewer notebook, `demo/portfolio-drift-bridge.md` for portfolio drift bridge review, `demo/review-packet/review-packet-manifest.json` for release packet evidence, `demo/index.html` for the static preview, or read the paired Markdown and JSON demo artifacts.
+Open `demo/showcase.html` for the no-JavaScript landing page, `demo/showcase.json` for the manifest, `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, `demo/scenario-notebook.md` for the combined reviewer notebook, `demo/portfolio-drift-bridge.md` for portfolio drift bridge review, `demo/review-packet/review-packet-manifest.json` for release packet evidence, `demo/coldstart-audit.md` for clone-read-run-trust-promote readiness, `demo/index.html` for the static preview, or read the paired Markdown and JSON demo artifacts.
 
 Expected output: a review packet for the bundled EXM and NXT example events with beat/base/miss exposure bands, stale-source warnings, risk questions, and deterministic JSON for downstream local tooling.
 
@@ -75,6 +78,7 @@ Expected output: a review packet for the bundled EXM and NXT example events with
 - Showcase landing pages with value proposition, artifact map, release evidence, maturity rubric, tutorial path, risk boundaries, and star-worthy differentiation.
 - Scenario reviewer notebooks with thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, risk boundary checklist, and reusable agent prompts.
 - Portfolio drift bridge packets with exposure concentration, event-linked tickers, scenario mismatch alerts, post-event drift watchlist, next risk review prompts, static risk thresholds, and no-trade safety boundaries.
+- Cold-start audit packets with clone-read-run-trust-promote scores, missing-doc checks, exact quickstart commands, artifact existence and SHA-256 checks, release gate checks, and promotion blockers.
 
 ## Examples
 
@@ -104,6 +108,17 @@ PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review
 ```
 
 That writes copied static inputs, generated Markdown/HTML/JSON review artifacts, and `demo/review-packet/review-packet-manifest.json` with ordered commands, relative artifact paths, file roles, byte sizes, SHA-256 hashes, release gate checks, promotion notes, and risk boundaries. See `docs/review-packet.md` for the manifest contract and reproducibility check.
+
+Run the cold-start audit against the checked-in review packet:
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook coldstart-audit \
+  --manifest demo/review-packet/review-packet-manifest.json \
+  --out demo/coldstart-audit.md \
+  --json-out demo/coldstart-audit.json
+```
+
+That writes Markdown and JSON scoring clone-read-run-trust-promote readiness. The audit reads README, docs, demo paths, and the review packet manifest; records missing-doc checks, exact README quickstart commands, artifact existence and SHA-256 checks, release gates, and promotion blockers.
 
 Compare a pre-event playbook to local post-event actuals:
 
@@ -211,6 +226,7 @@ This project is a local research organization tool.
 - It does not place, stage, or recommend orders.
 - It does not provide personalized investment, legal, tax, accounting, buy, sell, or hold advice.
 - Outputs should be reviewed against source materials before use.
+- Cold-start audit output is release-readiness evidence, not an audit, compliance report, recommendation, or external validation.
 
 It is intentionally not a trading bot, data vendor client, portfolio optimizer, alerting system, or compliance system.
 

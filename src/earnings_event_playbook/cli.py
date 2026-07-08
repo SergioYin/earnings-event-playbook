@@ -156,6 +156,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     packet.add_argument("--tutorial-case", default=Path("examples/cases/software"), type=Path)
 
+    audit = subparsers.add_parser(
+        "coldstart-audit",
+        help="Score clone-read-run-trust-promote readiness from docs and the review packet manifest.",
+    )
+    audit.add_argument("--manifest", default=Path("demo/review-packet/review-packet-manifest.json"), type=Path)
+    audit.add_argument("--out", required=True, type=Path)
+    audit.add_argument("--json-out", required=True, type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -199,6 +207,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.cases,
                 args.tutorial_case,
             )
+        if args.command == "coldstart-audit":
+            return _coldstart_audit(args.manifest, args.out, args.json_out)
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -651,6 +661,15 @@ def _review_packet(
     return 0
 
 
+def _coldstart_audit(manifest_path: Path, out_path: Path, json_path: Path) -> int:
+    project_root = _project_root()
+    manifest = read_json(manifest_path)
+    audit = _build_coldstart_audit(project_root, manifest_path, manifest)
+    write_text(out_path, _render_coldstart_audit_markdown(audit))
+    write_text(json_path, json.dumps(audit, indent=2, sort_keys=True) + "\n")
+    return 0
+
+
 def _selfcheck() -> int:
     roots = _selfcheck_roots()
     forbidden = [
@@ -794,6 +813,220 @@ def _build_review_packet_manifest(
             "Are docs, changelog, package version, and release manifest aligned for the release candidate?",
         ],
     }
+
+
+def _build_coldstart_audit(project_root: Path, manifest_path: Path, manifest: dict) -> dict:
+    doc_checks = _coldstart_doc_checks(project_root)
+    quickstart = _coldstart_quickstart_commands(project_root / "README.md")
+    packet_base = manifest_path.resolve().parent.parent
+    artifact_checks = _coldstart_artifact_checks(packet_base, manifest)
+    release_gate_checks = list(manifest.get("release_gate_checks", []))
+    blockers = _coldstart_blockers(doc_checks, quickstart, artifact_checks, release_gate_checks, project_root, manifest)
+    categories = _coldstart_scores(doc_checks, quickstart, artifact_checks, release_gate_checks, blockers, manifest)
+    total = sum(category["score"] for category in categories)
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "coldstart-audit",
+        "package_version": __version__,
+        "manifest_path": _project_rel(manifest_path),
+        "source_documents": [item["path"] for item in doc_checks],
+        "score": {
+            "total": total,
+            "maximum": 100,
+            "status": "pass" if total >= 90 and not blockers else "blocked",
+            "categories": categories,
+        },
+        "readiness_chain": ["clone", "read", "run", "trust", "promote"],
+        "missing_doc_checks": doc_checks,
+        "exact_quickstart_commands": quickstart,
+        "artifact_checks": artifact_checks,
+        "release_gate_checks": release_gate_checks,
+        "promotion_blockers": blockers,
+        "promotion_summary": (
+            "Ready to promote after all blockers are cleared."
+            if not blockers
+            else f"Blocked by {len(blockers)} cold-start readiness issue(s)."
+        ),
+        "safety_boundaries": manifest.get("risk_boundaries", []),
+    }
+
+
+def _coldstart_doc_checks(project_root: Path) -> list[dict]:
+    required = [
+        ("README.md", ["Quickstart", "review-packet", "coldstart-audit"]),
+        ("docs/usage.md", ["coldstart-audit", "review-packet"]),
+        ("docs/review-packet.md", ["review-packet-manifest.json", "SHA-256"]),
+        ("docs/release-readiness.md", ["Cold-Start Audit", "Verification"]),
+        ("docs/promote.md", ["coldstart-audit", "v1.2.0"]),
+        ("docs/coldstart-audit.md", ["Cold-Start Audit", "clone", "promote"]),
+        ("demo/review-packet/review-packet-manifest.json", ["review-packet-manifest"]),
+    ]
+    checks = []
+    for rel_path, required_terms in required:
+        path = project_root / rel_path
+        text = path.read_text(encoding="utf-8", errors="ignore") if path.exists() else ""
+        missing_terms = [term for term in required_terms if term not in text]
+        checks.append(
+            {
+                "path": rel_path,
+                "exists": path.exists(),
+                "required_terms": required_terms,
+                "missing_terms": missing_terms,
+                "status": "pass" if path.exists() and not missing_terms else "fail",
+            }
+        )
+    return checks
+
+
+def _coldstart_quickstart_commands(readme_path: Path) -> list[str]:
+    if not readme_path.exists():
+        return []
+    commands = []
+    pending = ""
+    for line in readme_path.read_text(encoding="utf-8", errors="ignore").splitlines():
+        stripped = line.strip()
+        if pending:
+            continuation = stripped.rstrip("\\").strip()
+            pending = f"{pending} {continuation}"
+            if not stripped.endswith("\\"):
+                commands.append(" ".join(pending.split()))
+                pending = ""
+            continue
+        if stripped.startswith("PYTHONPATH=src python -m earnings_event_playbook "):
+            if stripped.endswith("\\"):
+                pending = stripped.rstrip("\\").strip()
+            else:
+                commands.append(" ".join(stripped.split()))
+    if pending:
+        commands.append(" ".join(pending.split()))
+    return sorted(dict.fromkeys(commands))
+
+
+def _coldstart_artifact_checks(packet_base: Path, manifest: dict) -> list[dict]:
+    checks = []
+    for artifact in manifest.get("artifacts", []):
+        rel_path = artifact.get("path", "")
+        path = packet_base / rel_path
+        exists = path.exists()
+        actual_hash = hashlib.sha256(path.read_bytes()).hexdigest() if exists else ""
+        expected_hash = artifact.get("sha256", "")
+        checks.append(
+            {
+                "path": rel_path,
+                "role": artifact.get("role", "packet-artifact"),
+                "exists": exists,
+                "size_bytes": path.stat().st_size if exists else 0,
+                "expected_sha256": expected_hash,
+                "actual_sha256": actual_hash,
+                "hash_match": exists and actual_hash == expected_hash,
+                "status": "pass" if exists and actual_hash == expected_hash else "fail",
+            }
+        )
+    return sorted(checks, key=lambda item: item["path"])
+
+
+def _coldstart_blockers(
+    doc_checks: Sequence[dict],
+    quickstart: Sequence[str],
+    artifact_checks: Sequence[dict],
+    release_gate_checks: Sequence[dict],
+    project_root: Path,
+    manifest: dict,
+) -> list[str]:
+    blockers = []
+    blockers.extend(f"missing or incomplete document: {item['path']}" for item in doc_checks if item["status"] != "pass")
+    if len(quickstart) < 5:
+        blockers.append("README quickstart does not expose enough PYTHONPATH clone-run commands")
+    blockers.extend(f"artifact missing or hash mismatch: {item['path']}" for item in artifact_checks if item["status"] != "pass")
+    blockers.extend(
+        f"release gate failed: {item.get('name', 'unknown')}"
+        for item in release_gate_checks
+        if item.get("status") != "pass"
+    )
+    if (project_root / ".github" / "workflows").exists():
+        blockers.append("workflow files are present")
+    if manifest.get("generated_by") != "earnings-event-playbook":
+        blockers.append("review packet manifest generated_by is unexpected")
+    if manifest.get("package_version") != __version__:
+        blockers.append("review packet manifest package_version does not match installed package version")
+    return sorted(blockers)
+
+
+def _coldstart_scores(
+    doc_checks: Sequence[dict],
+    quickstart: Sequence[str],
+    artifact_checks: Sequence[dict],
+    release_gate_checks: Sequence[dict],
+    blockers: Sequence[str],
+    manifest: dict,
+) -> list[dict]:
+    docs_pass = sum(1 for item in doc_checks if item["status"] == "pass")
+    artifacts_pass = sum(1 for item in artifact_checks if item["status"] == "pass")
+    gates_pass = sum(1 for item in release_gate_checks if item.get("status") == "pass")
+    return [
+        {
+            "name": "clone",
+            "score": 20 if manifest.get("package_version") == __version__ and quickstart else 10,
+            "evidence": f"package_version={manifest.get('package_version')}; quickstart_commands={len(quickstart)}",
+        },
+        {
+            "name": "read",
+            "score": min(20, docs_pass * 20 // max(1, len(doc_checks))),
+            "evidence": f"{docs_pass}/{len(doc_checks)} required documents complete",
+        },
+        {
+            "name": "run",
+            "score": 20 if len(quickstart) >= 5 and all(item.get("status") == "pass" for item in release_gate_checks) else 10,
+            "evidence": f"{len(quickstart)} exact README quickstart commands; {gates_pass}/{len(release_gate_checks)} release gates pass",
+        },
+        {
+            "name": "trust",
+            "score": min(20, artifacts_pass * 20 // max(1, len(artifact_checks))),
+            "evidence": f"{artifacts_pass}/{len(artifact_checks)} manifest artifacts exist and match SHA-256",
+        },
+        {
+            "name": "promote",
+            "score": 20 if not blockers else 0,
+            "evidence": "no promotion blockers" if not blockers else f"{len(blockers)} promotion blocker(s)",
+        },
+    ]
+
+
+def _render_coldstart_audit_markdown(audit: dict) -> str:
+    lines = [
+        "# Cold-Start Audit",
+        "",
+        f"- Package version: `{audit['package_version']}`",
+        f"- Manifest: `{audit['manifest_path']}`",
+        f"- Score: {audit['score']['total']}/{audit['score']['maximum']} ({audit['score']['status']})",
+        f"- Promotion summary: {audit['promotion_summary']}",
+        "",
+        "## Readiness Score",
+        "",
+        "| Dimension | Score | Evidence |",
+        "| --- | ---: | --- |",
+    ]
+    for category in audit["score"]["categories"]:
+        lines.append(f"| {category['name']} | {category['score']}/20 | {category['evidence']} |")
+    lines.extend(["", "## Missing-Doc Checks", "", "| Path | Status | Missing Terms |", "| --- | --- | --- |"])
+    for item in audit["missing_doc_checks"]:
+        missing = ", ".join(item["missing_terms"]) if item["missing_terms"] else "none"
+        lines.append(f"| `{item['path']}` | {item['status']} | {missing} |")
+    lines.extend(["", "## Exact Quickstart Commands", ""])
+    for command in audit["exact_quickstart_commands"]:
+        lines.append(f"- `{command}`")
+    lines.extend(["", "## Artifact Existence And Hash Checks", "", "| Path | Role | Status | SHA-256 |", "| --- | --- | --- | --- |"])
+    for item in audit["artifact_checks"]:
+        lines.append(f"| `{item['path']}` | {item['role']} | {item['status']} | {item['actual_sha256']} |")
+    lines.extend(["", "## Promotion Blockers", ""])
+    if audit["promotion_blockers"]:
+        lines.extend(f"- {blocker}" for blocker in audit["promotion_blockers"])
+    else:
+        lines.append("- none")
+    lines.extend(["", "## Safety Boundaries", ""])
+    lines.extend(f"- {boundary}" for boundary in audit["safety_boundaries"])
+    return "\n".join(lines) + "\n"
 
 
 def _packet_artifact(path: Path, base: Path) -> dict:

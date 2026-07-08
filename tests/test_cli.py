@@ -23,6 +23,12 @@ def test_cli_demo_bundle(tmp_path):
     assert (tmp_path / "visual-receipt.json").exists()
     assert (tmp_path / "handoff.md").exists()
     assert (tmp_path / "handoff.json").exists()
+    assert (tmp_path / "fixture-gallery.md").exists()
+    assert (tmp_path / "fixture-gallery.json").exists()
+    assert (tmp_path / "tutorial-bundle.md").exists()
+    assert (tmp_path / "tutorial-bundle.json").exists()
+    assert (tmp_path / "scenario-notebook.md").exists()
+    assert (tmp_path / "scenario-notebook.json").exists()
     data = json.loads((tmp_path / "playbook.json").read_text(encoding="utf-8"))
     assert data["generated_by"] == "earnings-event-playbook"
     receipt = json.loads((tmp_path / "visual-receipt.json").read_text(encoding="utf-8"))
@@ -32,6 +38,9 @@ def test_cli_demo_bundle(tmp_path):
     handoff = json.loads((tmp_path / "handoff.json").read_text(encoding="utf-8"))
     assert handoff["artifact"] == "cross-asset-handoff"
     assert handoff["handoff_packs"][0]["evidence_artifact_hashes"]
+    notebook = json.loads((tmp_path / "scenario-notebook.json").read_text(encoding="utf-8"))
+    assert notebook["artifact"] == "scenario-notebook"
+    assert notebook["summary"]["optional_manifest_count"] == 2
 
 
 def test_cli_build_playbook(tmp_path):
@@ -168,6 +177,65 @@ def test_cli_showcase_page(tmp_path):
     assert all("financial advice" not in item.lower() for item in data["star_worthy_differentiation"])
 
 
+def test_cli_scenario_notebook(tmp_path):
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "demo-bundle", "--out", str(tmp_path)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    out = tmp_path / "notebook.md"
+    json_out = tmp_path / "notebook.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "scenario-notebook",
+            "--playbook",
+            str(tmp_path / "playbook.json"),
+            "--handoff",
+            str(tmp_path / "handoff.json"),
+            "--fixture-gallery",
+            str(tmp_path / "fixture-gallery.json"),
+            "--manifest",
+            str(tmp_path / "tutorial-bundle.json"),
+            str(tmp_path / "showcase.json"),
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert "Scenario Reviewer Notebook" in text
+    assert "Thesis Assumptions" in text
+    assert "Scenario Bands" in text
+    assert "Source Freshness" in text
+    assert "Evidence Hashes" in text
+    assert "Comparison Aftermath" in text
+    assert "Next-Action Queue" in text
+    assert "Risk Boundary Checklist" in text
+    assert "Reusable Agent Prompts" in text
+    assert data["artifact"] == "scenario-notebook"
+    assert data["summary"]["playbook_count"] == 2
+    assert data["summary"]["handoff_pack_count"] == 2
+    assert data["summary"]["case_count"] == 3
+    assert data["summary"]["optional_manifest_count"] == 2
+    assert data["thesis_assumptions"]
+    assert data["scenario_bands"][0]["bands"]
+    assert data["source_freshness"]
+    assert data["evidence_hashes"]
+    assert data["comparison_aftermath"]
+    assert data["next_action_queue"]
+    assert data["risk_boundary_checklist"]
+    assert data["reusable_agent_prompts"]
+
+
 def test_cli_compare_post_event(tmp_path):
     playbook_json = tmp_path / "playbook.json"
     subprocess.run(
@@ -250,6 +318,7 @@ def test_cli_visual_receipt(tmp_path):
     assert all(len(item["sha256"]) == 64 for item in data["files"])
     assert not any(item["path"].endswith("visual-receipt.json") for item in data["files"])
     assert not any(item["path"].endswith("handoff.json") for item in data["files"])
+    assert not any(item["path"].endswith("scenario-notebook.json") for item in data["files"])
 
 
 def test_cli_export_handoff(tmp_path):

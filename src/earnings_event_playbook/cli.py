@@ -17,6 +17,7 @@ from .models import (
     parse_visual_receipt_hashes,
 )
 from .render import (
+    build_scenario_notebook,
     build_showcase_manifest,
     build_tutorial_bundle,
     build_visual_receipt,
@@ -29,6 +30,8 @@ from .render import (
     render_markdown,
     render_post_event_json,
     render_post_event_markdown,
+    render_scenario_notebook_json,
+    render_scenario_notebook_markdown,
     render_showcase_html,
     render_showcase_json,
     render_tutorial_bundle_json,
@@ -101,6 +104,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     showcase.add_argument("--out", required=True, type=Path)
     showcase.add_argument("--json-out", required=True, type=Path)
 
+    notebook = subparsers.add_parser(
+        "scenario-notebook", help="Combine generated artifacts into a Markdown and JSON reviewer notebook."
+    )
+    notebook.add_argument("--playbook", required=True, type=Path)
+    notebook.add_argument("--handoff", required=True, type=Path)
+    notebook.add_argument("--fixture-gallery", required=True, type=Path)
+    notebook.add_argument("--manifest", nargs="*", default=[], type=Path)
+    notebook.add_argument("--out", required=True, type=Path)
+    notebook.add_argument("--json-out", required=True, type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -121,6 +134,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _tutorial_bundle(args.case, args.out, args.json_out, args.output_root)
         if args.command == "showcase-page":
             return _showcase_page(args.out, args.json_out)
+        if args.command == "scenario-notebook":
+            return _scenario_notebook(
+                args.playbook, args.handoff, args.fixture_gallery, args.manifest, args.out, args.json_out
+            )
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -173,6 +190,29 @@ def _demo_bundle(out_dir: Path) -> int:
         out_dir / "handoff.md",
         out_dir / "handoff.json",
         out_dir / "visual-receipt.json",
+    )
+    _fixture_gallery(
+        [
+            _project_root() / "examples" / "cases" / "software",
+            _project_root() / "examples" / "cases" / "retail",
+            _project_root() / "examples" / "cases" / "semiconductor",
+        ],
+        out_dir / "fixture-gallery.md",
+        out_dir / "fixture-gallery.json",
+    )
+    _tutorial_bundle(
+        _project_root() / "examples" / "cases" / "software",
+        out_dir / "tutorial-bundle.md",
+        out_dir / "tutorial-bundle.json",
+        "demo",
+    )
+    _scenario_notebook(
+        out_dir / "playbook.json",
+        out_dir / "handoff.json",
+        out_dir / "fixture-gallery.json",
+        [out_dir / "tutorial-bundle.json", out_dir / "showcase.json"],
+        out_dir / "scenario-notebook.md",
+        out_dir / "scenario-notebook.json",
     )
     return 0
 
@@ -271,6 +311,25 @@ def _showcase_page(out_path: Path, json_path: Path) -> int:
     manifest = build_showcase_manifest()
     write_text(out_path, render_showcase_html(manifest))
     write_text(json_path, render_showcase_json(manifest))
+    return 0
+
+
+def _scenario_notebook(
+    playbook_path: Path,
+    handoff_path: Path,
+    fixture_gallery_path: Path,
+    manifest_paths: Sequence[Path],
+    out_path: Path,
+    json_path: Path,
+) -> int:
+    notebook = build_scenario_notebook(
+        read_json(playbook_path),
+        read_json(handoff_path),
+        read_json(fixture_gallery_path),
+        [read_json(path) for path in manifest_paths],
+    )
+    write_text(out_path, render_scenario_notebook_markdown(notebook))
+    write_text(json_path, render_scenario_notebook_json(notebook))
     return 0
 
 

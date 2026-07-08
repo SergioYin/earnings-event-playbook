@@ -55,6 +55,11 @@
       "label": "Tutorial bundle",
       "path": "demo/tutorial-bundle.md",
       "role": "ordered reviewer packet"
+    },
+    {
+      "label": "Scenario notebook",
+      "path": "demo/scenario-notebook.md",
+      "role": "combined reviewer notebook"
     }
   ],
   "generated_by": "earnings-event-playbook",
@@ -65,7 +70,7 @@
     },
     {
       "area": "artifact completeness",
-      "evidence": "Playbook, compare, receipt, handoff, gallery, tutorial, and showcase artifacts are generated as deterministic Markdown, JSON, or no-JS HTML."
+      "evidence": "Playbook, compare, receipt, handoff, gallery, tutorial, scenario notebook, and showcase artifacts are generated as deterministic Markdown, JSON, or no-JS HTML."
     },
     {
       "area": "package hygiene",
@@ -81,12 +86,14 @@
     "PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json",
     "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json",
     "PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json",
+    "PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json",
     "PYTHONPATH=src python -m earnings_event_playbook selfcheck"
   ],
   "release_evidence": [
     "README first screen names the target user, quickstart, demo path, and star reason.",
     "docs/release-readiness.md records verification commands, asset inventory, risk boundaries, and maturity status.",
     "release_manifest.json lists generated artifacts, verification commands, zero runtime dependencies, and workflow absence.",
+    "demo/scenario-notebook.md and demo/scenario-notebook.json combine playbook, handoff, gallery, tutorial, and showcase evidence for reviewers.",
     "selfcheck scans public package files for private markers and verifies workflow absence.",
     "pytest and unittest cover parsing, scoring, rendering, CLI outputs, public hygiene, and smoke import behavior."
   ],
@@ -111,6 +118,7 @@
     "Read docs/tutorial-software-case.md.",
     "Run tutorial-bundle for examples/cases/software.",
     "Regenerate the software playbook, post-event compare, visual receipt, handoff, and fixture gallery commands listed in the bundle.",
+    "Run scenario-notebook to combine playbook, handoff, gallery, tutorial, and showcase artifacts.",
     "Use demo/tutorial-bundle.json as the machine-readable reviewer checklist."
   ],
   "value_proposition": [

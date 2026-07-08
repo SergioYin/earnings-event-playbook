@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+
+- Added `scenario-notebook` CLI command for combining playbook JSON, handoff JSON, fixture gallery JSON, and optional tutorial/showcase manifests into Markdown and JSON reviewer notebooks.
+- Added checked-in `demo/scenario-notebook.md` and `demo/scenario-notebook.json` covering thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, risk boundary checklist, and reusable agent prompts.
+- Updated README, usage docs, showcase docs, release evidence, release manifest, agent skill, demo bundle generation, version metadata, and tests.
+
 ## 0.7.0
 
 - Added `showcase-page` CLI command for a self-contained no-JavaScript showcase landing page plus JSON manifest.

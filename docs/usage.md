@@ -28,7 +28,7 @@ PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 ```
 
-Receipt and handoff outputs are excluded from the receipt inventory so repeated runs remain deterministic and avoid circular handoff hashes.
+Receipt, handoff, and scenario notebook outputs are excluded from the receipt inventory so repeated runs remain deterministic and avoid circular hashes.
 
 `export-handoff` reads generated playbook JSON and post-event compare JSON, then writes thesis-ledger and earnings-call-risk-map style Markdown and JSON handoff packs.
 
@@ -62,6 +62,14 @@ PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showca
 
 The showcase manifest summarizes value proposition, quickstart commands, demo artifact links, release evidence, maturity rubric, case gallery highlights, tutorial path, risk boundaries, and star-worthy differentiation. It is static release collateral; it does not fetch data or provide advice.
 
+`scenario-notebook` reads generated playbook JSON, handoff JSON, fixture gallery JSON, and optional tutorial/showcase manifests, then writes one Markdown and JSON reviewer notebook.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json
+```
+
+The notebook covers thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, fixture gallery summary, optional manifest summary, risk boundary checklist, reusable agent prompts, and safety boundaries. It is a reviewer artifact; it does not fetch data, execute manifests, or provide action recommendations.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -80,6 +88,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Fixture gallery output is deterministic and only scans local public case fixture directories.
 - Tutorial bundle output is deterministic and only references local public case fixture directories.
 - Showcase output is deterministic, self-contained, and does not require JavaScript or a server.
+- Scenario notebook output is deterministic and combines existing local generated artifacts without executing external workflows.
 
 ## Boundary
 

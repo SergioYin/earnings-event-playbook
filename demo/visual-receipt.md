@@ -6,7 +6,7 @@
 
 - Artifact root: `demo`
 - Files scanned: 24
-- Total bytes: 100987
+- Total bytes: 102428
 
 ## File Roles
 
@@ -44,8 +44,8 @@
 | `demo/portfolio.json` | input-fixture | 442 | `552f2e7c3fec4cd7bc32b642eec760706200adb3d567225dcb15fa981f299e00` |
 | `demo/post-event-compare.json` | post-event-json | 5099 | `72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79` |
 | `demo/post-event-compare.md` | post-event-markdown | 3035 | `a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb` |
-| `demo/showcase.html` | html-artifact | 9117 | `96a49ab0e2caf3b391f8ab9e9fcbf4f244066a027433681f41d6c8d5298a1639` |
-| `demo/showcase.json` | json-artifact | 5649 | `e9540b8e05163bd0f503e328ae787190ac34bbf212fb964be9d062e954215d85` |
+| `demo/showcase.html` | html-artifact | 9851 | `e32783a6885a5121d82dd4c1ef2cc047b65a3cbae93dd5451dc35f9d83acc587` |
+| `demo/showcase.json` | json-artifact | 6356 | `7a203f7bddeeb1c3a21df3c8c1de9f8c7273742244a879e80c54449fee34e8dd` |
 | `demo/tutorial-bundle.json` | json-artifact | 4704 | `08b39909a94d0b96c347f5b60186681c9a892644177eb230683c0e4786fb6b63` |
 | `demo/tutorial-bundle.md` | markdown-artifact | 4002 | `7f5cd3d252e0ec61bfe07762f023bed72dc029200fd9ac461e33dc74170aedfc` |
 

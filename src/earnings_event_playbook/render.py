@@ -134,6 +134,12 @@ def build_showcase_manifest() -> dict:
             "PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle "
             "--case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json"
         ),
+        (
+            "PYTHONPATH=src python -m earnings_event_playbook scenario-notebook "
+            "--playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json "
+            "--manifest demo/tutorial-bundle.json demo/showcase.json "
+            "--out demo/scenario-notebook.md --json-out demo/scenario-notebook.json"
+        ),
         "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
     ]
     return {
@@ -159,11 +165,13 @@ def build_showcase_manifest() -> dict:
             {"label": "Handoff pack", "path": "demo/handoff.md", "role": "thesis-ledger and risk-map handoff"},
             {"label": "Fixture gallery", "path": "demo/fixture-gallery.md", "role": "multi-case comparison"},
             {"label": "Tutorial bundle", "path": "demo/tutorial-bundle.md", "role": "ordered reviewer packet"},
+            {"label": "Scenario notebook", "path": "demo/scenario-notebook.md", "role": "combined reviewer notebook"},
         ],
         "release_evidence": [
             "README first screen names the target user, quickstart, demo path, and star reason.",
             "docs/release-readiness.md records verification commands, asset inventory, risk boundaries, and maturity status.",
             "release_manifest.json lists generated artifacts, verification commands, zero runtime dependencies, and workflow absence.",
+            "demo/scenario-notebook.md and demo/scenario-notebook.json combine playbook, handoff, gallery, tutorial, and showcase evidence for reviewers.",
             "selfcheck scans public package files for private markers and verifies workflow absence.",
             "pytest and unittest cover parsing, scoring, rendering, CLI outputs, public hygiene, and smoke import behavior.",
         ],
@@ -174,7 +182,7 @@ def build_showcase_manifest() -> dict:
             },
             {
                 "area": "artifact completeness",
-                "evidence": "Playbook, compare, receipt, handoff, gallery, tutorial, and showcase artifacts are generated as deterministic Markdown, JSON, or no-JS HTML.",
+                "evidence": "Playbook, compare, receipt, handoff, gallery, tutorial, scenario notebook, and showcase artifacts are generated as deterministic Markdown, JSON, or no-JS HTML.",
             },
             {
                 "area": "package hygiene",
@@ -194,6 +202,7 @@ def build_showcase_manifest() -> dict:
             "Read docs/tutorial-software-case.md.",
             "Run tutorial-bundle for examples/cases/software.",
             "Regenerate the software playbook, post-event compare, visual receipt, handoff, and fixture gallery commands listed in the bundle.",
+            "Run scenario-notebook to combine playbook, handoff, gallery, tutorial, and showcase artifacts.",
             "Use demo/tutorial-bundle.json as the machine-readable reviewer checklist.",
         ],
         "risk_boundaries": SHOWCASE_SAFETY_BOUNDARIES,
@@ -208,6 +217,225 @@ def build_showcase_manifest() -> dict:
 
 def render_showcase_json(manifest: dict) -> str:
     return json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+
+
+SCENARIO_NOTEBOOK_SAFETY_BOUNDARIES = [
+    "local static artifacts only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice",
+    "descriptive reviewer notebook only",
+]
+
+SCENARIO_NOTEBOOK_RISK_CHECKLIST = [
+    "Confirm every source date is acceptable for the review window.",
+    "Confirm scenario bands are treated as deterministic fixture calculations, not forecasts.",
+    "Confirm handoff packs have matching playbook tickers and fiscal periods.",
+    "Confirm evidence hashes point to local generated artifacts.",
+    "Confirm optional tutorial and showcase manifests reference local public paths only.",
+    "Confirm unresolved review queue items stay open until source materials are attached.",
+]
+
+SCENARIO_NOTEBOOK_AGENT_PROMPTS = [
+    {
+        "name": "thesis ledger updater",
+        "prompt": (
+            "Using the scenario notebook JSON, draft concise thesis-ledger notes grouped by ticker, "
+            "source freshness, scenario band, review status, open queue item, and evidence hash. "
+            "Keep the output descriptive and do not include action language."
+        ),
+    },
+    {
+        "name": "earnings call risk mapper",
+        "prompt": (
+            "Using the scenario notebook JSON, convert risk questions and handoff prompts into an "
+            "earnings-call risk map with source freshness, unresolved assumptions, and follow-up evidence fields."
+        ),
+    },
+    {
+        "name": "release reviewer",
+        "prompt": (
+            "Using the scenario notebook JSON, verify artifact completeness, local-only boundaries, "
+            "evidence hashes, optional manifests, and open review items before release."
+        ),
+    },
+]
+
+
+def build_scenario_notebook(
+    playbook: dict,
+    handoff: dict,
+    fixture_gallery: dict,
+    optional_manifests: Iterable[dict] | None = None,
+) -> dict:
+    playbooks = list(playbook.get("playbooks", []))
+    handoff_packs = list(handoff.get("handoff_packs", []))
+    cases = list(fixture_gallery.get("cases", []))
+    manifests = list(optional_manifests or [])
+    playbook_keys = {
+        (item.get("event", {}).get("ticker", ""), item.get("event", {}).get("fiscal_period", ""))
+        for item in playbooks
+    }
+    handoff_keys = {(item.get("ticker", ""), item.get("fiscal_period", "")) for item in handoff_packs}
+    evidence_hashes = _notebook_evidence_hashes(handoff_packs)
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "scenario-notebook",
+        "inputs": {
+            "playbook_artifact": playbook.get("artifact", "playbook"),
+            "handoff_artifact": handoff.get("artifact", "cross-asset-handoff"),
+            "fixture_gallery_artifact": fixture_gallery.get("artifact", "fixture-gallery"),
+            "optional_manifest_artifacts": [
+                item.get("artifact", item.get("title", "manifest")) for item in manifests
+            ],
+        },
+        "summary": {
+            "playbook_count": len(playbooks),
+            "handoff_pack_count": len(handoff_packs),
+            "case_count": len(cases),
+            "optional_manifest_count": len(manifests),
+            "open_review_item_count": sum(len(item.get("open_review_items", [])) for item in handoff_packs),
+            "evidence_hash_count": len(evidence_hashes),
+            "mismatched_handoff_keys": sorted(
+                f"{ticker}:{period}" for ticker, period in handoff_keys.difference(playbook_keys)
+            ),
+        },
+        "thesis_assumptions": _notebook_thesis_assumptions(playbooks),
+        "scenario_bands": _notebook_scenario_bands(playbooks),
+        "source_freshness": _notebook_source_freshness(playbooks, handoff_packs),
+        "evidence_hashes": evidence_hashes,
+        "comparison_aftermath": _notebook_comparison_aftermath(handoff_packs),
+        "next_action_queue": _notebook_next_action_queue(handoff_packs),
+        "fixture_gallery": {
+            "summary": fixture_gallery.get("summary", {}),
+            "cases": [
+                {
+                    "case_id": case.get("case_id", ""),
+                    "tickers": list(case.get("tickers", [])),
+                    "event_count": case.get("event_count", 0),
+                    "post_event_available": bool(case.get("post_event_available", False)),
+                    "post_event_match_count": case.get("post_event_match_count", 0),
+                    "stale_sources": list(case.get("stale_sources", [])),
+                    "high_attention_scores": list(case.get("high_attention_scores", [])),
+                }
+                for case in cases
+            ],
+        },
+        "optional_manifests": [_notebook_manifest_summary(item) for item in manifests],
+        "risk_boundary_checklist": SCENARIO_NOTEBOOK_RISK_CHECKLIST,
+        "reusable_agent_prompts": SCENARIO_NOTEBOOK_AGENT_PROMPTS,
+        "safety_boundaries": SCENARIO_NOTEBOOK_SAFETY_BOUNDARIES,
+    }
+
+
+def render_scenario_notebook_json(notebook: dict) -> str:
+    return json.dumps(notebook, indent=2, sort_keys=True) + "\n"
+
+
+def render_scenario_notebook_markdown(notebook: dict) -> str:
+    summary = notebook["summary"]
+    lines: List[str] = [
+        "# Scenario Reviewer Notebook",
+        "",
+        "> Local static reviewer notebook. No live data, broker connection, orders, or personalized investment, legal, tax, accounting, buy, sell, hold, or allocation advice.",
+        "",
+        "## Summary",
+        "",
+        f"- Playbooks: {summary['playbook_count']}",
+        f"- Handoff packs: {summary['handoff_pack_count']}",
+        f"- Fixture cases: {summary['case_count']}",
+        f"- Optional manifests: {summary['optional_manifest_count']}",
+        f"- Open review items: {summary['open_review_item_count']}",
+        f"- Evidence hashes: {summary['evidence_hash_count']}",
+        "",
+        "## Thesis Assumptions",
+        "",
+    ]
+    for item in notebook["thesis_assumptions"]:
+        lines.extend(
+            [
+                f"### {item['ticker']} - {item['company']}",
+                "",
+                f"- Fiscal period: {item['fiscal_period']}",
+                f"- Attention score: {item['attention_score']}",
+                f"- Position exposure: {_fmt_number(item['position_exposure'])}",
+                f"- Portfolio weight: {_fmt_number(item['portfolio_weight_percent'])}%",
+            ]
+        )
+        lines.extend(f"- Sensitivity: {entry}" for entry in item["sensitivities"])
+        lines.extend(f"- Risk question: {entry}" for entry in item["risk_questions"])
+        lines.append("")
+    lines.extend(["## Scenario Bands", ""])
+    for item in notebook["scenario_bands"]:
+        lines.extend(
+            [
+                f"### {item['ticker']} {item['fiscal_period']}",
+                "",
+                "| Band | Price move | EPS delta | Revenue delta | Exposure delta | Watch items |",
+                "| --- | ---: | ---: | ---: | ---: | --- |",
+            ]
+        )
+        for band in item["bands"]:
+            lines.append(
+                f"| {band['name']} | {band['price_move_percent']:.2f}% | {band['eps_delta_percent']:.2f}% | "
+                f"{band['revenue_delta_percent']:.2f}% | {band['exposure_delta']:.2f} | "
+                f"{'; '.join(band['watch_items'])} |"
+            )
+        lines.append("")
+    lines.extend(["## Source Freshness", "", "| Ticker | Fiscal period | Event source | Freshness | Handoff status |", "| --- | --- | --- | --- | --- |"])
+    for item in notebook["source_freshness"]:
+        lines.append(
+            f"| {item['ticker']} | {item['fiscal_period']} | {item['event_source']} ({item['event_source_date']}) | "
+            f"{item['freshness']} | {item['review_status']} |"
+        )
+    lines.extend(["", "## Evidence Hashes", ""])
+    if notebook["evidence_hashes"]:
+        lines.extend(["| Ticker | Path | Role | Bytes | SHA-256 |", "| --- | --- | --- | ---: | --- |"])
+        for item in notebook["evidence_hashes"]:
+            lines.append(
+                f"| {item['ticker']} | `{item['path']}` | {item['role']} | {item['size_bytes']} | `{item['sha256']}` |"
+            )
+    else:
+        lines.append("- None provided.")
+    lines.extend(["", "## Comparison Aftermath", ""])
+    for item in notebook["comparison_aftermath"]:
+        lines.extend(
+            [
+                f"### {item['ticker']} {item['fiscal_period']}",
+                "",
+                f"- Review status: `{item['review_status']}`",
+                f"- Thesis note draft: {item['thesis_note_draft']}",
+            ]
+        )
+        lines.extend(f"- Catalyst follow-up: {entry}" for entry in item["catalyst_follow_up"])
+        lines.append("")
+    lines.extend(["## Next-Action Queue", ""])
+    for item in notebook["next_action_queue"]:
+        lines.append(f"- [ ] {item['ticker']} {item['fiscal_period']}: {item['item']}")
+    if not notebook["next_action_queue"]:
+        lines.append("- None.")
+    lines.extend(["", "## Fixture Gallery Snapshot", ""])
+    for case in notebook["fixture_gallery"]["cases"]:
+        lines.append(
+            f"- `{case['case_id']}`: {case['event_count']} events, tickers {', '.join(case['tickers']) or 'None'}, "
+            f"post-event {case['post_event_match_count']} matched"
+        )
+    lines.extend(["", "## Optional Manifest Snapshot", ""])
+    if notebook["optional_manifests"]:
+        for manifest in notebook["optional_manifests"]:
+            lines.append(f"- `{manifest['artifact']}`: {manifest['title']} ({manifest['path_count']} paths/commands)")
+    else:
+        lines.append("- None provided.")
+    lines.extend(["", "## Risk Boundary Checklist", ""])
+    lines.extend(f"- [ ] {item}" for item in notebook["risk_boundary_checklist"])
+    lines.extend(["", "## Reusable Agent Prompts", ""])
+    for item in notebook["reusable_agent_prompts"]:
+        lines.extend([f"### {item['name']}", "", item["prompt"], ""])
+    lines.extend(["## Safety Boundaries", ""])
+    lines.extend(f"- {item}" for item in notebook["safety_boundaries"])
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def render_showcase_html(manifest: dict) -> str:
@@ -705,6 +933,7 @@ def _is_visual_artifact(path: Path) -> bool:
         and path.suffix.lower() in VISUAL_RECEIPT_SUFFIXES
         and not path.name.startswith("visual-receipt.")
         and not path.name.startswith("handoff.")
+        and not path.name.startswith("scenario-notebook.")
     )
 
 
@@ -1016,6 +1245,153 @@ def _showcase_rubric(items: Iterable[dict]) -> str:
             "</div>"
         )
     return "".join(cards)
+
+
+def _notebook_thesis_assumptions(playbooks: List[dict]) -> List[dict]:
+    assumptions = []
+    for item in playbooks:
+        event = item.get("event", {})
+        position = item.get("position") or {}
+        assumptions.append(
+            {
+                "ticker": event.get("ticker", ""),
+                "company": event.get("company", ""),
+                "fiscal_period": event.get("fiscal_period", ""),
+                "attention_score": item.get("attention_score", 0),
+                "position_exposure": position.get("exposure"),
+                "portfolio_weight_percent": position.get("portfolio_weight_percent"),
+                "sensitivities": [
+                    f"{sensitivity.get('topic', '')} ({sensitivity.get('risk_weight', 1)}): {sensitivity.get('note', '')}"
+                    for sensitivity in item.get("thesis_sensitivities", [])
+                ]
+                or ["None provided."],
+                "risk_questions": list(item.get("risk_questions", [])) or ["None provided."],
+            }
+        )
+    return assumptions
+
+
+def _notebook_scenario_bands(playbooks: List[dict]) -> List[dict]:
+    bands = []
+    for item in playbooks:
+        event = item.get("event", {})
+        bands.append(
+            {
+                "ticker": event.get("ticker", ""),
+                "fiscal_period": event.get("fiscal_period", ""),
+                "bands": [
+                    {
+                        "name": band.get("name", ""),
+                        "price_move_percent": float(band.get("price_move_percent", 0.0) or 0.0),
+                        "eps_delta_percent": float(band.get("eps_delta_percent", 0.0) or 0.0),
+                        "revenue_delta_percent": float(band.get("revenue_delta_percent", 0.0) or 0.0),
+                        "exposure_delta": float(band.get("exposure_delta", 0.0) or 0.0),
+                        "watch_items": list(band.get("watch_items", [])),
+                    }
+                    for band in item.get("scenario_bands", [])
+                    if isinstance(band, dict)
+                ],
+            }
+        )
+    return bands
+
+
+def _notebook_source_freshness(playbooks: List[dict], handoff_packs: List[dict]) -> List[dict]:
+    status_by_key = {
+        (item.get("ticker", ""), item.get("fiscal_period", "")): item.get("review_status", "not matched")
+        for item in handoff_packs
+    }
+    freshness = []
+    for item in playbooks:
+        event = item.get("event", {})
+        key = (event.get("ticker", ""), event.get("fiscal_period", ""))
+        freshness.append(
+            {
+                "ticker": key[0],
+                "fiscal_period": key[1],
+                "event_source": event.get("source_name", ""),
+                "event_source_date": event.get("source_date", ""),
+                "freshness": item.get("freshness", ""),
+                "review_status": status_by_key.get(key, "not matched"),
+            }
+        )
+    return freshness
+
+
+def _notebook_evidence_hashes(handoff_packs: List[dict]) -> List[dict]:
+    hashes_by_key = {}
+    for pack in handoff_packs:
+        for item in pack.get("evidence_artifact_hashes", []):
+            key = (item.get("path", ""), item.get("sha256", ""))
+            if key in hashes_by_key:
+                hashes_by_key[key]["tickers"].append(pack.get("ticker", ""))
+                continue
+            hashes_by_key[key] = {
+                "ticker": pack.get("ticker", ""),
+                "tickers": [pack.get("ticker", "")],
+                "fiscal_period": pack.get("fiscal_period", ""),
+                "path": item.get("path", ""),
+                "role": item.get("role", ""),
+                "media_type": item.get("media_type", ""),
+                "size_bytes": item.get("size_bytes", 0),
+                "sha256": item.get("sha256", ""),
+            }
+    hashes = []
+    for item in hashes_by_key.values():
+        unique_tickers = sorted({ticker for ticker in item["tickers"] if ticker})
+        item["tickers"] = unique_tickers
+        item["ticker"] = ", ".join(unique_tickers)
+        hashes.append(item)
+    return hashes
+
+
+def _notebook_comparison_aftermath(handoff_packs: List[dict]) -> List[dict]:
+    return [
+        {
+            "ticker": item.get("ticker", ""),
+            "company": item.get("company", ""),
+            "fiscal_period": item.get("fiscal_period", ""),
+            "review_status": item.get("review_status", ""),
+            "thesis_note_draft": item.get("thesis_note_draft", ""),
+            "risk_map_prompts": list(item.get("risk_map_prompts", [])),
+            "catalyst_follow_up": list(item.get("catalyst_follow_up", [])),
+        }
+        for item in handoff_packs
+    ]
+
+
+def _notebook_next_action_queue(handoff_packs: List[dict]) -> List[dict]:
+    queue = []
+    for pack in handoff_packs:
+        for index, item in enumerate(pack.get("open_review_items", []), start=1):
+            queue.append(
+                {
+                    "ticker": pack.get("ticker", ""),
+                    "fiscal_period": pack.get("fiscal_period", ""),
+                    "priority": index,
+                    "item": item,
+                }
+            )
+    return queue
+
+
+def _notebook_manifest_summary(manifest: dict) -> dict:
+    artifact = manifest.get("artifact", manifest.get("title", "manifest"))
+    paths = []
+    for key in ("demo_artifact_links", "ordered_commands"):
+        for item in manifest.get(key, []):
+            if isinstance(item, dict):
+                if "path" in item:
+                    paths.append(item["path"])
+                if "command" in item:
+                    paths.append(item["command"])
+    return {
+        "artifact": artifact,
+        "title": manifest.get("title", artifact),
+        "path_count": len(paths),
+        "paths_or_commands": paths,
+        "risk_boundaries": list(manifest.get("risk_boundaries", manifest.get("safety_boundaries", []))),
+    }
 
 
 def _metric_row(label: str, comparison) -> str:

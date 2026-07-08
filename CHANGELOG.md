@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+
+- Added `evidence-ledger` CLI command for deterministic maintainer evidence ledgers from `release_manifest.json`, review packet manifests, cold-start audit JSON, and git commit metadata when available.
+- Added checked-in `demo/evidence-ledger.md`, `demo/evidence-ledger.json`, and `docs/evidence-ledger.md` covering release artifacts, commands, maturity rubric mapping, consistency checks, risk boundaries, next evidence requests, and public hygiene flags.
+- Updated README, usage docs, promotion checklist, release-readiness evidence, release manifest, agent skill, package version metadata, and tests.
+
 ## 1.2.0
 
 - Added `coldstart-audit` CLI command for deterministic clone-read-run-trust-promote readiness scoring from README, docs, demo paths, and the review packet manifest.

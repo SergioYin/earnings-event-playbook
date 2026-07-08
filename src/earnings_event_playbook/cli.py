@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 from typing import Sequence
 
@@ -164,6 +165,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     audit.add_argument("--out", required=True, type=Path)
     audit.add_argument("--json-out", required=True, type=Path)
 
+    ledger = subparsers.add_parser(
+        "evidence-ledger",
+        help="Build deterministic maintainer evidence ledger Markdown and JSON from release, packet, audit, and git metadata.",
+    )
+    ledger.add_argument("--release-manifest", default=Path("release_manifest.json"), type=Path)
+    ledger.add_argument("--review-manifest", default=Path("demo/review-packet/review-packet-manifest.json"), type=Path)
+    ledger.add_argument("--coldstart-audit", default=Path("demo/coldstart-audit.json"), type=Path)
+    ledger.add_argument("--out", required=True, type=Path)
+    ledger.add_argument("--json-out", required=True, type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -209,6 +220,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         if args.command == "coldstart-audit":
             return _coldstart_audit(args.manifest, args.out, args.json_out)
+        if args.command == "evidence-ledger":
+            return _evidence_ledger(
+                args.release_manifest,
+                args.review_manifest,
+                args.coldstart_audit,
+                args.out,
+                args.json_out,
+            )
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -670,6 +689,27 @@ def _coldstart_audit(manifest_path: Path, out_path: Path, json_path: Path) -> in
     return 0
 
 
+def _evidence_ledger(
+    release_manifest_path: Path,
+    review_manifest_path: Path,
+    coldstart_audit_path: Path,
+    out_path: Path,
+    json_path: Path,
+) -> int:
+    ledger = _build_evidence_ledger(
+        _project_root(),
+        release_manifest_path,
+        read_json(release_manifest_path),
+        review_manifest_path,
+        read_json(review_manifest_path),
+        coldstart_audit_path,
+        read_json(coldstart_audit_path),
+    )
+    write_text(out_path, _render_evidence_ledger_markdown(ledger))
+    write_text(json_path, json.dumps(ledger, indent=2, sort_keys=True) + "\n")
+    return 0
+
+
 def _selfcheck() -> int:
     roots = _selfcheck_roots()
     forbidden = [
@@ -852,13 +892,339 @@ def _build_coldstart_audit(project_root: Path, manifest_path: Path, manifest: di
     }
 
 
+def _build_evidence_ledger(
+    project_root: Path,
+    release_manifest_path: Path,
+    release_manifest: dict,
+    review_manifest_path: Path,
+    review_manifest: dict,
+    coldstart_audit_path: Path,
+    coldstart_audit: dict,
+) -> dict:
+    release_artifacts = sorted(str(path) for path in release_manifest.get("generated_artifacts", []))
+    review_artifacts = list(review_manifest.get("artifacts", []))
+    review_artifact_paths = sorted(str(path) for path in review_manifest.get("artifact_paths", []))
+    audit_artifact_paths = sorted(str(item.get("path", "")) for item in coldstart_audit.get("artifact_checks", []))
+    release_commands = [
+        {
+            "source": "release_manifest",
+            "step": index,
+            "command": str(item.get("command", "")),
+            "result": str(item.get("result", "")),
+        }
+        for index, item in enumerate(release_manifest.get("verification_commands", []), start=1)
+    ]
+    packet_commands = [
+        {
+            "source": "review_packet_manifest",
+            "step": item.get("step", index),
+            "name": item.get("name", ""),
+            "command": item.get("command", ""),
+            "status": item.get("status", ""),
+            "artifact_paths": item.get("artifact_paths", []),
+        }
+        for index, item in enumerate(review_manifest.get("commands", []), start=1)
+    ]
+    consistency_checks = _evidence_ledger_consistency(
+        release_manifest,
+        review_manifest,
+        coldstart_audit,
+        release_artifacts,
+        review_artifact_paths,
+        audit_artifact_paths,
+    )
+    ledger = {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "maintainer-evidence-ledger",
+        "package_version": __version__,
+        "source_manifests": {
+            "release_manifest": _public_source_path(release_manifest_path),
+            "review_packet_manifest": _public_source_path(review_manifest_path),
+            "coldstart_audit": _public_source_path(coldstart_audit_path),
+        },
+        "git_metadata": _read_git_metadata(project_root),
+        "release_artifacts": {
+            "count": len(release_artifacts),
+            "paths": release_artifacts,
+        },
+        "review_packet_artifacts": {
+            "count": len(review_artifacts),
+            "paths": review_artifact_paths,
+            "hash_inventory": [
+                {
+                    "path": item.get("path", ""),
+                    "role": item.get("role", ""),
+                    "media_type": item.get("media_type", ""),
+                    "size_bytes": item.get("size_bytes", 0),
+                    "sha256": item.get("sha256", ""),
+                }
+                for item in review_artifacts
+            ],
+        },
+        "commands": release_commands + packet_commands,
+        "maturity_rubric_mapping": _evidence_ledger_maturity_mapping(
+            release_manifest, review_manifest, coldstart_audit, consistency_checks
+        ),
+        "risk_boundaries": _merge_unique(
+            release_manifest.get("safety_boundaries", []),
+            review_manifest.get("risk_boundaries", []),
+            coldstart_audit.get("safety_boundaries", []),
+        ),
+        "consistency_checks": consistency_checks,
+        "next_evidence_requests": _evidence_ledger_next_requests(consistency_checks),
+    }
+    ledger["public_hygiene"] = {
+        "absolute_paths_present": _contains_absolute_path(ledger),
+        "private_markers_present": _contains_private_marker(ledger),
+        "workflow_files": release_manifest.get("workflow_files", "unknown"),
+    }
+    return ledger
+
+
+def _evidence_ledger_consistency(
+    release_manifest: dict,
+    review_manifest: dict,
+    coldstart_audit: dict,
+    release_artifacts: Sequence[str],
+    review_artifact_paths: Sequence[str],
+    audit_artifact_paths: Sequence[str],
+) -> list[dict]:
+    release_set = set(release_artifacts)
+    review_set = {f"demo/{path}" for path in review_artifact_paths}
+    audit_set = set(audit_artifact_paths)
+    release_version = str(release_manifest.get("version", ""))
+    review_version = str(review_manifest.get("package_version", ""))
+    audit_version = str(coldstart_audit.get("package_version", ""))
+    checks = [
+        {
+            "name": "package-version-alignment",
+            "status": "pass" if {release_version, review_version, audit_version, __version__} == {__version__} else "fail",
+            "evidence": f"release={release_version}; review={review_version}; audit={audit_version}; package={__version__}",
+        },
+        {
+            "name": "review-packet-artifacts-covered-by-release-manifest",
+            "status": "pass" if review_set.issubset(release_set) else "fail",
+            "evidence": f"{len(review_set.intersection(release_set))}/{len(review_set)} review packet artifacts listed in release_manifest.json",
+        },
+        {
+            "name": "coldstart-audit-covered-review-artifacts",
+            "status": "pass" if set(review_artifact_paths) == audit_set else "fail",
+            "evidence": f"{len(set(review_artifact_paths).intersection(audit_set))}/{len(review_artifact_paths)} review packet artifacts checked by coldstart audit",
+        },
+        {
+            "name": "release-gates-pass",
+            "status": "pass"
+            if all(item.get("status") == "pass" for item in review_manifest.get("release_gate_checks", []))
+            else "fail",
+            "evidence": f"{sum(1 for item in review_manifest.get('release_gate_checks', []) if item.get('status') == 'pass')}/{len(review_manifest.get('release_gate_checks', []))} review packet release gates pass",
+        },
+        {
+            "name": "coldstart-promotion-pass",
+            "status": "pass" if coldstart_audit.get("score", {}).get("status") == "pass" else "fail",
+            "evidence": f"score={coldstart_audit.get('score', {}).get('total', 0)}/{coldstart_audit.get('score', {}).get('maximum', 100)}; blockers={len(coldstart_audit.get('promotion_blockers', []))}",
+        },
+        {
+            "name": "workflow-boundary",
+            "status": "pass" if release_manifest.get("workflow_files") == "none" else "fail",
+            "evidence": f"workflow_files={release_manifest.get('workflow_files', 'unknown')}",
+        },
+    ]
+    return checks
+
+
+def _evidence_ledger_maturity_mapping(
+    release_manifest: dict, review_manifest: dict, coldstart_audit: dict, consistency_checks: Sequence[dict]
+) -> list[dict]:
+    return [
+        {
+            "area": "artifact traceability",
+            "status": _check_status(consistency_checks, "review-packet-artifacts-covered-by-release-manifest"),
+            "evidence": [
+                f"{len(release_manifest.get('generated_artifacts', []))} release artifacts listed",
+                f"{len(review_manifest.get('artifacts', []))} review packet artifacts hashed",
+                "SHA-256 inventory carried from review-packet-manifest.json",
+            ],
+        },
+        {
+            "area": "command reproducibility",
+            "status": "pass"
+            if release_manifest.get("verification_commands") and review_manifest.get("commands")
+            else "fail",
+            "evidence": [
+                f"{len(release_manifest.get('verification_commands', []))} release verification commands recorded",
+                f"{len(review_manifest.get('commands', []))} review packet generation commands recorded",
+            ],
+        },
+        {
+            "area": "cold-start readiness",
+            "status": "pass" if coldstart_audit.get("score", {}).get("status") == "pass" else "fail",
+            "evidence": [
+                f"score {coldstart_audit.get('score', {}).get('total', 0)}/{coldstart_audit.get('score', {}).get('maximum', 100)}",
+                f"{len(coldstart_audit.get('promotion_blockers', []))} promotion blockers",
+            ],
+        },
+        {
+            "area": "package hygiene",
+            "status": "pass"
+            if release_manifest.get("runtime_dependencies") == 0 and release_manifest.get("workflow_files") == "none"
+            else "fail",
+            "evidence": [
+                f"runtime_dependencies={release_manifest.get('runtime_dependencies', 'unknown')}",
+                f"workflow_files={release_manifest.get('workflow_files', 'unknown')}",
+            ],
+        },
+        {
+            "area": "risk boundary clarity",
+            "status": "pass"
+            if release_manifest.get("safety_boundaries") and review_manifest.get("risk_boundaries")
+            else "fail",
+            "evidence": _merge_unique(
+                release_manifest.get("safety_boundaries", []),
+                review_manifest.get("risk_boundaries", []),
+            ),
+        },
+    ]
+
+
+def _evidence_ledger_next_requests(consistency_checks: Sequence[dict]) -> list[str]:
+    failed = [item["name"] for item in consistency_checks if item.get("status") != "pass"]
+    if failed:
+        return [f"Resolve failing evidence check: {name}" for name in failed]
+    return [
+        "Attach regenerated demo/evidence-ledger.md and demo/evidence-ledger.json before tagging.",
+        "Confirm release_manifest.json verification command results match the final local run.",
+        "Confirm review-packet-manifest.json and coldstart-audit.json were regenerated from the same checked-in artifacts.",
+        "Confirm public files contain no private refs, workflow files, credentials, or action language.",
+        "Capture any optional screenshot or package-index evidence outside the repository if needed by the maintainer.",
+    ]
+
+
+def _render_evidence_ledger_markdown(ledger: dict) -> str:
+    lines = [
+        "# Maintainer Evidence Ledger",
+        "",
+        f"- Package version: `{ledger['package_version']}`",
+        f"- Release manifest: `{ledger['source_manifests']['release_manifest']}`",
+        f"- Review packet manifest: `{ledger['source_manifests']['review_packet_manifest']}`",
+        f"- Cold-start audit: `{ledger['source_manifests']['coldstart_audit']}`",
+        f"- Git metadata: {ledger['git_metadata']['status']}",
+        f"- Release artifacts: {ledger['release_artifacts']['count']}",
+        f"- Review packet hashed artifacts: {ledger['review_packet_artifacts']['count']}",
+        "",
+        "## Consistency Checks",
+        "",
+        "| Check | Status | Evidence |",
+        "| --- | --- | --- |",
+    ]
+    for item in ledger["consistency_checks"]:
+        lines.append(f"| {item['name']} | {item['status']} | {item['evidence']} |")
+    lines.extend(["", "## Commands", "", "| Source | Step | Command | Result |", "| --- | ---: | --- | --- |"])
+    for command in ledger["commands"]:
+        result = command.get("result") or command.get("status", "")
+        lines.append(f"| {command['source']} | {command.get('step', '')} | `{command.get('command', '')}` | {result} |")
+    lines.extend(["", "## Maturity Rubric Mapping", "", "| Area | Status | Evidence |", "| --- | --- | --- |"])
+    for item in ledger["maturity_rubric_mapping"]:
+        lines.append(f"| {item['area']} | {item['status']} | {'; '.join(item['evidence'])} |")
+    lines.extend(["", "## Release Artifact Paths", ""])
+    lines.extend(f"- `{path}`" for path in ledger["release_artifacts"]["paths"])
+    lines.extend(["", "## Review Packet Hash Inventory", "", "| Path | Role | SHA-256 |", "| --- | --- | --- |"])
+    for item in ledger["review_packet_artifacts"]["hash_inventory"]:
+        lines.append(f"| `{item['path']}` | {item['role']} | `{item['sha256']}` |")
+    lines.extend(["", "## Risk Boundaries", ""])
+    lines.extend(f"- {boundary}" for boundary in ledger["risk_boundaries"])
+    lines.extend(["", "## Next Evidence Requests", ""])
+    lines.extend(f"- {request}" for request in ledger["next_evidence_requests"])
+    lines.extend(["", "## Public Hygiene", ""])
+    lines.append(f"- Absolute paths present: `{ledger['public_hygiene']['absolute_paths_present']}`")
+    lines.append(f"- Private markers present: `{ledger['public_hygiene']['private_markers_present']}`")
+    lines.append(f"- Workflow files: `{ledger['public_hygiene']['workflow_files']}`")
+    return "\n".join(lines) + "\n"
+
+
+def _read_git_metadata(project_root: Path) -> dict:
+    commit = _git_output(project_root, ["rev-parse", "HEAD"])
+    if not commit:
+        return {"status": "unavailable", "commit_sha": "", "commit_short": ""}
+    return {
+        "status": "available",
+        "commit_sha": commit if _looks_like_hex(commit, 40) else "",
+        "commit_short": commit[:12] if _looks_like_hex(commit, 40) else "",
+    }
+
+
+def _git_output(project_root: Path, args: Sequence[str]) -> str:
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=project_root,
+            check=False,
+            text=True,
+            capture_output=True,
+            timeout=2,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    if result.returncode != 0:
+        return ""
+    return result.stdout.strip()
+
+
+def _looks_like_hex(value: str, length: int) -> bool:
+    return len(value) == length and all(char in "0123456789abcdefABCDEF" for char in value)
+
+
+def _merge_unique(*groups: Sequence[str]) -> list[str]:
+    merged = []
+    seen = set()
+    for group in groups:
+        for item in group:
+            text = str(item)
+            if text not in seen:
+                seen.add(text)
+                merged.append(text)
+    return merged
+
+
+def _check_status(checks: Sequence[dict], name: str) -> str:
+    for check in checks:
+        if check.get("name") == name:
+            return str(check.get("status", "fail"))
+    return "fail"
+
+
+def _contains_absolute_path(value) -> bool:
+    if isinstance(value, dict):
+        return any(_contains_absolute_path(item) for item in value.values())
+    if isinstance(value, list):
+        return any(_contains_absolute_path(item) for item in value)
+    if isinstance(value, str):
+        return value.startswith("/") or ":\\" in value
+    return False
+
+
+def _contains_private_marker(value) -> bool:
+    text = json.dumps(value, sort_keys=True)
+    markers = ["Her" + "mes", "Fei" + "shu", "/" + "home" + "/" + "xjyin", "/" + "mnt" + "/" + "c"]
+    return any(marker in text for marker in markers)
+
+
+def _public_source_path(path: Path) -> str:
+    resolved = path.resolve()
+    project_root = _project_root()
+    try:
+        return resolved.relative_to(project_root).as_posix()
+    except ValueError:
+        return path.name
+
+
 def _coldstart_doc_checks(project_root: Path) -> list[dict]:
     required = [
         ("README.md", ["Quickstart", "review-packet", "coldstart-audit"]),
         ("docs/usage.md", ["coldstart-audit", "review-packet"]),
         ("docs/review-packet.md", ["review-packet-manifest.json", "SHA-256"]),
         ("docs/release-readiness.md", ["Cold-Start Audit", "Verification"]),
-        ("docs/promote.md", ["coldstart-audit", "v1.2.0"]),
+        ("docs/promote.md", ["coldstart-audit", "v1.3.0"]),
         ("docs/coldstart-audit.md", ["Cold-Start Audit", "clone", "promote"]),
         ("demo/review-packet/review-packet-manifest.json", ["review-packet-manifest"]),
     ]

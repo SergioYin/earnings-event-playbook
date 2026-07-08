@@ -15,6 +15,7 @@ Concise evidence for the GitHub asset maturity rubric. This project is positione
 - Portfolio drift bridge output is checked in at `demo/portfolio-drift-bridge.md` and `demo/portfolio-drift-bridge.json`.
 - Review packet docs live at `docs/review-packet.md`; the checked-in release packet and manifest live under `demo/review-packet`.
 - Cold-Start Audit docs live at `docs/coldstart-audit.md`; checked-in audit artifacts live at `demo/coldstart-audit.md` and `demo/coldstart-audit.json`.
+- Evidence ledger docs live at `docs/evidence-ledger.md`; checked-in ledger artifacts live at `demo/evidence-ledger.md` and `demo/evidence-ledger.json`.
 - Promotion checklist lives at `docs/promote.md`.
 
 ## Asset Evidence
@@ -32,6 +33,7 @@ Concise evidence for the GitHub asset maturity rubric. This project is positione
 - Portfolio drift bridge outputs: `demo/portfolio-drift-bridge.md` and `demo/portfolio-drift-bridge.json`
 - Review packet outputs: `demo/review-packet` and `demo/review-packet/review-packet-manifest.json`
 - Cold-start audit outputs: `demo/coldstart-audit.md`, `demo/coldstart-audit.json`, and `docs/coldstart-audit.md`
+- Evidence ledger outputs: `demo/evidence-ledger.md`, `demo/evidence-ledger.json`, and `docs/evidence-ledger.md`
 - Agent skill: `skills/agent/earnings-event-playbook/SKILL.md`
 - License: `LICENSE`
 - Changelog: `CHANGELOG.md`
@@ -55,11 +57,12 @@ PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook de
 PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
 PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet
 PYTHONPATH=src python -m earnings_event_playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json
+PYTHONPATH=src python -m earnings_event_playbook evidence-ledger --release-manifest release_manifest.json --review-manifest demo/review-packet/review-packet-manifest.json --coldstart-audit demo/coldstart-audit.json --out demo/evidence-ledger.md --json-out demo/evidence-ledger.json
 PYTHONPATH=src python -m earnings_event_playbook selfcheck
 UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation
 ```
 
-Latest local run on 2026-07-08: pytest passed, demo regeneration completed, documented build-playbook completed, documented post-event compare completed, visual receipt regeneration completed, handoff export completed, fixture gallery regeneration completed, tutorial bundle regeneration completed, showcase page regeneration completed, scenario notebook regeneration completed, portfolio drift bridge regeneration completed, review packet regeneration completed, cold-start audit regeneration completed, selfcheck passed, and `UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation` produced v1.2.0 sdist and wheel artifacts.
+Latest local run on 2026-07-08: pytest passed, demo regeneration completed, documented build-playbook completed, documented post-event compare completed, visual receipt regeneration completed, handoff export completed, fixture gallery regeneration completed, tutorial bundle regeneration completed, showcase page regeneration completed, scenario notebook regeneration completed, portfolio drift bridge regeneration completed, review packet regeneration completed, cold-start audit regeneration completed, evidence ledger regeneration completed, selfcheck passed, and `UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation` produced v1.3.0 sdist and wheel artifacts.
 
 ## Risk Boundaries
 
@@ -77,6 +80,7 @@ Latest local run on 2026-07-08: pytest passed, demo regeneration completed, docu
 - Portfolio drift bridge output connects local portfolio exposure, scenario mismatches, post-event drift rows, risk review prompts, and no-trade boundaries; it does not rank or recommend securities.
 - Review packet output is deterministic release evidence with relative paths and local artifact hashes only; it does not fetch data, connect to brokers, place orders, or provide action recommendations.
 - Cold-start audit output is deterministic release-readiness evidence with docs checks, exact quickstart commands, artifact hashes, and promotion blockers only; it does not fetch data, connect to brokers, place orders, or provide action recommendations.
+- Evidence ledger output is deterministic maintainer evidence with release artifact paths, command evidence, maturity rubric mapping, consistency checks, risk boundaries, next evidence requests, and public hygiene flags only.
 - Fixture outputs must be checked against source materials before use.
 - Visual receipts record local demo artifact roles, sizes, and SHA-256 hashes; handoff packs can carry those hashes as local evidence references. They are release evidence, not an audit or compliance system.
 - GitHub Actions workflows are intentionally not included.
@@ -86,5 +90,5 @@ Latest local run on 2026-07-08: pytest passed, demo regeneration completed, docu
 - Stage: alpha public MVP.
 - Runtime dependencies: 0.
 - Public hygiene: selfcheck scans package files for private markers and verifies workflow absence.
-- Release shape: source package, CLI, showcase landing page, scenario notebook, portfolio drift bridge, review packet manifest, tutorial case study, examples, checked-in demo artifacts, tests, docs, license, changelog, security policy, and contribution notes.
+- Release shape: source package, CLI, showcase landing page, scenario notebook, portfolio drift bridge, review packet manifest, cold-start audit, evidence ledger, tutorial case study, examples, checked-in demo artifacts, tests, docs, license, changelog, security policy, and contribution notes.
 - Known limits: static fixtures are deliberately small; scoring and band matching are heuristic; no external data validation is performed.

@@ -61,7 +61,7 @@ EXM FY2026 Q2 handoff: review status needs-review. EPS band beat; revenue band b
 | `review-packet/playbook.md` | playbook-markdown | 2856 | `59d9451b5206bfa979f0ee224214b1aed2501485246ec230805c982c29354a47` |
 | `review-packet/post-event-compare.json` | post-event-json | 5099 | `72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79` |
 | `review-packet/post-event-compare.md` | post-event-markdown | 3035 | `a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb` |
-| `review-packet/review-packet-manifest.json` | json-artifact | 13198 | `111d32cffec8267667d431ac18edd8fd965ab271145a126576df3aa937f428eb` |
+| `review-packet/review-packet-manifest.json` | json-artifact | 13198 | `d9ab685d779e2caaa0b4bb06b2f05173ebbada626e4ba6efb12b63335eacbaab` |
 | `review-packet/showcase.html` | html-artifact | 10879 | `8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca` |
 | `review-packet/showcase.json` | json-artifact | 7351 | `e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a` |
 | `review-packet/tutorial-bundle.json` | json-artifact | 4938 | `43fe3db28198add8399d23a5898b5393cb9510ec1209a81a177b53b8655a8c47` |
@@ -116,7 +116,7 @@ NXT FY2026 Q1 handoff: review status needs-review. EPS band base; revenue band b
 | `review-packet/playbook.md` | playbook-markdown | 2856 | `59d9451b5206bfa979f0ee224214b1aed2501485246ec230805c982c29354a47` |
 | `review-packet/post-event-compare.json` | post-event-json | 5099 | `72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79` |
 | `review-packet/post-event-compare.md` | post-event-markdown | 3035 | `a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb` |
-| `review-packet/review-packet-manifest.json` | json-artifact | 13198 | `111d32cffec8267667d431ac18edd8fd965ab271145a126576df3aa937f428eb` |
+| `review-packet/review-packet-manifest.json` | json-artifact | 13198 | `d9ab685d779e2caaa0b4bb06b2f05173ebbada626e4ba6efb12b63335eacbaab` |
 | `review-packet/showcase.html` | html-artifact | 10879 | `8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca` |
 | `review-packet/showcase.json` | json-artifact | 7351 | `e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a` |
 | `review-packet/tutorial-bundle.json` | json-artifact | 4938 | `43fe3db28198add8399d23a5898b5393cb9510ec1209a81a177b53b8655a8c47` |

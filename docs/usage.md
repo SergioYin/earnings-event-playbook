@@ -94,6 +94,14 @@ PYTHONPATH=src python -m earnings_event_playbook coldstart-audit --manifest demo
 
 The audit scores clone, read, run, trust, and promote readiness. It records missing-doc checks, exact README quickstart commands, artifact existence and SHA-256 checks, release gate checks, and promotion blockers. It does not fetch data, execute workflows, connect to brokers, place orders, or provide action recommendations.
 
+`evidence-ledger` reads the release manifest, review packet manifest, cold-start audit JSON, and git commit metadata when available, then writes Markdown plus JSON maintainer evidence.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook evidence-ledger --release-manifest release_manifest.json --review-manifest demo/review-packet/review-packet-manifest.json --coldstart-audit demo/coldstart-audit.json --out demo/evidence-ledger.md --json-out demo/evidence-ledger.json
+```
+
+The ledger records release artifact paths, review packet SHA-256 inventory, release and packet commands, maturity rubric mapping, consistency checks, risk boundaries, next evidence requests, and public hygiene flags. It keeps paths relative and does not embed branch names, absolute paths, workflow files, credentials, or action language.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -116,6 +124,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Portfolio drift bridge output is deterministic and combines local portfolio, scenario notebook, post-event compare, and optional static threshold artifacts without executing trades or external workflows.
 - Review packet output is deterministic and records relative paths plus SHA-256 hashes for local release evidence.
 - Cold-start audit output is deterministic and records docs coverage, exact quickstart commands, manifest artifact hash checks, and promotion blockers without external validation.
+- Evidence ledger output is deterministic and records maintainer release evidence from existing local manifests without executing external workflows.
 
 ## Boundary
 

@@ -178,7 +178,7 @@
       "media_type": "application/json",
       "path": "review-packet/review-packet-manifest.json",
       "role": "json-artifact",
-      "sha256": "111d32cffec8267667d431ac18edd8fd965ab271145a126576df3aa937f428eb",
+      "sha256": "d9ab685d779e2caaa0b4bb06b2f05173ebbada626e4ba6efb12b63335eacbaab",
       "size_bytes": 13198,
       "ticker": "EXM, NXT",
       "tickers": [

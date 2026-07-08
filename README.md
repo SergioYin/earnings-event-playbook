@@ -17,6 +17,7 @@ Zero-dependency Python package and CLI. No API keys, no live market data, no bro
 - Portfolio drift bridge: open `demo/portfolio-drift-bridge.md` or `demo/portfolio-drift-bridge.json` for exposure concentration, event-linked tickers, scenario mismatches, post-event drift watchlist, next risk review prompts, and no-trade boundaries.
 - Review packet: open `docs/review-packet.md` and `demo/review-packet/review-packet-manifest.json` for the deterministic release packet, manifest schema, file roles, and SHA-256 hash inventory.
 - Cold-start audit: open `docs/coldstart-audit.md`, `demo/coldstart-audit.md`, and `demo/coldstart-audit.json` for clone-read-run-trust-promote readiness scoring across README, docs, demo artifacts, and the review packet manifest.
+- Evidence ledger: open `docs/evidence-ledger.md`, `demo/evidence-ledger.md`, and `demo/evidence-ledger.json` for the maintainer evidence ledger across release manifest, review packet manifest, cold-start audit, and git commit metadata when available.
 - Star reason: useful as a public, dependency-free template for finance research artifacts with explicit safety boundaries and release evidence.
 
 ## Quickstart
@@ -35,6 +36,7 @@ earnings-event-playbook scenario-notebook --playbook demo/playbook.json --handof
 earnings-event-playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
 earnings-event-playbook review-packet --out demo/review-packet
 earnings-event-playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json
+earnings-event-playbook evidence-ledger --release-manifest release_manifest.json --review-manifest demo/review-packet/review-packet-manifest.json --coldstart-audit demo/coldstart-audit.json --out demo/evidence-ledger.md --json-out demo/evidence-ledger.json
 earnings-event-playbook selfcheck
 ```
 
@@ -53,9 +55,10 @@ PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook de
 PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
 PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet
 PYTHONPATH=src python -m earnings_event_playbook coldstart-audit --manifest demo/review-packet/review-packet-manifest.json --out demo/coldstart-audit.md --json-out demo/coldstart-audit.json
+PYTHONPATH=src python -m earnings_event_playbook evidence-ledger --release-manifest release_manifest.json --review-manifest demo/review-packet/review-packet-manifest.json --coldstart-audit demo/coldstart-audit.json --out demo/evidence-ledger.md --json-out demo/evidence-ledger.json
 ```
 
-Open `demo/showcase.html` for the no-JavaScript landing page, `demo/showcase.json` for the manifest, `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, `demo/scenario-notebook.md` for the combined reviewer notebook, `demo/portfolio-drift-bridge.md` for portfolio drift bridge review, `demo/review-packet/review-packet-manifest.json` for release packet evidence, `demo/coldstart-audit.md` for clone-read-run-trust-promote readiness, `demo/index.html` for the static preview, or read the paired Markdown and JSON demo artifacts.
+Open `demo/showcase.html` for the no-JavaScript landing page, `demo/showcase.json` for the manifest, `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, `demo/scenario-notebook.md` for the combined reviewer notebook, `demo/portfolio-drift-bridge.md` for portfolio drift bridge review, `demo/review-packet/review-packet-manifest.json` for release packet evidence, `demo/coldstart-audit.md` for clone-read-run-trust-promote readiness, `demo/evidence-ledger.md` for maintainer release evidence, `demo/index.html` for the static preview, or read the paired Markdown and JSON demo artifacts.
 
 Expected output: a review packet for the bundled EXM and NXT example events with beat/base/miss exposure bands, stale-source warnings, risk questions, and deterministic JSON for downstream local tooling.
 
@@ -79,6 +82,7 @@ Expected output: a review packet for the bundled EXM and NXT example events with
 - Scenario reviewer notebooks with thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, risk boundary checklist, and reusable agent prompts.
 - Portfolio drift bridge packets with exposure concentration, event-linked tickers, scenario mismatch alerts, post-event drift watchlist, next risk review prompts, static risk thresholds, and no-trade safety boundaries.
 - Cold-start audit packets with clone-read-run-trust-promote scores, missing-doc checks, exact quickstart commands, artifact existence and SHA-256 checks, release gate checks, and promotion blockers.
+- Maintainer evidence ledgers with release artifacts, commands, maturity rubric mapping, consistency checks, risk boundaries, next evidence requests, and public hygiene flags.
 
 ## Examples
 
@@ -119,6 +123,19 @@ PYTHONPATH=src python -m earnings_event_playbook coldstart-audit \
 ```
 
 That writes Markdown and JSON scoring clone-read-run-trust-promote readiness. The audit reads README, docs, demo paths, and the review packet manifest; records missing-doc checks, exact README quickstart commands, artifact existence and SHA-256 checks, release gates, and promotion blockers.
+
+Generate the maintainer evidence ledger:
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook evidence-ledger \
+  --release-manifest release_manifest.json \
+  --review-manifest demo/review-packet/review-packet-manifest.json \
+  --coldstart-audit demo/coldstart-audit.json \
+  --out demo/evidence-ledger.md \
+  --json-out demo/evidence-ledger.json
+```
+
+That writes Markdown and JSON combining release manifest artifacts, review packet hash inventory, cold-start audit readiness, verification commands, package hygiene, risk boundaries, and next evidence requests. Git metadata is limited to commit identifiers when available.
 
 Compare a pre-event playbook to local post-event actuals:
 
@@ -227,6 +244,7 @@ This project is a local research organization tool.
 - It does not provide personalized investment, legal, tax, accounting, buy, sell, or hold advice.
 - Outputs should be reviewed against source materials before use.
 - Cold-start audit output is release-readiness evidence, not an audit, compliance report, recommendation, or external validation.
+- Evidence ledger output is maintainer release evidence, not an audit, compliance report, recommendation, or external validation.
 
 It is intentionally not a trading bot, data vendor client, portfolio optimizer, alerting system, or compliance system.
 
@@ -251,6 +269,8 @@ It is intentionally not a trading bot, data vendor client, portfolio optimizer, 
 `scenario-notebook.json` contains `schema_version`, `artifact`, input artifact names, summary counts, thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, fixture gallery summary, optional manifests, risk boundary checklist, reusable agent prompts, and safety boundaries.
 
 `portfolio-drift-bridge.json` contains `schema_version`, `artifact`, input artifact names, static threshold values, summary counts, exposure concentration rows, event-linked tickers, scenario mismatch alerts, post-event drift watchlist rows, next risk review prompts, no-trade safety boundaries, and safety boundaries.
+
+`evidence-ledger.json` contains `schema_version`, `artifact`, package version, source manifest paths, git commit metadata when available, release artifact paths, review packet hash inventory, command evidence, maturity rubric mapping, consistency checks, risk boundaries, next evidence requests, and public hygiene flags.
 
 The parser is intentionally small and strict so fixture errors fail early.
 

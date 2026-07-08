@@ -296,7 +296,7 @@ def test_cli_review_packet_manifest_schema_and_roles(tmp_path):
     assert manifest["schema_version"] == "1.0"
     assert manifest["artifact"] == "review-packet-manifest"
     assert manifest["generated_by"] == "earnings-event-playbook"
-    assert manifest["package_version"] == "1.2.0"
+    assert manifest["package_version"] == "1.3.0"
     assert manifest["output_root"] == "review-packet"
     assert [command["step"] for command in manifest["commands"]] == list(range(1, 10))
     assert all(command["status"] == "completed" for command in manifest["commands"])
@@ -345,7 +345,7 @@ def test_cli_coldstart_audit_scores_review_packet(tmp_path):
     data = json.loads(json_out.read_text(encoding="utf-8"))
     assert "Cold-Start Audit" in text
     assert data["artifact"] == "coldstart-audit"
-    assert data["package_version"] == "1.2.0"
+    assert data["package_version"] == "1.3.0"
     assert data["score"]["total"] == 100
     assert data["score"]["status"] == "pass"
     assert [item["name"] for item in data["score"]["categories"]] == ["clone", "read", "run", "trust", "promote"]
@@ -411,6 +411,70 @@ def test_cli_review_packet_manifest_is_deterministic_and_public(tmp_path):
     assert not any(Path(item["path"]).is_absolute() for item in manifest["artifacts"])
     assert not any(Path(path).is_absolute() for path in manifest["artifact_paths"])
     assert not any(".." in Path(item["path"]).parts for item in manifest["artifacts"])
+    private_markers = ["Her" + "mes", "Fei" + "shu", "/" + "home" + "/" + "xjyin", "/" + "mnt" + "/" + "c"]
+    assert not any(marker in all_strings for marker in private_markers)
+
+
+def test_cli_evidence_ledger_is_deterministic_and_public(tmp_path):
+    review_dir = tmp_path / "demo" / "review-packet"
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "review-packet", "--out", str(review_dir)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    cold_md = tmp_path / "demo" / "coldstart-audit.md"
+    cold_json = tmp_path / "demo" / "coldstart-audit.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "coldstart-audit",
+            "--manifest",
+            str(review_dir / "review-packet-manifest.json"),
+            "--out",
+            str(cold_md),
+            "--json-out",
+            str(cold_json),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    first_md = tmp_path / "demo" / "evidence-ledger.md"
+    first_json = tmp_path / "demo" / "evidence-ledger.json"
+    second_md = tmp_path / "second" / "evidence-ledger.md"
+    second_json = tmp_path / "second" / "evidence-ledger.json"
+    command = [
+        sys.executable,
+        "-m",
+        "earnings_event_playbook",
+        "evidence-ledger",
+        "--release-manifest",
+        "release_manifest.json",
+        "--review-manifest",
+        str(review_dir / "review-packet-manifest.json"),
+        "--coldstart-audit",
+        str(cold_json),
+    ]
+    subprocess.run([*command, "--out", str(first_md), "--json-out", str(first_json)], check=True, text=True, capture_output=True)
+    subprocess.run(
+        [*command, "--out", str(second_md), "--json-out", str(second_json)], check=True, text=True, capture_output=True
+    )
+
+    assert first_md.read_text(encoding="utf-8") == second_md.read_text(encoding="utf-8")
+    assert first_json.read_text(encoding="utf-8") == second_json.read_text(encoding="utf-8")
+    text = first_md.read_text(encoding="utf-8")
+    data = json.loads(first_json.read_text(encoding="utf-8"))
+    assert "Maintainer Evidence Ledger" in text
+    assert data["artifact"] == "maintainer-evidence-ledger"
+    assert data["package_version"] == "1.3.0"
+    assert data["public_hygiene"]["absolute_paths_present"] is False
+    assert data["public_hygiene"]["private_markers_present"] is False
+    assert all(check["status"] == "pass" for check in data["consistency_checks"])
+    assert any(item["area"] == "artifact traceability" for item in data["maturity_rubric_mapping"])
+    all_strings = json.dumps(data, sort_keys=True)
     private_markers = ["Her" + "mes", "Fei" + "shu", "/" + "home" + "/" + "xjyin", "/" + "mnt" + "/" + "c"]
     assert not any(marker in all_strings for marker in private_markers)
 

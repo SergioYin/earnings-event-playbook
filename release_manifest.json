@@ -1,19 +1,22 @@
 {
   "project": "earnings-event-playbook",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "runtime_dependencies": 0,
   "workflow_files": "none",
   "generated_artifacts": [
     "demo/events.json",
     "demo/portfolio.json",
+    "demo/actuals.json",
     "demo/playbook.md",
     "demo/playbook.json",
+    "demo/post-event-compare.md",
+    "demo/post-event-compare.json",
     "demo/index.html"
   ],
   "verification_commands": [
     {
       "command": "PYTHONPATH=src python -m pytest",
-      "result": "14 passed"
+      "result": "18 passed"
     },
     {
       "command": "PYTHONPATH=src python -m unittest discover",
@@ -28,16 +31,16 @@
       "result": "passed"
     },
     {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json",
+      "result": "passed"
+    },
+    {
       "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok"
+      "result": "selfcheck ok; scanned 35 public files"
     },
     {
       "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
-      "result": "passed without setuptools license deprecation warnings"
-    },
-    {
-      "command": "python -m venv /tmp/eep-release-venv2 && /tmp/eep-release-venv2/bin/python -m pip install --no-index --find-links dist earnings-event-playbook && mkdir -p /tmp/eep-empty-cwd && cd /tmp/eep-empty-cwd && /tmp/eep-release-venv2/bin/python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok from installed package; scanned packaged module root"
+      "result": "built dist/earnings_event_playbook-0.2.0.tar.gz and dist/earnings_event_playbook-0.2.0-py3-none-any.whl"
     }
   ],
   "safety_boundaries": [

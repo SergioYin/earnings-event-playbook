@@ -4,7 +4,7 @@ import html
 import json
 from typing import Iterable, List
 
-from .models import EventPlaybook
+from .models import EventPlaybook, PostEventComparison
 
 
 def playbooks_to_dict(playbooks: Iterable[EventPlaybook]) -> dict:
@@ -25,6 +25,27 @@ def playbooks_to_dict(playbooks: Iterable[EventPlaybook]) -> dict:
 
 def render_json(playbooks: Iterable[EventPlaybook]) -> str:
     return json.dumps(playbooks_to_dict(playbooks), indent=2, sort_keys=True) + "\n"
+
+
+def post_event_to_dict(comparisons: Iterable[PostEventComparison]) -> dict:
+    items = [item.to_dict() for item in comparisons]
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "post-event-compare",
+        "safety_boundaries": [
+            "local static fixtures only",
+            "no live market data",
+            "no broker connection",
+            "no order placement",
+            "no personalized investment advice",
+        ],
+        "comparisons": items,
+    }
+
+
+def render_post_event_json(comparisons: Iterable[PostEventComparison]) -> str:
+    return json.dumps(post_event_to_dict(comparisons), indent=2, sort_keys=True) + "\n"
 
 
 def render_markdown(playbooks: Iterable[EventPlaybook]) -> str:
@@ -88,6 +109,71 @@ def render_markdown(playbooks: Iterable[EventPlaybook]) -> str:
         else:
             lines.append("- None provided.")
         lines.extend(["", "### Post-Event Review Queue", ""])
+        lines.extend(f"- {entry}" for entry in item.review_queue)
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def render_post_event_markdown(comparisons: Iterable[PostEventComparison]) -> str:
+    items = list(comparisons)
+    lines: List[str] = [
+        "# Post-Event Compare",
+        "",
+        "> Educational research review only. Local static fixtures only; no live data, broker connection, orders, or investment advice.",
+        "",
+        "## Summary",
+        "",
+        f"- Comparisons: {len(items)}",
+        f"- Review queue items: {sum(len(item.review_queue) for item in items)}",
+        "",
+    ]
+    for item in items:
+        event = item.event
+        lines.extend(
+            [
+                f"## {event.ticker} - {event.company}",
+                "",
+                f"- Fiscal period: {event.fiscal_period}",
+                f"- Event date: {event.date.isoformat()}",
+                f"- Review status: {item.review_status}",
+            ]
+        )
+        if item.actual is None:
+            lines.append("- Actuals source: not matched")
+        else:
+            actual = item.actual
+            lines.extend(
+                [
+                    f"- Report date: {actual.report_date.isoformat()}",
+                    f"- Actuals source: {actual.source_name} ({actual.source_date.isoformat()})",
+                    f"- Actuals note: {actual.notes or 'None'}",
+                ]
+            )
+        lines.extend(
+            [
+                "",
+                "### Outcome Comparison",
+                "",
+                "| Metric | Consensus | Actual | Delta | Delta % | Band |",
+                "| --- | ---: | ---: | ---: | ---: | --- |",
+                _metric_row("EPS", item.eps),
+                _metric_row("Revenue", item.revenue),
+                "",
+                "### Move Comparison",
+                "",
+                "| Implied move | Actual move | Delta | Matched scenario |",
+                "| ---: | ---: | ---: | --- |",
+                (
+                    f"| {item.move.implied_move_percent:.2f}% | {_fmt_percent(item.move.actual_move_percent)} | "
+                    f"{_fmt_percent(item.move.delta_percent)} | {item.move.matched_scenario} |"
+                ),
+                "",
+                "### Thesis Ledger Handoff",
+                "",
+            ]
+        )
+        lines.extend(f"- {note}" for note in item.thesis_ledger_handoff)
+        lines.extend(["", "### Review Queue", ""])
         lines.extend(f"- {entry}" for entry in item.review_queue)
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
@@ -169,3 +255,16 @@ def _fmt_number(value: float | None) -> str:
     if value is None:
         return "not provided"
     return f"{value:.2f}"
+
+
+def _fmt_percent(value: float | None) -> str:
+    if value is None:
+        return "not provided"
+    return f"{value:.2f}%"
+
+
+def _metric_row(label: str, comparison) -> str:
+    return (
+        f"| {label} | {_fmt_number(comparison.consensus)} | {_fmt_number(comparison.actual)} | "
+        f"{_fmt_number(comparison.delta)} | {_fmt_percent(comparison.delta_percent)} | {comparison.band} |"
+    )

@@ -1,0 +1,27 @@
+{
+  "as_of": "2026-07-27",
+  "actuals": [
+    {
+      "ticker": "EXM",
+      "fiscal_period": "FY2026 Q2",
+      "report_date": "2026-07-24",
+      "actual_eps": 1.55,
+      "actual_revenue": 3378.0,
+      "actual_move_percent": 7.1,
+      "source_date": "2026-07-24",
+      "source_name": "Static post-event fixture",
+      "notes": "Revenue and margin comments require ledger follow-up against pre-event sensitivities."
+    },
+    {
+      "ticker": "NXT",
+      "fiscal_period": "FY2026 Q1",
+      "report_date": "2026-08-01",
+      "actual_eps": 0.72,
+      "actual_revenue": 1812.0,
+      "actual_move_percent": -8.4,
+      "source_date": "2026-08-01",
+      "source_name": "Static post-event fixture",
+      "notes": "Management commentary should be attached before closing the review queue."
+    }
+  ]
+}

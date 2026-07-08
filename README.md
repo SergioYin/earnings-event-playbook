@@ -1,6 +1,6 @@
 # earnings-event-playbook
 
-Build deterministic earnings event playbooks from local JSON fixtures for analysts, investors, and research teams who want a repeatable pre-earnings review packet without wiring up data vendors or broker systems.
+Build deterministic earnings event playbooks from local JSON fixtures for analysts, investors, and research teams who want repeatable pre-earnings and post-event review packets without wiring up data vendors or broker systems.
 
 Star this repo if you want a small, auditable example of turning static earnings-calendar, consensus, and portfolio fixtures into Markdown, JSON, and a no-JavaScript HTML review artifact.
 
@@ -9,7 +9,7 @@ Zero-dependency Python package and CLI. No API keys, no live market data, no bro
 ## First Look
 
 - Target user: a research operator who wants a local, deterministic checklist before earnings events.
-- Value in 2 minutes: open `demo/index.html` or `demo/playbook.md` to see scenario bands, source freshness, attention scores, thesis sensitivities, and a post-event review queue.
+- Value in 2 minutes: open `demo/index.html`, `demo/playbook.md`, or `demo/post-event-compare.md` to see scenario bands, source freshness, attention scores, actuals comparisons, thesis sensitivities, and review queues.
 - Star reason: useful as a public, dependency-free template for finance research artifacts with explicit safety boundaries and release evidence.
 
 ## Quickstart
@@ -18,6 +18,7 @@ Zero-dependency Python package and CLI. No API keys, no live market data, no bro
 python -m pip install -e .
 earnings-event-playbook demo-bundle --out demo
 earnings-event-playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json
+earnings-event-playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json
 earnings-event-playbook selfcheck
 ```
 
@@ -26,9 +27,10 @@ Without installation:
 ```bash
 PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json
+PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json
 ```
 
-Open `demo/index.html` in a browser for the static preview, or read `demo/playbook.md` and `demo/playbook.json`.
+Open `demo/index.html` in a browser for the static preview, or read `demo/playbook.md`, `demo/playbook.json`, `demo/post-event-compare.md`, and `demo/post-event-compare.json`.
 
 Expected output: a review packet for the bundled EXM and NXT example events with beat/base/miss exposure bands, stale-source warnings, risk questions, and deterministic JSON for downstream local tooling.
 
@@ -42,10 +44,12 @@ Expected output: a review packet for the bundled EXM and NXT example events with
 - Source freshness labels.
 - Beat, base, and miss scenario bands.
 - Risk questions and post-event review queue.
+- Post-event actual EPS, revenue, and move outcomes.
+- Thesis-ledger handoff notes and review queue status.
 
 ## Examples
 
-Bundled fixtures live in `examples/events.json` and `examples/portfolio.json`.
+Bundled fixtures live in `examples/events.json`, `examples/portfolio.json`, and `examples/actuals.json`.
 
 ```bash
 PYTHONPATH=src python -m earnings_event_playbook build-playbook \
@@ -61,7 +65,19 @@ Generate a complete local demo bundle:
 PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 ```
 
-That writes `events.json`, `portfolio.json`, `playbook.md`, `playbook.json`, and `index.html`.
+That writes `events.json`, `portfolio.json`, `actuals.json`, `playbook.md`, `playbook.json`, `post-event-compare.md`, `post-event-compare.json`, and `index.html`.
+
+Compare a pre-event playbook to local post-event actuals:
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook compare-post-event \
+  --before-playbook demo/playbook.json \
+  --actuals examples/actuals.json \
+  --out demo/post-event-compare.md \
+  --json-out demo/post-event-compare.json
+```
+
+That writes a descriptive post-event comparison with EPS, revenue, and move outcomes, matched scenario bands, thesis-ledger handoff notes, and review status. It does not recommend any action.
 
 ## Safety Boundaries
 
@@ -81,6 +97,8 @@ It is intentionally not a trading bot, data vendor client, portfolio optimizer, 
 `events.json` contains `as_of`, an `events` list, optional `thesis_sensitivities`, and optional `risk_questions`.
 
 `portfolio.json` contains `as_of`, `base_currency`, and a `positions` list.
+
+`actuals.json` contains `as_of` and an `actuals` list with report date, actual EPS, actual revenue, actual move percent, source metadata, and optional notes.
 
 The parser is intentionally small and strict so fixture errors fail early.
 

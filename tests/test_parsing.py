@@ -1,4 +1,4 @@
-from earnings_event_playbook.models import FixtureError, parse_events_fixture, parse_portfolio_fixture
+from earnings_event_playbook.models import FixtureError, parse_actuals_fixture, parse_events_fixture, parse_portfolio_fixture
 
 
 def test_parse_events_fixture_requires_events():
@@ -32,3 +32,24 @@ def test_parse_events_fixture_normalizes_ticker():
 def test_parse_portfolio_fixture_accepts_empty_positions():
     fixture = parse_portfolio_fixture({"as_of": "2026-07-08", "base_currency": "USD", "positions": []})
     assert fixture.positions == []
+
+
+def test_parse_actuals_fixture_normalizes_ticker():
+    fixture = parse_actuals_fixture(
+        {
+            "as_of": "2026-07-27",
+            "actuals": [
+                {
+                    "ticker": "exm",
+                    "fiscal_period": "FY2026 Q2",
+                    "report_date": "2026-07-24",
+                    "actual_eps": 1.55,
+                    "actual_revenue": 3378,
+                    "actual_move_percent": 7.1,
+                    "source_date": "2026-07-24",
+                    "source_name": "Fixture",
+                }
+            ],
+        }
+    )
+    assert fixture.actuals[0].ticker == "EXM"

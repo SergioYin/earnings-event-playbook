@@ -4,11 +4,16 @@ from datetime import date
 from typing import List
 
 from .models import (
+    ActualsFixture,
     EarningsEvent,
     EventFixture,
     EventPlaybook,
+    MetricComparison,
+    MoveComparison,
     PortfolioFixture,
+    PostEventComparison,
     ScenarioBand,
+    find_actual,
     find_position,
 )
 
@@ -95,3 +100,144 @@ def build_playbooks(events_fixture: EventFixture, portfolio_fixture: PortfolioFi
             )
         )
     return playbooks
+
+
+def compare_post_event(playbooks: List[EventPlaybook], actuals_fixture: ActualsFixture) -> List[PostEventComparison]:
+    comparisons = []
+    for playbook in playbooks:
+        event = playbook.event
+        actual = find_actual(actuals_fixture.actuals, event.ticker, event.fiscal_period)
+        eps = _metric_comparison(
+            "eps",
+            event.consensus_eps,
+            actual.actual_eps if actual else None,
+            _scenario_thresholds(playbook.scenario_bands, "eps_delta_percent"),
+        )
+        revenue = _metric_comparison(
+            "revenue",
+            event.consensus_revenue,
+            actual.actual_revenue if actual else None,
+            _scenario_thresholds(playbook.scenario_bands, "revenue_delta_percent"),
+        )
+        move = _move_comparison(
+            event.implied_move_percent,
+            actual.actual_move_percent if actual else None,
+            playbook.scenario_bands,
+        )
+        handoff = _thesis_ledger_handoff(playbook, actual, eps, revenue, move)
+        review_queue = _post_event_review_queue(playbook, actual, eps, revenue, move)
+        comparisons.append(
+            PostEventComparison(
+                as_of=actuals_fixture.as_of,
+                event=event,
+                actual=actual,
+                eps=eps,
+                revenue=revenue,
+                move=move,
+                review_status=_review_status(actual, eps, revenue, move),
+                thesis_ledger_handoff=handoff,
+                review_queue=review_queue,
+            )
+        )
+    return comparisons
+
+
+def _scenario_thresholds(bands: List[ScenarioBand], attr: str) -> dict:
+    thresholds = {band.name: getattr(band, attr) for band in bands}
+    return {
+        "beat": float(thresholds.get("beat", 8.0)),
+        "miss": float(thresholds.get("miss", -8.0)),
+    }
+
+
+def _metric_comparison(metric: str, consensus: float | None, actual: float | None, thresholds: dict) -> MetricComparison:
+    if consensus is None or actual is None:
+        return MetricComparison(metric, consensus, actual, None, None, "not-comparable")
+    delta = actual - consensus
+    delta_percent = 0.0 if consensus == 0 else (delta / abs(consensus)) * 100.0
+    if delta_percent >= thresholds["beat"]:
+        band = "beat"
+    elif delta_percent <= thresholds["miss"]:
+        band = "miss"
+    else:
+        band = "base"
+    return MetricComparison(metric, consensus, actual, round(delta, 4), round(delta_percent, 2), band)
+
+
+def _move_comparison(
+    implied_move_percent: float, actual_move_percent: float | None, bands: List[ScenarioBand]
+) -> MoveComparison:
+    if actual_move_percent is None:
+        return MoveComparison(implied_move_percent, None, None, "not-comparable")
+    if bands:
+        matched = min(bands, key=lambda band: abs(band.price_move_percent - actual_move_percent)).name
+    else:
+        matched = "base"
+    return MoveComparison(
+        implied_move_percent=implied_move_percent,
+        actual_move_percent=actual_move_percent,
+        delta_percent=round(actual_move_percent - implied_move_percent, 2),
+        matched_scenario=matched,
+    )
+
+
+def _thesis_ledger_handoff(
+    playbook: EventPlaybook,
+    actual,
+    eps: MetricComparison,
+    revenue: MetricComparison,
+    move: MoveComparison,
+) -> List[str]:
+    event = playbook.event
+    if actual is None:
+        return [f"{event.ticker}: no matching actuals fixture; keep pre-event thesis ledger open for data capture."]
+
+    notes = [
+        f"{event.ticker} {event.fiscal_period}: EPS classified as {eps.band}; revenue classified as {revenue.band}; post-event move matched {move.matched_scenario}.",
+        f"Source handoff: {actual.source_name} dated {actual.source_date.isoformat()}; report date {actual.report_date.isoformat()}.",
+    ]
+    if actual.notes:
+        notes.append(f"Actuals note for ledger: {actual.notes}")
+    if playbook.thesis_sensitivities:
+        topics = ", ".join(item.topic for item in playbook.thesis_sensitivities)
+        notes.append(f"Review thesis sensitivity topics before closing ledger: {topics}.")
+    else:
+        notes.append("No thesis sensitivity topics were provided in the before-playbook.")
+    return notes
+
+
+def _post_event_review_queue(
+    playbook: EventPlaybook,
+    actual,
+    eps: MetricComparison,
+    revenue: MetricComparison,
+    move: MoveComparison,
+) -> List[str]:
+    event = playbook.event
+    queue = [f"Attach actuals source for {event.ticker} {event.fiscal_period} to the thesis ledger."]
+    if actual is None:
+        queue.append("Add a matching actuals fixture entry before marking the review complete.")
+        return queue
+    for comparison in (eps, revenue):
+        if comparison.band == "not-comparable":
+            queue.append(f"Fill missing {comparison.metric} consensus or actual value for comparison.")
+    if move.matched_scenario == "not-comparable":
+        queue.append("Fill missing post-event move value for scenario comparison.")
+    if eps.band != revenue.band and "not-comparable" not in {eps.band, revenue.band}:
+        queue.append("EPS and revenue landed in different bands; document which thesis sensitivity changed.")
+    if move.matched_scenario not in {eps.band, revenue.band, "not-comparable"}:
+        queue.append("Price move scenario differs from fundamentals bands; add market-reaction context.")
+    queue.extend(f"Answer after-call question: {question}" for question in playbook.risk_questions)
+    if len(queue) == 1:
+        queue.append("No additional comparison exceptions detected; complete source review and archive notes.")
+    return queue
+
+
+def _review_status(actual, eps: MetricComparison, revenue: MetricComparison, move: MoveComparison) -> str:
+    if actual is None:
+        return "blocked-missing-actuals"
+    if "not-comparable" in {eps.band, revenue.band, move.matched_scenario}:
+        return "needs-data"
+    if eps.band != revenue.band or move.matched_scenario not in {eps.band, revenue.band}:
+        return "needs-review"
+    return "ready-for-ledger"

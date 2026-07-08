@@ -8,6 +8,14 @@
 PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json
 ```
 
+`compare-post-event` reads a generated playbook JSON file and local actuals fixture, then writes a Markdown and JSON post-event comparison.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json
+```
+
+The comparison models actual EPS, actual revenue, and actual post-event move outcomes against consensus fields and scenario bands from the before-playbook. It produces thesis-ledger handoff notes and a review status of `ready-for-ledger`, `needs-review`, `needs-data`, or `blocked-missing-actuals`.
+
 `demo-bundle` writes demo fixtures and all demo outputs.
 
 ```bash
@@ -26,6 +34,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Markdown is deterministic and intended for human review.
 - JSON is deterministic, sorted, and intended for downstream local tooling.
 - HTML is static and does not require JavaScript.
+- Post-event compare output is descriptive and does not provide action recommendations.
 
 ## Boundary
 

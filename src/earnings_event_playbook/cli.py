@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Sequence
 
 from . import __version__
-from .core import build_playbooks
+from .core import build_playbooks, compare_post_event
 from .io import read_json, write_text
-from .models import FixtureError, parse_events_fixture, parse_portfolio_fixture
-from .render import render_html_index, render_json, render_markdown
+from .models import FixtureError, parse_actuals_fixture, parse_events_fixture, parse_playbook_json, parse_portfolio_fixture
+from .render import render_html_index, render_json, render_markdown, render_post_event_json, render_post_event_markdown
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -28,6 +28,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     build.add_argument("--out", required=True, type=Path)
     build.add_argument("--json-out", required=True, type=Path)
 
+    compare = subparsers.add_parser(
+        "compare-post-event", help="Compare a pre-event playbook JSON file with local actuals fixtures."
+    )
+    compare.add_argument("--before-playbook", required=True, type=Path)
+    compare.add_argument("--actuals", required=True, type=Path)
+    compare.add_argument("--out", required=True, type=Path)
+    compare.add_argument("--json-out", required=True, type=Path)
+
     demo = subparsers.add_parser("demo-bundle", help="Generate demo fixtures and static outputs.")
     demo.add_argument("--out", required=True, type=Path)
 
@@ -37,6 +45,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command == "build-playbook":
             return _build_playbook(args.events, args.portfolio, args.out, args.json_out)
+        if args.command == "compare-post-event":
+            return _compare_post_event(args.before_playbook, args.actuals, args.out, args.json_out)
         if args.command == "demo-bundle":
             return _demo_bundle(args.out)
         if args.command == "selfcheck":
@@ -59,15 +69,29 @@ def _build_playbook(events_path: Path, portfolio_path: Path, out_path: Path, jso
     return 0
 
 
+def _compare_post_event(before_path: Path, actuals_path: Path, out_path: Path, json_path: Path) -> int:
+    playbooks = parse_playbook_json(read_json(before_path))
+    actuals = parse_actuals_fixture(read_json(actuals_path))
+    comparisons = compare_post_event(playbooks, actuals)
+    write_text(out_path, render_post_event_markdown(comparisons))
+    write_text(json_path, render_post_event_json(comparisons))
+    return 0
+
+
 def _demo_bundle(out_dir: Path) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     events_path = out_dir / "events.json"
     portfolio_path = out_dir / "portfolio.json"
     write_text(events_path, _demo_events_json())
     write_text(portfolio_path, _demo_portfolio_json())
+    actuals_path = out_dir / "actuals.json"
+    write_text(actuals_path, _demo_actuals_json())
     playbooks = _load_playbooks(events_path, portfolio_path)
     write_text(out_dir / "playbook.md", render_markdown(playbooks))
     write_text(out_dir / "playbook.json", render_json(playbooks))
+    comparisons = compare_post_event(playbooks, parse_actuals_fixture(read_json(actuals_path)))
+    write_text(out_dir / "post-event-compare.md", render_post_event_markdown(comparisons))
+    write_text(out_dir / "post-event-compare.json", render_post_event_json(comparisons))
     write_text(out_dir / "index.html", render_html_index(playbooks))
     return 0
 
@@ -186,6 +210,37 @@ def _demo_portfolio_json() -> str:
       "exposure": 7600,
       "portfolio_weight_percent": 1.9,
       "notes": "Smaller discretionary retail exposure."
+    }
+  ]
+}
+"""
+
+
+def _demo_actuals_json() -> str:
+    return """{
+  "as_of": "2026-07-27",
+  "actuals": [
+    {
+      "ticker": "EXM",
+      "fiscal_period": "FY2026 Q2",
+      "report_date": "2026-07-24",
+      "actual_eps": 1.55,
+      "actual_revenue": 3378.0,
+      "actual_move_percent": 7.1,
+      "source_date": "2026-07-24",
+      "source_name": "Static post-event fixture",
+      "notes": "Revenue and margin comments require ledger follow-up against pre-event sensitivities."
+    },
+    {
+      "ticker": "NXT",
+      "fiscal_period": "FY2026 Q1",
+      "report_date": "2026-08-01",
+      "actual_eps": 0.72,
+      "actual_revenue": 1812.0,
+      "actual_move_percent": -8.4,
+      "source_date": "2026-08-01",
+      "source_name": "Static post-event fixture",
+      "notes": "Management commentary should be attached before closing the review queue."
     }
   ]
 }

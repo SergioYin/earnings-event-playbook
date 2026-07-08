@@ -96,6 +96,114 @@ class ScenarioBand:
 
 
 @dataclass(frozen=True)
+class ActualOutcome:
+    ticker: str
+    fiscal_period: str
+    report_date: date
+    actual_eps: Optional[float]
+    actual_revenue: Optional[float]
+    actual_move_percent: Optional[float]
+    source_name: str
+    source_date: date
+    notes: str = ""
+
+
+@dataclass(frozen=True)
+class ActualsFixture:
+    as_of: date
+    actuals: List[ActualOutcome]
+
+
+@dataclass(frozen=True)
+class MetricComparison:
+    metric: str
+    consensus: Optional[float]
+    actual: Optional[float]
+    delta: Optional[float]
+    delta_percent: Optional[float]
+    band: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "metric": self.metric,
+            "consensus": self.consensus,
+            "actual": self.actual,
+            "delta": self.delta,
+            "delta_percent": self.delta_percent,
+            "band": self.band,
+        }
+
+
+@dataclass(frozen=True)
+class MoveComparison:
+    implied_move_percent: float
+    actual_move_percent: Optional[float]
+    delta_percent: Optional[float]
+    matched_scenario: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "implied_move_percent": self.implied_move_percent,
+            "actual_move_percent": self.actual_move_percent,
+            "delta_percent": self.delta_percent,
+            "matched_scenario": self.matched_scenario,
+        }
+
+
+@dataclass(frozen=True)
+class PostEventComparison:
+    as_of: date
+    event: EarningsEvent
+    actual: Optional[ActualOutcome]
+    eps: MetricComparison
+    revenue: MetricComparison
+    move: MoveComparison
+    review_status: str
+    thesis_ledger_handoff: List[str]
+    review_queue: List[str]
+    safety_notice: str = (
+        "Educational post-event review only. Uses local static fixtures only; "
+        "no live data, broker connection, orders, or investment advice."
+    )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "as_of": self.as_of.isoformat(),
+            "event": {
+                "date": self.event.date.isoformat(),
+                "ticker": self.event.ticker,
+                "company": self.event.company,
+                "fiscal_period": self.event.fiscal_period,
+                "consensus_eps": self.event.consensus_eps,
+                "consensus_revenue": self.event.consensus_revenue,
+                "implied_move_percent": self.event.implied_move_percent,
+                "source_date": self.event.source_date.isoformat(),
+                "source_name": self.event.source_name,
+            },
+            "actual": None
+            if self.actual is None
+            else {
+                "ticker": self.actual.ticker,
+                "fiscal_period": self.actual.fiscal_period,
+                "report_date": self.actual.report_date.isoformat(),
+                "actual_eps": self.actual.actual_eps,
+                "actual_revenue": self.actual.actual_revenue,
+                "actual_move_percent": self.actual.actual_move_percent,
+                "source_name": self.actual.source_name,
+                "source_date": self.actual.source_date.isoformat(),
+                "notes": self.actual.notes,
+            },
+            "eps": self.eps.to_dict(),
+            "revenue": self.revenue.to_dict(),
+            "move": self.move.to_dict(),
+            "review_status": self.review_status,
+            "thesis_ledger_handoff": list(self.thesis_ledger_handoff),
+            "review_queue": list(self.review_queue),
+            "safety_notice": self.safety_notice,
+        }
+
+
+@dataclass(frozen=True)
 class EventPlaybook:
     as_of: date
     event: EarningsEvent
@@ -238,9 +346,135 @@ def parse_portfolio_fixture(raw: Mapping[str, Any]) -> PortfolioFixture:
     )
 
 
+def parse_actuals_fixture(raw: Mapping[str, Any]) -> ActualsFixture:
+    as_of = parse_date(require_text(raw, "as_of"), "as_of")
+    actuals_raw = raw.get("actuals")
+    if not isinstance(actuals_raw, list) or not actuals_raw:
+        raise FixtureError("actuals must be a non-empty list")
+
+    actuals = []
+    for index, item in enumerate(actuals_raw):
+        if not isinstance(item, Mapping):
+            raise FixtureError(f"actuals[{index}] must be an object")
+        actuals.append(
+            ActualOutcome(
+                ticker=require_text(item, "ticker").upper(),
+                fiscal_period=require_text(item, "fiscal_period"),
+                report_date=parse_date(require_text(item, "report_date"), f"actuals[{index}].report_date"),
+                actual_eps=number_or_none(item, "actual_eps"),
+                actual_revenue=number_or_none(item, "actual_revenue"),
+                actual_move_percent=number_or_none(item, "actual_move_percent"),
+                source_name=require_text(item, "source_name"),
+                source_date=parse_date(require_text(item, "source_date"), f"actuals[{index}].source_date"),
+                notes=str(item.get("notes", "")).strip(),
+            )
+        )
+    return ActualsFixture(as_of=as_of, actuals=actuals)
+
+
+def parse_playbook_json(raw: Any) -> List[EventPlaybook]:
+    if isinstance(raw, Mapping) and isinstance(raw.get("playbooks"), list):
+        items = raw["playbooks"]
+    elif isinstance(raw, Mapping) and isinstance(raw.get("event"), Mapping):
+        items = [raw]
+    elif isinstance(raw, list):
+        items = raw
+    else:
+        raise FixtureError("before-playbook must be rendered playbook JSON or a playbook object")
+
+    playbooks = []
+    for index, item in enumerate(items):
+        if not isinstance(item, Mapping):
+            raise FixtureError(f"playbooks[{index}] must be an object")
+        event_raw = item.get("event")
+        if not isinstance(event_raw, Mapping):
+            raise FixtureError(f"playbooks[{index}].event is required")
+        position_raw = item.get("position")
+        if position_raw is not None and not isinstance(position_raw, Mapping):
+            raise FixtureError(f"playbooks[{index}].position must be an object or null")
+        bands_raw = item.get("scenario_bands", [])
+        if not isinstance(bands_raw, list):
+            raise FixtureError(f"playbooks[{index}].scenario_bands must be a list")
+        sensitivities_raw = item.get("thesis_sensitivities", [])
+        if not isinstance(sensitivities_raw, list):
+            raise FixtureError(f"playbooks[{index}].thesis_sensitivities must be a list")
+
+        playbooks.append(
+            EventPlaybook(
+                as_of=parse_date(require_text(item, "as_of"), f"playbooks[{index}].as_of"),
+                event=EarningsEvent(
+                    date=parse_date(require_text(event_raw, "date"), f"playbooks[{index}].event.date"),
+                    ticker=require_text(event_raw, "ticker").upper(),
+                    company=require_text(event_raw, "company"),
+                    fiscal_period=require_text(event_raw, "fiscal_period"),
+                    consensus_eps=number_or_none(event_raw, "consensus_eps"),
+                    consensus_revenue=number_or_none(event_raw, "consensus_revenue"),
+                    implied_move_percent=float(number_or_none(event_raw, "implied_move_percent") or 0.0),
+                    source_date=parse_date(
+                        require_text(event_raw, "source_date"), f"playbooks[{index}].event.source_date"
+                    ),
+                    source_name=require_text(event_raw, "source_name"),
+                ),
+                position=None
+                if position_raw is None
+                else Position(
+                    ticker=require_text(position_raw, "ticker").upper(),
+                    shares=float(number_or_none(position_raw, "shares") or 0.0),
+                    exposure=float(number_or_none(position_raw, "exposure") or 0.0),
+                    portfolio_weight_percent=float(number_or_none(position_raw, "portfolio_weight_percent") or 0.0),
+                    notes=str(position_raw.get("notes", "")).strip(),
+                ),
+                freshness=require_text(item, "freshness"),
+                attention_score=int(number_or_none(item, "attention_score") or 0),
+                scenario_bands=[_parse_scenario_band(band, index, band_index) for band_index, band in enumerate(bands_raw)],
+                thesis_sensitivities=[
+                    _parse_thesis_sensitivity(sensitivity, index, sensitivity_index)
+                    for sensitivity_index, sensitivity in enumerate(sensitivities_raw)
+                ],
+                risk_questions=list_of_text(item, "risk_questions"),
+                review_queue=list_of_text(item, "review_queue"),
+                safety_notice=str(item.get("safety_notice", "")).strip() or EventPlaybook.safety_notice,
+            )
+        )
+    return playbooks
+
+
+def _parse_scenario_band(raw: Any, playbook_index: int, band_index: int) -> ScenarioBand:
+    if not isinstance(raw, Mapping):
+        raise FixtureError(f"playbooks[{playbook_index}].scenario_bands[{band_index}] must be an object")
+    return ScenarioBand(
+        name=require_text(raw, "name"),
+        price_move_percent=float(number_or_none(raw, "price_move_percent") or 0.0),
+        eps_delta_percent=float(number_or_none(raw, "eps_delta_percent") or 0.0),
+        revenue_delta_percent=float(number_or_none(raw, "revenue_delta_percent") or 0.0),
+        exposure_delta=float(number_or_none(raw, "exposure_delta") or 0.0),
+        watch_items=list_of_text(raw, "watch_items"),
+    )
+
+
+def _parse_thesis_sensitivity(raw: Any, playbook_index: int, sensitivity_index: int) -> ThesisSensitivity:
+    if not isinstance(raw, Mapping):
+        raise FixtureError(f"playbooks[{playbook_index}].thesis_sensitivities[{sensitivity_index}] must be an object")
+    weight = raw.get("risk_weight", 1)
+    if not isinstance(weight, int):
+        raise FixtureError(
+            f"playbooks[{playbook_index}].thesis_sensitivities[{sensitivity_index}].risk_weight must be an integer"
+        )
+    return ThesisSensitivity(topic=require_text(raw, "topic"), note=require_text(raw, "note"), risk_weight=max(1, weight))
+
+
 def find_position(positions: Iterable[Position], ticker: str) -> Optional[Position]:
     target = ticker.upper()
     for position in positions:
         if position.ticker == target:
             return position
+    return None
+
+
+def find_actual(actuals: Iterable[ActualOutcome], ticker: str, fiscal_period: str) -> Optional[ActualOutcome]:
+    target_ticker = ticker.upper()
+    target_period = fiscal_period.strip().lower()
+    for actual in actuals:
+        if actual.ticker == target_ticker and actual.fiscal_period.strip().lower() == target_period:
+            return actual
     return None

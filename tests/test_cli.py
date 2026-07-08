@@ -19,11 +19,16 @@ def test_cli_demo_bundle(tmp_path):
     assert (tmp_path / "index.html").exists()
     assert (tmp_path / "visual-receipt.md").exists()
     assert (tmp_path / "visual-receipt.json").exists()
+    assert (tmp_path / "handoff.md").exists()
+    assert (tmp_path / "handoff.json").exists()
     data = json.loads((tmp_path / "playbook.json").read_text(encoding="utf-8"))
     assert data["generated_by"] == "earnings-event-playbook"
     receipt = json.loads((tmp_path / "visual-receipt.json").read_text(encoding="utf-8"))
     assert receipt["artifact"] == "visual-receipt"
     assert receipt["summary"]["file_count"] == 8
+    handoff = json.loads((tmp_path / "handoff.json").read_text(encoding="utf-8"))
+    assert handoff["artifact"] == "cross-asset-handoff"
+    assert handoff["handoff_packs"][0]["evidence_artifact_hashes"]
 
 
 def test_cli_build_playbook(tmp_path):
@@ -133,6 +138,52 @@ def test_cli_visual_receipt(tmp_path):
     assert data["summary"]["roles"]["input-fixture"] == 3
     assert all(len(item["sha256"]) == 64 for item in data["files"])
     assert not any(item["path"].endswith("visual-receipt.json") for item in data["files"])
+    assert not any(item["path"].endswith("handoff.json") for item in data["files"])
+
+
+def test_cli_export_handoff(tmp_path):
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "demo-bundle", "--out", str(tmp_path)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    out = tmp_path / "handoff-rerun.md"
+    json_out = tmp_path / "handoff-rerun.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "export-handoff",
+            "--playbook",
+            str(tmp_path / "playbook.json"),
+            "--post-event-compare",
+            str(tmp_path / "post-event-compare.json"),
+            "--visual-receipt",
+            str(tmp_path / "visual-receipt.json"),
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    pack = data["handoff_packs"][0]
+    assert "Cross-Asset Handoff Pack" in text
+    assert data["workflows"] == ["thesis-ledger", "earnings-call-risk-map"]
+    assert pack["ticker"] == "EXM"
+    assert pack["fiscal_period"] == "FY2026 Q2"
+    assert pack["source_freshness"] == "fresh<=14d"
+    assert pack["open_review_items"]
+    assert pack["thesis_note_draft"]
+    assert pack["risk_map_prompts"]
+    assert pack["catalyst_follow_up"]
+    assert all(len(item["sha256"]) == 64 for item in pack["evidence_artifact_hashes"])
 
 
 def test_cli_selfcheck_scans_package_boundaries_from_other_cwd(tmp_path):

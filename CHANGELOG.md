@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Added `export-handoff` CLI command for cross-asset Markdown and JSON handoff packs.
+- Added handoff schema fields for ticker, fiscal period, source freshness, open review items, thesis note draft, risk map prompts, catalyst follow-up, and optional visual receipt evidence artifact hashes.
+- Added checked-in `demo/handoff.md` and `demo/handoff.json`, docs, release evidence, manifest updates, and parser/render/CLI tests.
+
 ## 0.3.0
 
 - Added `visual-receipt` CLI command for local demo artifact evidence receipts.

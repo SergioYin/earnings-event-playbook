@@ -28,7 +28,15 @@ PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 ```
 
-Receipt outputs are excluded from their own inventory so repeated runs remain deterministic.
+Receipt and handoff outputs are excluded from the receipt inventory so repeated runs remain deterministic and avoid circular handoff hashes.
+
+`export-handoff` reads generated playbook JSON and post-event compare JSON, then writes thesis-ledger and earnings-call-risk-map style Markdown and JSON handoff packs.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json
+```
+
+`--visual-receipt` is optional. When provided, the command carries evidence artifact hashes from the receipt into each handoff pack. The handoff schema includes ticker, fiscal period, source freshness, open review items, thesis note draft, risk map prompts, catalyst follow-up, and evidence artifact hashes. Output is descriptive handoff material and does not recommend any action.
 
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
@@ -44,6 +52,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - HTML is static and does not require JavaScript.
 - Post-event compare output is descriptive and does not provide action recommendations.
 - Visual receipt output is deterministic and records file hashes for local demo review evidence.
+- Handoff output is deterministic and carries optional receipt hashes for local evidence traceability.
 
 ## Boundary
 

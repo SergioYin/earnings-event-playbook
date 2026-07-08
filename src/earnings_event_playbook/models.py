@@ -204,6 +204,69 @@ class PostEventComparison:
 
 
 @dataclass(frozen=True)
+class EvidenceArtifactHash:
+    path: str
+    role: str
+    media_type: str
+    size_bytes: int
+    sha256: str
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "path": self.path,
+            "role": self.role,
+            "media_type": self.media_type,
+            "size_bytes": self.size_bytes,
+            "sha256": self.sha256,
+        }
+
+
+@dataclass(frozen=True)
+class HandoffPack:
+    ticker: str
+    company: str
+    fiscal_period: str
+    source_freshness: str
+    event_source_name: str
+    event_source_date: date
+    actual_source_name: str
+    actual_source_date: Optional[date]
+    review_status: str
+    open_review_items: List[str]
+    thesis_note_draft: str
+    risk_map_prompts: List[str]
+    catalyst_follow_up: List[str]
+    evidence_artifact_hashes: List[EvidenceArtifactHash] = field(default_factory=list)
+    safety_notice: str = (
+        "Educational cross-asset research handoff only. Uses local static artifacts only; "
+        "no live data, broker connection, orders, or investment advice."
+    )
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "ticker": self.ticker,
+            "company": self.company,
+            "fiscal_period": self.fiscal_period,
+            "source_freshness": self.source_freshness,
+            "event_source": {
+                "name": self.event_source_name,
+                "date": self.event_source_date.isoformat(),
+            },
+            "actual_source": {
+                "name": self.actual_source_name,
+                "date": None if self.actual_source_date is None else self.actual_source_date.isoformat(),
+            },
+            "review_status": self.review_status,
+            "open_review_items": list(self.open_review_items),
+            "thesis_note_draft": self.thesis_note_draft,
+            "risk_map_prompts": list(self.risk_map_prompts),
+            "catalyst_follow_up": list(self.catalyst_follow_up),
+            "evidence_artifact_hashes": [item.to_dict() for item in self.evidence_artifact_hashes],
+            "safety_notice": self.safety_notice,
+        }
+
+
+@dataclass(frozen=True)
 class EventPlaybook:
     as_of: date
     event: EarningsEvent
@@ -437,6 +500,118 @@ def parse_playbook_json(raw: Any) -> List[EventPlaybook]:
             )
         )
     return playbooks
+
+
+def parse_post_event_compare_json(raw: Any) -> List[PostEventComparison]:
+    if isinstance(raw, Mapping) and isinstance(raw.get("comparisons"), list):
+        items = raw["comparisons"]
+    elif isinstance(raw, Mapping) and isinstance(raw.get("event"), Mapping):
+        items = [raw]
+    elif isinstance(raw, list):
+        items = raw
+    else:
+        raise FixtureError("post-event-compare must be rendered comparison JSON or a comparison object")
+
+    comparisons = []
+    for index, item in enumerate(items):
+        if not isinstance(item, Mapping):
+            raise FixtureError(f"comparisons[{index}] must be an object")
+        event_raw = item.get("event")
+        if not isinstance(event_raw, Mapping):
+            raise FixtureError(f"comparisons[{index}].event is required")
+        actual_raw = item.get("actual")
+        if actual_raw is not None and not isinstance(actual_raw, Mapping):
+            raise FixtureError(f"comparisons[{index}].actual must be an object or null")
+        comparisons.append(
+            PostEventComparison(
+                as_of=parse_date(require_text(item, "as_of"), f"comparisons[{index}].as_of"),
+                event=EarningsEvent(
+                    date=parse_date(require_text(event_raw, "date"), f"comparisons[{index}].event.date"),
+                    ticker=require_text(event_raw, "ticker").upper(),
+                    company=require_text(event_raw, "company"),
+                    fiscal_period=require_text(event_raw, "fiscal_period"),
+                    consensus_eps=number_or_none(event_raw, "consensus_eps"),
+                    consensus_revenue=number_or_none(event_raw, "consensus_revenue"),
+                    implied_move_percent=float(number_or_none(event_raw, "implied_move_percent") or 0.0),
+                    source_date=parse_date(
+                        require_text(event_raw, "source_date"), f"comparisons[{index}].event.source_date"
+                    ),
+                    source_name=require_text(event_raw, "source_name"),
+                ),
+                actual=None
+                if actual_raw is None
+                else ActualOutcome(
+                    ticker=require_text(actual_raw, "ticker").upper(),
+                    fiscal_period=require_text(actual_raw, "fiscal_period"),
+                    report_date=parse_date(
+                        require_text(actual_raw, "report_date"), f"comparisons[{index}].actual.report_date"
+                    ),
+                    actual_eps=number_or_none(actual_raw, "actual_eps"),
+                    actual_revenue=number_or_none(actual_raw, "actual_revenue"),
+                    actual_move_percent=number_or_none(actual_raw, "actual_move_percent"),
+                    source_name=require_text(actual_raw, "source_name"),
+                    source_date=parse_date(
+                        require_text(actual_raw, "source_date"), f"comparisons[{index}].actual.source_date"
+                    ),
+                    notes=str(actual_raw.get("notes", "")).strip(),
+                ),
+                eps=_parse_metric_comparison(item.get("eps"), index, "eps"),
+                revenue=_parse_metric_comparison(item.get("revenue"), index, "revenue"),
+                move=_parse_move_comparison(item.get("move"), index),
+                review_status=require_text(item, "review_status"),
+                thesis_ledger_handoff=list_of_text(item, "thesis_ledger_handoff"),
+                review_queue=list_of_text(item, "review_queue"),
+                safety_notice=str(item.get("safety_notice", "")).strip() or PostEventComparison.safety_notice,
+            )
+        )
+    return comparisons
+
+
+def parse_visual_receipt_hashes(raw: Mapping[str, Any]) -> List[EvidenceArtifactHash]:
+    files_raw = raw.get("files", [])
+    if not isinstance(files_raw, list):
+        raise FixtureError("visual receipt files must be a list")
+    hashes = []
+    for index, item in enumerate(files_raw):
+        if not isinstance(item, Mapping):
+            raise FixtureError(f"visual receipt files[{index}] must be an object")
+        size = item.get("size_bytes")
+        if not isinstance(size, int):
+            raise FixtureError(f"visual receipt files[{index}].size_bytes must be an integer")
+        hashes.append(
+            EvidenceArtifactHash(
+                path=require_text(item, "path"),
+                role=require_text(item, "role"),
+                media_type=require_text(item, "media_type"),
+                size_bytes=size,
+                sha256=require_text(item, "sha256"),
+            )
+        )
+    return hashes
+
+
+def _parse_metric_comparison(raw: Any, comparison_index: int, key: str) -> MetricComparison:
+    if not isinstance(raw, Mapping):
+        raise FixtureError(f"comparisons[{comparison_index}].{key} must be an object")
+    return MetricComparison(
+        metric=require_text(raw, "metric"),
+        consensus=number_or_none(raw, "consensus"),
+        actual=number_or_none(raw, "actual"),
+        delta=number_or_none(raw, "delta"),
+        delta_percent=number_or_none(raw, "delta_percent"),
+        band=require_text(raw, "band"),
+    )
+
+
+def _parse_move_comparison(raw: Any, comparison_index: int) -> MoveComparison:
+    if not isinstance(raw, Mapping):
+        raise FixtureError(f"comparisons[{comparison_index}].move must be an object")
+    return MoveComparison(
+        implied_move_percent=float(number_or_none(raw, "implied_move_percent") or 0.0),
+        actual_move_percent=number_or_none(raw, "actual_move_percent"),
+        delta_percent=number_or_none(raw, "delta_percent"),
+        matched_scenario=require_text(raw, "matched_scenario"),
+    )
 
 
 def _parse_scenario_band(raw: Any, playbook_index: int, band_index: int) -> ScenarioBand:

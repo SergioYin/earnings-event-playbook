@@ -5,9 +5,11 @@ from typing import List
 
 from .models import (
     ActualsFixture,
+    EvidenceArtifactHash,
     EarningsEvent,
     EventFixture,
     EventPlaybook,
+    HandoffPack,
     MetricComparison,
     MoveComparison,
     PortfolioFixture,
@@ -142,6 +144,64 @@ def compare_post_event(playbooks: List[EventPlaybook], actuals_fixture: ActualsF
     return comparisons
 
 
+def build_handoff_packs(
+    playbooks: List[EventPlaybook],
+    comparisons: List[PostEventComparison],
+    evidence_hashes: List[EvidenceArtifactHash] | None = None,
+) -> List[HandoffPack]:
+    comparison_by_key = {
+        (item.event.ticker.upper(), item.event.fiscal_period.strip().lower()): item for item in comparisons
+    }
+    hashes = evidence_hashes or []
+    packs = []
+    for playbook in playbooks:
+        event = playbook.event
+        comparison = comparison_by_key.get((event.ticker.upper(), event.fiscal_period.strip().lower()))
+        if comparison is None:
+            open_items = [f"Add post-event comparison for {event.ticker} {event.fiscal_period}."]
+            open_items.extend(playbook.review_queue)
+            packs.append(
+                HandoffPack(
+                    ticker=event.ticker,
+                    company=event.company,
+                    fiscal_period=event.fiscal_period,
+                    source_freshness=playbook.freshness,
+                    event_source_name=event.source_name,
+                    event_source_date=event.source_date,
+                    actual_source_name="not matched",
+                    actual_source_date=None,
+                    review_status="blocked-missing-comparison",
+                    open_review_items=open_items,
+                    thesis_note_draft=_missing_comparison_thesis_note(playbook),
+                    risk_map_prompts=_risk_map_prompts(playbook, None),
+                    catalyst_follow_up=_catalyst_follow_up(playbook, None),
+                    evidence_artifact_hashes=hashes,
+                )
+            )
+            continue
+
+        open_items = _open_handoff_items(playbook, comparison)
+        packs.append(
+            HandoffPack(
+                ticker=event.ticker,
+                company=event.company,
+                fiscal_period=event.fiscal_period,
+                source_freshness=playbook.freshness,
+                event_source_name=event.source_name,
+                event_source_date=event.source_date,
+                actual_source_name=comparison.actual.source_name if comparison.actual else "not matched",
+                actual_source_date=comparison.actual.source_date if comparison.actual else None,
+                review_status=comparison.review_status,
+                open_review_items=open_items,
+                thesis_note_draft=_thesis_note_draft(playbook, comparison),
+                risk_map_prompts=_risk_map_prompts(playbook, comparison),
+                catalyst_follow_up=_catalyst_follow_up(playbook, comparison),
+                evidence_artifact_hashes=hashes,
+            )
+        )
+    return packs
+
+
 def _scenario_thresholds(bands: List[ScenarioBand], attr: str) -> dict:
     thresholds = {band.name: getattr(band, attr) for band in bands}
     return {
@@ -241,3 +301,63 @@ def _review_status(actual, eps: MetricComparison, revenue: MetricComparison, mov
     if eps.band != revenue.band or move.matched_scenario not in {eps.band, revenue.band}:
         return "needs-review"
     return "ready-for-ledger"
+
+
+def _open_handoff_items(playbook: EventPlaybook, comparison: PostEventComparison) -> List[str]:
+    items = list(comparison.review_queue)
+    if playbook.freshness.startswith("stale") or playbook.freshness == "source-after-as-of":
+        items.append(f"Refresh source freshness for {playbook.event.ticker} before closing handoff.")
+    if not items:
+        items.append("Archive source links and mark the local review complete.")
+    return items
+
+
+def _thesis_note_draft(playbook: EventPlaybook, comparison: PostEventComparison) -> str:
+    event = playbook.event
+    actual_source = "not matched" if comparison.actual is None else comparison.actual.source_name
+    return (
+        f"{event.ticker} {event.fiscal_period} handoff: review status {comparison.review_status}. "
+        f"EPS band {comparison.eps.band}; revenue band {comparison.revenue.band}; "
+        f"post-event move matched {comparison.move.matched_scenario}. "
+        f"Pre-event source freshness was {playbook.freshness}; actuals source was {actual_source}. "
+        "Use this as a thesis-ledger draft note after source review; it is not an action recommendation."
+    )
+
+
+def _missing_comparison_thesis_note(playbook: EventPlaybook) -> str:
+    event = playbook.event
+    return (
+        f"{event.ticker} {event.fiscal_period} handoff is blocked because no post-event comparison matched. "
+        f"Pre-event source freshness was {playbook.freshness}. Add actuals comparison evidence before closing."
+    )
+
+
+def _risk_map_prompts(playbook: EventPlaybook, comparison: PostEventComparison | None) -> List[str]:
+    event = playbook.event
+    prompts = [
+        f"Map {event.ticker} {event.fiscal_period} source freshness ({playbook.freshness}) to the call-risk log.",
+        "Identify which thesis sensitivities need updated evidence after the earnings call.",
+    ]
+    prompts.extend(f"Call-risk prompt: {question}" for question in playbook.risk_questions)
+    if comparison is not None:
+        prompts.append(
+            f"Compare EPS band {comparison.eps.band}, revenue band {comparison.revenue.band}, "
+            f"and move scenario {comparison.move.matched_scenario} for divergence."
+        )
+    return prompts
+
+
+def _catalyst_follow_up(playbook: EventPlaybook, comparison: PostEventComparison | None) -> List[str]:
+    event = playbook.event
+    follow_up = [
+        f"Carry forward unresolved {event.ticker} {event.fiscal_period} review items into the next catalyst log.",
+        "Attach source artifacts and notes before marking the event review closed.",
+    ]
+    if comparison is None or comparison.actual is None:
+        follow_up.append("Add matched actuals evidence before catalyst follow-up is complete.")
+    elif comparison.actual.notes:
+        follow_up.append(f"Review actuals note for catalyst context: {comparison.actual.notes}")
+    if playbook.thesis_sensitivities:
+        topics = ", ".join(item.topic for item in playbook.thesis_sensitivities)
+        follow_up.append(f"Update thesis sensitivity evidence for: {topics}.")
+    return follow_up

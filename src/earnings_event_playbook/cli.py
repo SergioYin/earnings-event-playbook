@@ -5,11 +5,21 @@ from pathlib import Path
 from typing import Sequence
 
 from . import __version__
-from .core import build_playbooks, compare_post_event
+from .core import build_handoff_packs, build_playbooks, compare_post_event
 from .io import read_json, write_text
-from .models import FixtureError, parse_actuals_fixture, parse_events_fixture, parse_playbook_json, parse_portfolio_fixture
+from .models import (
+    FixtureError,
+    parse_actuals_fixture,
+    parse_events_fixture,
+    parse_playbook_json,
+    parse_portfolio_fixture,
+    parse_post_event_compare_json,
+    parse_visual_receipt_hashes,
+)
 from .render import (
     build_visual_receipt,
+    render_handoff_json,
+    render_handoff_markdown,
     render_html_index,
     render_json,
     render_markdown,
@@ -53,6 +63,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     receipt.add_argument("--out", required=True, type=Path)
     receipt.add_argument("--json-out", required=True, type=Path)
 
+    handoff = subparsers.add_parser(
+        "export-handoff", help="Export Markdown and JSON cross-asset handoff packs from reviewed artifacts."
+    )
+    handoff.add_argument("--playbook", required=True, type=Path)
+    handoff.add_argument("--post-event-compare", required=True, type=Path)
+    handoff.add_argument("--out", required=True, type=Path)
+    handoff.add_argument("--json-out", required=True, type=Path)
+    handoff.add_argument("--visual-receipt", type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -65,6 +84,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _demo_bundle(args.out)
         if args.command == "visual-receipt":
             return _visual_receipt(args.artifacts, args.out, args.json_out)
+        if args.command == "export-handoff":
+            return _export_handoff(args.playbook, args.post_event_compare, args.out, args.json_out, args.visual_receipt)
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -110,6 +131,13 @@ def _demo_bundle(out_dir: Path) -> int:
     write_text(out_dir / "post-event-compare.json", render_post_event_json(comparisons))
     write_text(out_dir / "index.html", render_html_index(playbooks))
     _visual_receipt(out_dir, out_dir / "visual-receipt.md", out_dir / "visual-receipt.json")
+    _export_handoff(
+        out_dir / "playbook.json",
+        out_dir / "post-event-compare.json",
+        out_dir / "handoff.md",
+        out_dir / "handoff.json",
+        out_dir / "visual-receipt.json",
+    )
     return 0
 
 
@@ -118,6 +146,22 @@ def _visual_receipt(artifacts_dir: Path, out_path: Path, json_path: Path) -> int
     write_text(out_path, render_visual_receipt_markdown(receipt))
     receipt = build_visual_receipt(artifacts_dir)
     write_text(json_path, render_visual_receipt_json(receipt))
+    return 0
+
+
+def _export_handoff(
+    playbook_path: Path,
+    post_event_compare_path: Path,
+    out_path: Path,
+    json_path: Path,
+    visual_receipt_path: Path | None = None,
+) -> int:
+    playbooks = parse_playbook_json(read_json(playbook_path))
+    comparisons = parse_post_event_compare_json(read_json(post_event_compare_path))
+    hashes = parse_visual_receipt_hashes(read_json(visual_receipt_path)) if visual_receipt_path is not None else []
+    packs = build_handoff_packs(playbooks, comparisons, hashes)
+    write_text(out_path, render_handoff_markdown(packs))
+    write_text(json_path, render_handoff_json(packs))
     return 0
 
 

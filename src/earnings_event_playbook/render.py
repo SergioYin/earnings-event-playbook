@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Iterable, List
 
-from .models import EventPlaybook, PostEventComparison
+from .models import EventPlaybook, HandoffPack, PostEventComparison
 
 
 VISUAL_RECEIPT_SAFETY_BOUNDARIES = [
@@ -38,6 +38,11 @@ VISUAL_RECEIPT_REGENERATION_COMMANDS = [
     (
         "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo "
         "--out demo/visual-receipt.md --json-out demo/visual-receipt.json"
+    ),
+    (
+        "PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/playbook.json "
+        "--post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json "
+        "--out demo/handoff.md --json-out demo/handoff.json"
     ),
 ]
 
@@ -83,6 +88,28 @@ def post_event_to_dict(comparisons: Iterable[PostEventComparison]) -> dict:
 
 def render_post_event_json(comparisons: Iterable[PostEventComparison]) -> str:
     return json.dumps(post_event_to_dict(comparisons), indent=2, sort_keys=True) + "\n"
+
+
+def handoff_to_dict(packs: Iterable[HandoffPack]) -> dict:
+    items = [item.to_dict() for item in packs]
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "cross-asset-handoff",
+        "workflows": ["thesis-ledger", "earnings-call-risk-map"],
+        "safety_boundaries": [
+            "local static artifacts only",
+            "no live market data",
+            "no broker connection",
+            "no order placement",
+            "no personalized investment advice",
+        ],
+        "handoff_packs": items,
+    }
+
+
+def render_handoff_json(packs: Iterable[HandoffPack]) -> str:
+    return json.dumps(handoff_to_dict(packs), indent=2, sort_keys=True) + "\n"
 
 
 def build_visual_receipt(artifact_root: Path, project_root: Path | None = None) -> dict:
@@ -230,7 +257,12 @@ def render_markdown(playbooks: Iterable[EventPlaybook]) -> str:
 
 
 def _is_visual_artifact(path: Path) -> bool:
-    return path.is_file() and path.suffix.lower() in VISUAL_RECEIPT_SUFFIXES and not path.name.startswith("visual-receipt.")
+    return (
+        path.is_file()
+        and path.suffix.lower() in VISUAL_RECEIPT_SUFFIXES
+        and not path.name.startswith("visual-receipt.")
+        and not path.name.startswith("handoff.")
+    )
 
 
 def _visual_receipt_file(path: Path, base: Path) -> dict:
@@ -259,6 +291,10 @@ def _visual_receipt_role(path: Path) -> str:
         return "playbook-markdown"
     if suffix == ".json" and "playbook" in name:
         return "playbook-json"
+    if suffix == ".md" and "handoff" in name:
+        return "handoff-markdown"
+    if suffix == ".json" and "handoff" in name:
+        return "handoff-json"
     if suffix == ".json" and name in {"events.json", "portfolio.json", "actuals.json"}:
         return "input-fixture"
     if suffix == ".md":
@@ -347,6 +383,62 @@ def render_post_event_markdown(comparisons: Iterable[PostEventComparison]) -> st
     return "\n".join(lines).rstrip() + "\n"
 
 
+def render_handoff_markdown(packs: Iterable[HandoffPack]) -> str:
+    items = list(packs)
+    lines: List[str] = [
+        "# Cross-Asset Handoff Pack",
+        "",
+        "> Educational research handoff only. Local static artifacts only; no live data, broker connection, orders, or investment advice.",
+        "",
+        "## Summary",
+        "",
+        f"- Handoff packs: {len(items)}",
+        f"- Open review items: {sum(len(item.open_review_items) for item in items)}",
+        f"- Evidence hashes attached: {sum(len(item.evidence_artifact_hashes) for item in items)}",
+        "",
+        "## Workflows",
+        "",
+        "- thesis-ledger",
+        "- earnings-call-risk-map",
+        "",
+    ]
+    for item in items:
+        lines.extend(
+            [
+                f"## {item.ticker} - {item.company}",
+                "",
+                f"- Fiscal period: {item.fiscal_period}",
+                f"- Source freshness: {item.source_freshness}",
+                f"- Event source: {item.event_source_name} ({item.event_source_date.isoformat()})",
+                f"- Actuals source: {item.actual_source_name} ({_fmt_date_or_none(item.actual_source_date)})",
+                f"- Review status: {item.review_status}",
+                "",
+                "### Thesis Note Draft",
+                "",
+                item.thesis_note_draft,
+                "",
+                "### Open Review Items",
+                "",
+            ]
+        )
+        lines.extend(f"- {entry}" for entry in item.open_review_items)
+        lines.extend(["", "### Risk Map Prompts", ""])
+        lines.extend(f"- {prompt}" for prompt in item.risk_map_prompts)
+        lines.extend(["", "### Catalyst Follow-Up", ""])
+        lines.extend(f"- {entry}" for entry in item.catalyst_follow_up)
+        lines.extend(["", "### Evidence Artifact Hashes", ""])
+        if item.evidence_artifact_hashes:
+            lines.extend(["| Path | Role | Bytes | SHA-256 |", "| --- | --- | ---: | --- |"])
+            for artifact in item.evidence_artifact_hashes:
+                lines.append(
+                    f"| `{artifact.path}` | {artifact.role} | {artifact.size_bytes} | `{artifact.sha256}` |"
+                )
+        else:
+            lines.append("- None provided.")
+        lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def render_html_index(playbooks: Iterable[EventPlaybook]) -> str:
     items = list(playbooks)
     cards = []
@@ -429,6 +521,12 @@ def _fmt_percent(value: float | None) -> str:
     if value is None:
         return "not provided"
     return f"{value:.2f}%"
+
+
+def _fmt_date_or_none(value) -> str:
+    if value is None:
+        return "not provided"
+    return value.isoformat()
 
 
 def _metric_row(label: str, comparison) -> str:

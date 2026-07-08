@@ -48,6 +48,10 @@ PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-pla
 PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 ```
 
+```bash
+PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json
+```
+
 ## Review Checklist
 
 - [ ] Open demo/index.html directly in a browser and confirm the static preview renders.

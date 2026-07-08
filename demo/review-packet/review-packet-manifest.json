@@ -28,30 +28,30 @@
     {
       "media_type": "application/json",
       "path": "review-packet/fixture-gallery.json",
-      "role": "machine-readable-artifact",
+      "role": "case-gallery-artifact",
       "sha256": "3965bf845ee22791be53507c37fe709cebc83111960b10b6614144a1a6c8c35d",
       "size_bytes": 4139
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/fixture-gallery.md",
-      "role": "human-review-artifact",
+      "role": "case-gallery-artifact",
       "sha256": "85245a266cacca9861b74e9b9fa097f0982c97bcfebbf140b0fa55326d81f607",
       "size_bytes": 2308
     },
     {
       "media_type": "application/json",
       "path": "review-packet/handoff.json",
-      "role": "machine-readable-artifact",
-      "sha256": "163f183ec844aa98e55a56bc312df2532107edbb5248d65ff66ac87176efabe0",
-      "size_bytes": 12557
+      "role": "cross-asset-handoff-artifact",
+      "sha256": "b0a0c392daccc33785056520879774e4957dd224da9ef3bd92558e2618e71a57",
+      "size_bytes": 13119
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/handoff.md",
-      "role": "human-review-artifact",
-      "sha256": "452cf52b27e8c7abdfb07a93890f84e5509337b18b0071f169806b12ad030c00",
-      "size_bytes": 7654
+      "role": "cross-asset-handoff-artifact",
+      "sha256": "057b993db5b46725896a7bf84f6655e239acd67b550400a0a1f0a00edd130f2e",
+      "size_bytes": 7936
     },
     {
       "media_type": "application/json",
@@ -84,100 +84,100 @@
     {
       "media_type": "application/json",
       "path": "review-packet/playbook.json",
-      "role": "machine-readable-artifact",
+      "role": "pre-event-playbook-artifact",
       "sha256": "3c94be26c733282f91ddf58012aa8fe93aedd8fe077fff7b7c9bc665169d2b34",
       "size_bytes": 6263
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/playbook.md",
-      "role": "human-review-artifact",
+      "role": "pre-event-playbook-artifact",
       "sha256": "59d9451b5206bfa979f0ee224214b1aed2501485246ec230805c982c29354a47",
       "size_bytes": 2856
     },
     {
       "media_type": "application/json",
       "path": "review-packet/portfolio-drift-bridge.json",
-      "role": "machine-readable-artifact",
+      "role": "portfolio-drift-artifact",
       "sha256": "bc3fa072331df1af64c68360473e114b9891f244f928c00425b3cd7bde3a7f4f",
       "size_bytes": 6128
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/portfolio-drift-bridge.md",
-      "role": "human-review-artifact",
+      "role": "portfolio-drift-artifact",
       "sha256": "10436cd2b6083ef9df49df701139956996e7d35b0db3982646ec174b4a3478d0",
       "size_bytes": 4269
     },
     {
       "media_type": "application/json",
       "path": "review-packet/post-event-compare.json",
-      "role": "machine-readable-artifact",
+      "role": "post-event-comparison-artifact",
       "sha256": "72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79",
       "size_bytes": 5099
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/post-event-compare.md",
-      "role": "human-review-artifact",
+      "role": "post-event-comparison-artifact",
       "sha256": "a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb",
       "size_bytes": 3035
     },
     {
       "media_type": "application/json",
       "path": "review-packet/scenario-notebook.json",
-      "role": "machine-readable-artifact",
-      "sha256": "197e13647dff7963af310d1ed1053204de0d37589d90c74c75a4e273d1081994",
-      "size_bytes": 20807
+      "role": "scenario-review-artifact",
+      "sha256": "272ebf161df2d0ad36a7548a46ad27e51f74a6f9c1d359cb47c764ff58737503",
+      "size_bytes": 21181
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/scenario-notebook.md",
-      "role": "human-review-artifact",
-      "sha256": "24d2f29bd4ed4bba3d8e7c4d7b5cfd4f1003a15b3fa60361aab9ba026c5becb3",
-      "size_bytes": 9503
+      "role": "scenario-review-artifact",
+      "sha256": "740cb3b4ffa91b0c6dbe3a91a8e78f49fa76775c958d4fa659e4b1b71620808c",
+      "size_bytes": 9655
     },
     {
       "media_type": "text/html",
       "path": "review-packet/showcase.html",
-      "role": "static-html-preview",
+      "role": "showcase-artifact",
       "sha256": "8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca",
       "size_bytes": 10879
     },
     {
       "media_type": "application/json",
       "path": "review-packet/showcase.json",
-      "role": "machine-readable-artifact",
+      "role": "showcase-artifact",
       "sha256": "e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a",
       "size_bytes": 7351
     },
     {
       "media_type": "application/json",
       "path": "review-packet/tutorial-bundle.json",
-      "role": "machine-readable-artifact",
+      "role": "tutorial-artifact",
       "sha256": "43fe3db28198add8399d23a5898b5393cb9510ec1209a81a177b53b8655a8c47",
       "size_bytes": 4938
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/tutorial-bundle.md",
-      "role": "human-review-artifact",
+      "role": "tutorial-artifact",
       "sha256": "d22f4698d14eaffe4e69dc148466c2d1d5d47166c282beeca50a101e734e30a1",
       "size_bytes": 4236
     },
     {
       "media_type": "application/json",
       "path": "review-packet/visual-receipt.json",
-      "role": "machine-readable-artifact",
-      "sha256": "4c6f29d142b29e1c3feb0adb60e4027104ff7cc5de4acd366d2f128e10b2f713",
-      "size_bytes": 5611
+      "role": "hash-receipt-artifact",
+      "sha256": "79c9ecbd7fe93bc9069477285bc76fb6ccf22c246fd0ab146866d8d29be5d298",
+      "size_bytes": 5864
     },
     {
       "media_type": "text/markdown",
       "path": "review-packet/visual-receipt.md",
-      "role": "human-review-artifact",
-      "sha256": "17132bf7cde3c741927544591271b85fb53e16fb661869b40d34ac5af499b2e4",
-      "size_bytes": 4090
+      "role": "hash-receipt-artifact",
+      "sha256": "575b598c4926d635a2e937112fc4b56483fd3b280639e0bdce49ab18a7860534",
+      "size_bytes": 4231
     }
   ],
   "commands": [
@@ -281,7 +281,7 @@
     "Are docs, changelog, package version, and release manifest aligned for the release candidate?"
   ],
   "output_root": "review-packet",
-  "package_version": "1.0.0",
+  "package_version": "1.1.0",
   "promotion_gate_notes": [
     "Promote only after pytest, unittest discovery, selfcheck, and build pass in the release environment.",
     "Confirm checked-in demo/review-packet manifest hashes match regenerated artifacts before tagging.",

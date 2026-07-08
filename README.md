@@ -15,6 +15,7 @@ Zero-dependency Python package and CLI. No API keys, no live market data, no bro
 - Multi-case fixture gallery: open `demo/fixture-gallery.md` or `demo/fixture-gallery.json` to compare the software, retail, and semiconductor case fixtures.
 - Scenario notebook: open `demo/scenario-notebook.md` or `demo/scenario-notebook.json` for the combined reviewer packet across playbook, handoff, gallery, tutorial, and showcase artifacts.
 - Portfolio drift bridge: open `demo/portfolio-drift-bridge.md` or `demo/portfolio-drift-bridge.json` for exposure concentration, event-linked tickers, scenario mismatches, post-event drift watchlist, next risk review prompts, and no-trade boundaries.
+- Review packet: open `docs/review-packet.md` and `demo/review-packet/review-packet-manifest.json` for the deterministic release packet, manifest schema, file roles, and SHA-256 hash inventory.
 - Star reason: useful as a public, dependency-free template for finance research artifacts with explicit safety boundaries and release evidence.
 
 ## Quickstart
@@ -31,6 +32,7 @@ earnings-event-playbook tutorial-bundle --case examples/cases/software --out dem
 earnings-event-playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json
 earnings-event-playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json
 earnings-event-playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
+earnings-event-playbook review-packet --out demo/review-packet
 earnings-event-playbook selfcheck
 ```
 
@@ -47,9 +49,10 @@ PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples
 PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json
 PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json
 PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json
+PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet
 ```
 
-Open `demo/showcase.html` for the no-JavaScript landing page, `demo/showcase.json` for the manifest, `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, `demo/scenario-notebook.md` for the combined reviewer notebook, `demo/portfolio-drift-bridge.md` for portfolio drift bridge review, `demo/index.html` for the static preview, or read the paired Markdown and JSON demo artifacts.
+Open `demo/showcase.html` for the no-JavaScript landing page, `demo/showcase.json` for the manifest, `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, `demo/scenario-notebook.md` for the combined reviewer notebook, `demo/portfolio-drift-bridge.md` for portfolio drift bridge review, `demo/review-packet/review-packet-manifest.json` for release packet evidence, `demo/index.html` for the static preview, or read the paired Markdown and JSON demo artifacts.
 
 Expected output: a review packet for the bundled EXM and NXT example events with beat/base/miss exposure bands, stale-source warnings, risk questions, and deterministic JSON for downstream local tooling.
 
@@ -93,6 +96,14 @@ PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 ```
 
 That writes `events.json`, `portfolio.json`, `actuals.json`, `playbook.md`, `playbook.json`, `post-event-compare.md`, `post-event-compare.json`, `index.html`, `visual-receipt.md`, `visual-receipt.json`, `handoff.md`, `handoff.json`, `fixture-gallery.md`, `fixture-gallery.json`, `tutorial-bundle.md`, `tutorial-bundle.json`, `scenario-notebook.md`, `scenario-notebook.json`, `portfolio-drift-bridge.md`, and `portfolio-drift-bridge.json`.
+
+Generate the deterministic release review packet:
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet
+```
+
+That writes copied static inputs, generated Markdown/HTML/JSON review artifacts, and `demo/review-packet/review-packet-manifest.json` with ordered commands, relative artifact paths, file roles, byte sizes, SHA-256 hashes, release gate checks, promotion notes, and risk boundaries. See `docs/review-packet.md` for the manifest contract and reproducibility check.
 
 Compare a pre-event playbook to local post-event actuals:
 
@@ -218,6 +229,8 @@ It is intentionally not a trading bot, data vendor client, portfolio optimizer, 
 `tutorial-bundle.json` contains `schema_version`, `artifact`, `case_id`, fixture paths, ordered commands, expected artifacts, reviewer checklist, maturity rubric evidence, and safety boundaries.
 
 `showcase.json` contains `schema_version`, `artifact`, title, tagline, value proposition, quickstart commands, demo artifact links, release evidence, maturity rubric, case gallery highlights, tutorial path, risk boundaries, and star-worthy differentiation.
+
+`review-packet-manifest.json` contains `schema_version`, `artifact`, package version, output root, ordered commands, relative artifact paths, artifact roles, media types, byte sizes, SHA-256 hashes, release gate checks, promotion gate notes, risk boundaries, and next review prompts.
 
 `scenario-notebook.json` contains `schema_version`, `artifact`, input artifact names, summary counts, thesis assumptions, scenario bands, source freshness, evidence hashes, comparison aftermath, next-action queue, fixture gallery summary, optional manifests, risk boundary checklist, reusable agent prompts, and safety boundaries.
 

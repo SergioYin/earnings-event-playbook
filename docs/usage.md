@@ -78,6 +78,14 @@ PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfo
 
 `--risk-thresholds` is optional. When provided, it must be a local static JSON object with a `thresholds` object such as `examples/risk-thresholds.json`. The output covers exposure concentration, event-linked tickers, scenario mismatch alerts, post-event drift watchlist rows, next risk review prompts, threshold values, and no-trade safety boundaries. It does not fetch data, connect to brokers, place orders, or provide action recommendations.
 
+`review-packet` regenerates the complete release review packet and writes a JSON manifest with command evidence, relative artifact paths, file roles, byte sizes, SHA-256 hashes, release gate checks, promotion notes, and risk boundaries.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet
+```
+
+See `docs/review-packet.md` for the manifest contract and reproducibility check. The command uses local static fixtures only and does not fetch data, connect to brokers, place orders, or provide action recommendations.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -98,6 +106,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Showcase output is deterministic, self-contained, and does not require JavaScript or a server.
 - Scenario notebook output is deterministic and combines existing local generated artifacts without executing external workflows.
 - Portfolio drift bridge output is deterministic and combines local portfolio, scenario notebook, post-event compare, and optional static threshold artifacts without executing trades or external workflows.
+- Review packet output is deterministic and records relative paths plus SHA-256 hashes for local release evidence.
 
 ## Boundary
 

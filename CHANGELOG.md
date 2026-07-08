@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- Added review packet release docs and promotion checklist for deterministic packet review, screenshots/GIF capture, manifest evidence, and risk copy.
+- Hardened `review-packet` manifest coverage with explicit artifact roles, relative path checks, SHA-256 determinism tests, and private-reference hygiene assertions.
+- Updated README quickstart, usage docs, release evidence, release manifest, agent skill, package version metadata, checked-in review packet artifacts, and tests.
+
 ## 0.9.0
 
 - Added `portfolio-drift-bridge` CLI command for bridging portfolio fixture exposure, scenario notebook JSON, post-event compare JSON, and optional static risk thresholds into Markdown and JSON drift packets.

@@ -137,7 +137,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     packet = subparsers.add_parser(
         "review-packet",
-        help="Generate the deterministic v1.0.0 release-candidate review packet and JSON run manifest.",
+        help="Generate the deterministic release-candidate review packet and JSON run manifest.",
     )
     packet.add_argument("--out", required=True, type=Path)
     packet.add_argument("--events", default=Path("examples/events.json"), type=Path)
@@ -811,6 +811,20 @@ def _packet_artifact_role(path: Path) -> str:
     if "inputs" in path.parts:
         return "input-fixture"
     name = path.name
+    artifact_roles = {
+        "fixture-gallery": "case-gallery-artifact",
+        "handoff": "cross-asset-handoff-artifact",
+        "playbook": "pre-event-playbook-artifact",
+        "portfolio-drift-bridge": "portfolio-drift-artifact",
+        "post-event-compare": "post-event-comparison-artifact",
+        "scenario-notebook": "scenario-review-artifact",
+        "showcase": "showcase-artifact",
+        "tutorial-bundle": "tutorial-artifact",
+        "visual-receipt": "hash-receipt-artifact",
+    }
+    stem = path.stem
+    if stem in artifact_roles:
+        return artifact_roles[stem]
     if name.endswith(".md"):
         return "human-review-artifact"
     if name.endswith(".html"):

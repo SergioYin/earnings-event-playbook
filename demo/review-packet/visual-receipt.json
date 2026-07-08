@@ -73,6 +73,13 @@
       "size_bytes": 3035
     },
     {
+      "media_type": "application/json",
+      "path": "review-packet/review-packet-manifest.json",
+      "role": "json-artifact",
+      "sha256": "bf3ef3d3be70e74e26deb4eaff7ff343326b0cf049775011bcf0a9a4701f0b9d",
+      "size_bytes": 13198
+    },
+    {
       "media_type": "text/html",
       "path": "review-packet/showcase.html",
       "role": "html-artifact",
@@ -126,17 +133,17 @@
   ],
   "schema_version": "1.0",
   "summary": {
-    "file_count": 14,
+    "file_count": 15,
     "roles": {
       "html-artifact": 1,
       "input-fixture": 3,
-      "json-artifact": 4,
+      "json-artifact": 5,
       "markdown-artifact": 2,
       "playbook-json": 1,
       "playbook-markdown": 1,
       "post-event-json": 1,
       "post-event-markdown": 1
     },
-    "total_bytes": 54158
+    "total_bytes": 67356
   }
 }

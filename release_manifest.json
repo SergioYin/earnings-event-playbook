@@ -1,6 +1,6 @@
 {
   "project": "earnings-event-playbook",
-  "version": "0.9.0",
+  "version": "1.1.0",
   "runtime_dependencies": 0,
   "workflow_files": "none",
   "generated_artifacts": [
@@ -26,6 +26,29 @@
     "demo/scenario-notebook.json",
     "demo/portfolio-drift-bridge.md",
     "demo/portfolio-drift-bridge.json",
+    "demo/review-packet/inputs/events.json",
+    "demo/review-packet/inputs/portfolio.json",
+    "demo/review-packet/inputs/actuals.json",
+    "demo/review-packet/inputs/risk-thresholds.json",
+    "demo/review-packet/playbook.md",
+    "demo/review-packet/playbook.json",
+    "demo/review-packet/post-event-compare.md",
+    "demo/review-packet/post-event-compare.json",
+    "demo/review-packet/fixture-gallery.md",
+    "demo/review-packet/fixture-gallery.json",
+    "demo/review-packet/tutorial-bundle.md",
+    "demo/review-packet/tutorial-bundle.json",
+    "demo/review-packet/showcase.html",
+    "demo/review-packet/showcase.json",
+    "demo/review-packet/visual-receipt.md",
+    "demo/review-packet/visual-receipt.json",
+    "demo/review-packet/handoff.md",
+    "demo/review-packet/handoff.json",
+    "demo/review-packet/scenario-notebook.md",
+    "demo/review-packet/scenario-notebook.json",
+    "demo/review-packet/portfolio-drift-bridge.md",
+    "demo/review-packet/portfolio-drift-bridge.json",
+    "demo/review-packet/review-packet-manifest.json",
     "demo/cases/software/playbook.md",
     "demo/cases/software/playbook.json",
     "demo/cases/software/post-event-compare.md",
@@ -40,59 +63,19 @@
   "verification_commands": [
     {
       "command": "PYTHONPATH=src python -m pytest",
-      "result": "31 passed"
+      "result": "33 passed"
     },
     {
-      "command": "PYTHONPATH=src python -m unittest discover",
-      "result": "1 passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json",
-      "result": "passed"
-    },
-    {
-      "command": "PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json",
+      "command": "PYTHONPATH=src python -m earnings_event_playbook review-packet --out demo/review-packet",
       "result": "passed"
     },
     {
       "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok; scanned 70 public files"
+      "result": "selfcheck ok: version=1.1.0, scanned=95, runtime_dependencies=0"
     },
     {
       "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
-      "result": "built dist/earnings_event_playbook-0.9.0.tar.gz and dist/earnings_event_playbook-0.9.0-py3-none-any.whl"
+      "result": "built dist/earnings_event_playbook-1.1.0.tar.gz and dist/earnings_event_playbook-1.1.0-py3-none-any.whl"
     }
   ],
   "safety_boundaries": [

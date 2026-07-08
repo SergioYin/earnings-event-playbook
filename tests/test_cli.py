@@ -284,6 +284,61 @@ def test_cli_portfolio_drift_bridge(tmp_path):
     assert data["no_trade_safety_boundaries"]
 
 
+def test_cli_review_packet_manifest_schema_and_roles(tmp_path):
+    out_dir = tmp_path / "review-packet"
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "review-packet", "--out", str(out_dir)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    manifest = json.loads((out_dir / "review-packet-manifest.json").read_text(encoding="utf-8"))
+    assert manifest["schema_version"] == "1.0"
+    assert manifest["artifact"] == "review-packet-manifest"
+    assert manifest["generated_by"] == "earnings-event-playbook"
+    assert manifest["package_version"] == "1.1.0"
+    assert manifest["output_root"] == "review-packet"
+    assert [command["step"] for command in manifest["commands"]] == list(range(1, 10))
+    assert all(command["status"] == "completed" for command in manifest["commands"])
+    assert all(check["status"] == "pass" for check in manifest["release_gate_checks"])
+    assert len(manifest["artifacts"]) == 22
+    assert sorted(item["path"] for item in manifest["artifacts"]) == manifest["artifact_paths"]
+    assert all(len(item["sha256"]) == 64 for item in manifest["artifacts"])
+    roles = {item["path"]: item["role"] for item in manifest["artifacts"]}
+    assert roles["review-packet/playbook.json"] == "pre-event-playbook-artifact"
+    assert roles["review-packet/post-event-compare.json"] == "post-event-comparison-artifact"
+    assert roles["review-packet/visual-receipt.json"] == "hash-receipt-artifact"
+    assert roles["review-packet/showcase.html"] == "showcase-artifact"
+    assert roles["review-packet/inputs/events.json"] == "input-fixture"
+    expected_paths = {path for command in manifest["commands"] for path in command["artifact_paths"]}
+    assert expected_paths.issubset(set(manifest["artifact_paths"]))
+
+
+def test_cli_review_packet_manifest_is_deterministic_and_public(tmp_path):
+    first = tmp_path / "first" / "review-packet"
+    second = tmp_path / "second" / "review-packet"
+    for out_dir in [first, second]:
+        subprocess.run(
+            [sys.executable, "-m", "earnings_event_playbook", "review-packet", "--out", str(out_dir)],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+
+    first_text = (first / "review-packet-manifest.json").read_text(encoding="utf-8")
+    second_text = (second / "review-packet-manifest.json").read_text(encoding="utf-8")
+    assert first_text == second_text
+
+    manifest = json.loads(first_text)
+    all_strings = json.dumps(manifest, sort_keys=True)
+    assert str(tmp_path) not in all_strings
+    assert not any(Path(item["path"]).is_absolute() for item in manifest["artifacts"])
+    assert not any(Path(path).is_absolute() for path in manifest["artifact_paths"])
+    assert not any(".." in Path(item["path"]).parts for item in manifest["artifacts"])
+    private_markers = ["Her" + "mes", "Fei" + "shu", "/" + "home" + "/" + "xjyin", "/" + "mnt" + "/" + "c"]
+    assert not any(marker in all_strings for marker in private_markers)
+
+
 def test_cli_compare_post_event(tmp_path):
     playbook_json = tmp_path / "playbook.json"
     subprocess.run(

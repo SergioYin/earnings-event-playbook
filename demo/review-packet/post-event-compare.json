@@ -1,0 +1,136 @@
+{
+  "artifact": "post-event-compare",
+  "comparisons": [
+    {
+      "actual": {
+        "actual_eps": 1.55,
+        "actual_move_percent": 7.1,
+        "actual_revenue": 3378.0,
+        "fiscal_period": "FY2026 Q2",
+        "notes": "Revenue and margin comments require ledger follow-up against pre-event sensitivities.",
+        "report_date": "2026-07-24",
+        "source_date": "2026-07-24",
+        "source_name": "Static post-event fixture",
+        "ticker": "EXM"
+      },
+      "as_of": "2026-07-27",
+      "eps": {
+        "actual": 1.55,
+        "band": "beat",
+        "consensus": 1.42,
+        "delta": 0.13,
+        "delta_percent": 9.15,
+        "metric": "eps"
+      },
+      "event": {
+        "company": "Example Machines Inc.",
+        "consensus_eps": 1.42,
+        "consensus_revenue": 3250.0,
+        "date": "2026-07-24",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 6.5,
+        "source_date": "2026-07-05",
+        "source_name": "Static consensus fixture",
+        "ticker": "EXM"
+      },
+      "move": {
+        "actual_move_percent": 7.1,
+        "delta_percent": 0.6,
+        "implied_move_percent": 6.5,
+        "matched_scenario": "beat"
+      },
+      "revenue": {
+        "actual": 3378.0,
+        "band": "base",
+        "consensus": 3250.0,
+        "delta": 128.0,
+        "delta_percent": 3.94,
+        "metric": "revenue"
+      },
+      "review_queue": [
+        "Attach actuals source for EXM FY2026 Q2 to the thesis ledger.",
+        "EPS and revenue landed in different bands; document which thesis sensitivity changed.",
+        "Answer after-call question: Did management change full-year guidance assumptions?",
+        "Answer after-call question: Were one-time items separated from recurring demand signals?"
+      ],
+      "review_status": "needs-review",
+      "safety_notice": "Educational post-event review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "thesis_ledger_handoff": [
+        "EXM FY2026 Q2: EPS classified as beat; revenue classified as base; post-event move matched beat.",
+        "Source handoff: Static post-event fixture dated 2026-07-24; report date 2026-07-24.",
+        "Actuals note for ledger: Revenue and margin comments require ledger follow-up against pre-event sensitivities.",
+        "Review thesis sensitivity topics before closing ledger: gross margin, demand durability."
+      ]
+    },
+    {
+      "actual": {
+        "actual_eps": 0.72,
+        "actual_move_percent": -8.4,
+        "actual_revenue": 1812.0,
+        "fiscal_period": "FY2026 Q1",
+        "notes": "Management commentary should be attached before closing the review queue.",
+        "report_date": "2026-08-01",
+        "source_date": "2026-08-01",
+        "source_name": "Static post-event fixture",
+        "ticker": "NXT"
+      },
+      "as_of": "2026-07-27",
+      "eps": {
+        "actual": 0.72,
+        "band": "base",
+        "consensus": 0.78,
+        "delta": -0.06,
+        "delta_percent": -7.69,
+        "metric": "eps"
+      },
+      "event": {
+        "company": "Next Retail Group",
+        "consensus_eps": 0.78,
+        "consensus_revenue": 1840.0,
+        "date": "2026-08-01",
+        "fiscal_period": "FY2026 Q1",
+        "implied_move_percent": 9.2,
+        "source_date": "2026-05-12",
+        "source_name": "Static calendar fixture",
+        "ticker": "NXT"
+      },
+      "move": {
+        "actual_move_percent": -8.4,
+        "delta_percent": -17.6,
+        "implied_move_percent": 9.2,
+        "matched_scenario": "miss"
+      },
+      "revenue": {
+        "actual": 1812.0,
+        "band": "base",
+        "consensus": 1840.0,
+        "delta": -28.0,
+        "delta_percent": -1.52,
+        "metric": "revenue"
+      },
+      "review_queue": [
+        "Attach actuals source for NXT FY2026 Q1 to the thesis ledger.",
+        "Price move scenario differs from fundamentals bands; add market-reaction context.",
+        "Answer after-call question: Did management change full-year guidance assumptions?",
+        "Answer after-call question: Were one-time items separated from recurring demand signals?"
+      ],
+      "review_status": "needs-review",
+      "safety_notice": "Educational post-event review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "thesis_ledger_handoff": [
+        "NXT FY2026 Q1: EPS classified as base; revenue classified as base; post-event move matched miss.",
+        "Source handoff: Static post-event fixture dated 2026-08-01; report date 2026-08-01.",
+        "Actuals note for ledger: Management commentary should be attached before closing the review queue.",
+        "Review thesis sensitivity topics before closing ledger: gross margin, demand durability."
+      ]
+    }
+  ],
+  "generated_by": "earnings-event-playbook",
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0"
+}

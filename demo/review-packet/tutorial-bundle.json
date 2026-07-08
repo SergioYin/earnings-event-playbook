@@ -1,0 +1,115 @@
+{
+  "artifact": "tutorial-bundle",
+  "case_id": "software",
+  "case_path": "examples/cases/software",
+  "generated_by": "earnings-event-playbook",
+  "maturity_rubric_evidence": [
+    {
+      "area": "cold-user path",
+      "evidence": [
+        "one tutorial article",
+        "one deterministic tutorial bundle",
+        "ordered commands from fixtures through review artifacts"
+      ]
+    },
+    {
+      "area": "artifact traceability",
+      "evidence": [
+        "Markdown and JSON playbook outputs",
+        "post-event comparison outputs",
+        "visual receipt hashes",
+        "handoff evidence references"
+      ]
+    },
+    {
+      "area": "public package boundary",
+      "evidence": [
+        "zero runtime dependencies",
+        "local static fixtures only",
+        "no workflow files",
+        "selfcheck private-marker scan"
+      ]
+    },
+    {
+      "area": "safety language",
+      "evidence": [
+        "no live market data",
+        "no broker connection",
+        "no order placement",
+        "no personalized investment, legal, tax, accounting, buy, sell, or hold advice"
+      ]
+    }
+  ],
+  "ordered_commands": [
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/cases/software/events.json --portfolio examples/cases/software/portfolio.json --out review-packet/cases/software/playbook.md --json-out review-packet/cases/software/playbook.json",
+      "expected_artifacts": [
+        "review-packet/cases/software/playbook.md",
+        "review-packet/cases/software/playbook.json"
+      ],
+      "name": "build case playbook",
+      "step": 1
+    },
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook review-packet/cases/software/playbook.json --actuals examples/cases/software/actuals.json --out review-packet/cases/software/post-event-compare.md --json-out review-packet/cases/software/post-event-compare.json",
+      "expected_artifacts": [
+        "review-packet/cases/software/post-event-compare.md",
+        "review-packet/cases/software/post-event-compare.json"
+      ],
+      "name": "compare post-event actuals",
+      "requires_actuals_fixture": true,
+      "step": 2
+    },
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts review-packet/cases/software --out review-packet/cases/software/visual-receipt.md --json-out review-packet/cases/software/visual-receipt.json",
+      "expected_artifacts": [
+        "review-packet/cases/software/visual-receipt.md",
+        "review-packet/cases/software/visual-receipt.json"
+      ],
+      "name": "create visual receipt",
+      "step": 3
+    },
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook review-packet/cases/software/playbook.json --post-event-compare review-packet/cases/software/post-event-compare.json --visual-receipt review-packet/cases/software/visual-receipt.json --out review-packet/cases/software/handoff.md --json-out review-packet/cases/software/handoff.json",
+      "expected_artifacts": [
+        "review-packet/cases/software/handoff.md",
+        "review-packet/cases/software/handoff.json"
+      ],
+      "name": "export handoff pack",
+      "step": 4
+    },
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out review-packet/fixture-gallery.md --json-out review-packet/fixture-gallery.json",
+      "expected_artifacts": [
+        "review-packet/fixture-gallery.md",
+        "review-packet/fixture-gallery.json"
+      ],
+      "name": "refresh fixture gallery",
+      "step": 5
+    }
+  ],
+  "output_root": "review-packet",
+  "reviewer_checklist": [
+    "Confirm the static fixture paths are local files under examples/cases.",
+    "Regenerate the case playbook and compare Markdown against the JSON outputs.",
+    "Open the visual receipt and confirm expected artifact roles, sizes, and SHA-256 hashes are present.",
+    "Review the handoff pack for open review items, thesis-note draft language, risk-map prompts, and evidence hashes.",
+    "Refresh the fixture gallery and confirm the software case is represented with post-event actuals available.",
+    "Confirm all outputs remain descriptive research review artifacts with no buy, sell, hold, allocation, or order language."
+  ],
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, or hold advice",
+    "descriptive research review only"
+  ],
+  "schema_version": "1.0",
+  "static_fixtures": [
+    "examples/cases/software/events.json",
+    "examples/cases/software/portfolio.json",
+    "examples/cases/software/actuals.json"
+  ],
+  "tutorial_article": "docs/tutorial-software-case.md"
+}

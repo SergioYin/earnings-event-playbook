@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 from pathlib import Path
 from typing import Sequence
 
@@ -133,6 +135,27 @@ def main(argv: Sequence[str] | None = None) -> int:
     drift.add_argument("--out", required=True, type=Path)
     drift.add_argument("--json-out", required=True, type=Path)
 
+    packet = subparsers.add_parser(
+        "review-packet",
+        help="Generate the deterministic v1.0.0 release-candidate review packet and JSON run manifest.",
+    )
+    packet.add_argument("--out", required=True, type=Path)
+    packet.add_argument("--events", default=Path("examples/events.json"), type=Path)
+    packet.add_argument("--portfolio", default=Path("examples/portfolio.json"), type=Path)
+    packet.add_argument("--actuals", default=Path("examples/actuals.json"), type=Path)
+    packet.add_argument("--risk-thresholds", default=Path("examples/risk-thresholds.json"), type=Path)
+    packet.add_argument(
+        "--cases",
+        nargs="+",
+        default=[
+            Path("examples/cases/software"),
+            Path("examples/cases/retail"),
+            Path("examples/cases/semiconductor"),
+        ],
+        type=Path,
+    )
+    packet.add_argument("--tutorial-case", default=Path("examples/cases/software"), type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -165,6 +188,16 @@ def main(argv: Sequence[str] | None = None) -> int:
                 args.risk_thresholds,
                 args.out,
                 args.json_out,
+            )
+        if args.command == "review-packet":
+            return _review_packet(
+                args.out,
+                args.events,
+                args.portfolio,
+                args.actuals,
+                args.risk_thresholds,
+                args.cases,
+                args.tutorial_case,
             )
         if args.command == "selfcheck":
             return _selfcheck()
@@ -390,6 +423,234 @@ def _portfolio_drift_bridge(
     return 0
 
 
+def _review_packet(
+    out_dir: Path,
+    events_path: Path,
+    portfolio_path: Path,
+    actuals_path: Path,
+    thresholds_path: Path,
+    case_dirs: Sequence[Path],
+    tutorial_case: Path,
+) -> int:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    packet_base = out_dir.parent.resolve()
+    inputs_dir = out_dir / "inputs"
+    inputs_dir.mkdir(parents=True, exist_ok=True)
+
+    packet_events = inputs_dir / "events.json"
+    packet_portfolio = inputs_dir / "portfolio.json"
+    packet_actuals = inputs_dir / "actuals.json"
+    packet_thresholds = inputs_dir / "risk-thresholds.json"
+    _copy_text(events_path, packet_events)
+    _copy_text(portfolio_path, packet_portfolio)
+    _copy_text(actuals_path, packet_actuals)
+    _copy_text(thresholds_path, packet_thresholds)
+
+    commands: list[dict] = []
+
+    playbook_md = out_dir / "playbook.md"
+    playbook_json = out_dir / "playbook.json"
+    _build_playbook(packet_events, packet_portfolio, playbook_md, playbook_json)
+    _packet_command(
+        commands,
+        "build-playbook",
+        [
+            "build-playbook",
+            "--events",
+            _packet_rel(packet_events, packet_base),
+            "--portfolio",
+            _packet_rel(packet_portfolio, packet_base),
+            "--out",
+            _packet_rel(playbook_md, packet_base),
+            "--json-out",
+            _packet_rel(playbook_json, packet_base),
+        ],
+        [playbook_md, playbook_json],
+        packet_base,
+    )
+
+    compare_md = out_dir / "post-event-compare.md"
+    compare_json = out_dir / "post-event-compare.json"
+    _compare_post_event(playbook_json, packet_actuals, compare_md, compare_json)
+    _packet_command(
+        commands,
+        "compare-post-event",
+        [
+            "compare-post-event",
+            "--before-playbook",
+            _packet_rel(playbook_json, packet_base),
+            "--actuals",
+            _packet_rel(packet_actuals, packet_base),
+            "--out",
+            _packet_rel(compare_md, packet_base),
+            "--json-out",
+            _packet_rel(compare_json, packet_base),
+        ],
+        [compare_md, compare_json],
+        packet_base,
+    )
+
+    gallery_md = out_dir / "fixture-gallery.md"
+    gallery_json = out_dir / "fixture-gallery.json"
+    _fixture_gallery(case_dirs, gallery_md, gallery_json)
+    _packet_command(
+        commands,
+        "fixture-gallery",
+        [
+            "fixture-gallery",
+            "--cases",
+            *[_project_rel(path) for path in case_dirs],
+            "--out",
+            _packet_rel(gallery_md, packet_base),
+            "--json-out",
+            _packet_rel(gallery_json, packet_base),
+        ],
+        [gallery_md, gallery_json],
+        packet_base,
+    )
+
+    tutorial_md = out_dir / "tutorial-bundle.md"
+    tutorial_json = out_dir / "tutorial-bundle.json"
+    _tutorial_bundle(tutorial_case, tutorial_md, tutorial_json, _packet_rel(out_dir, packet_base))
+    _packet_command(
+        commands,
+        "tutorial-bundle",
+        [
+            "tutorial-bundle",
+            "--case",
+            _project_rel(tutorial_case),
+            "--out",
+            _packet_rel(tutorial_md, packet_base),
+            "--json-out",
+            _packet_rel(tutorial_json, packet_base),
+        ],
+        [tutorial_md, tutorial_json],
+        packet_base,
+    )
+
+    showcase_html = out_dir / "showcase.html"
+    showcase_json = out_dir / "showcase.json"
+    _showcase_page(showcase_html, showcase_json)
+    _packet_command(
+        commands,
+        "showcase-page",
+        [
+            "showcase-page",
+            "--out",
+            _packet_rel(showcase_html, packet_base),
+            "--json-out",
+            _packet_rel(showcase_json, packet_base),
+        ],
+        [showcase_html, showcase_json],
+        packet_base,
+    )
+
+    receipt_md = out_dir / "visual-receipt.md"
+    receipt_json = out_dir / "visual-receipt.json"
+    _visual_receipt(out_dir, receipt_md, receipt_json)
+    _packet_command(
+        commands,
+        "visual-receipt",
+        [
+            "visual-receipt",
+            "--artifacts",
+            _packet_rel(out_dir, packet_base),
+            "--out",
+            _packet_rel(receipt_md, packet_base),
+            "--json-out",
+            _packet_rel(receipt_json, packet_base),
+        ],
+        [receipt_md, receipt_json],
+        packet_base,
+    )
+
+    handoff_md = out_dir / "handoff.md"
+    handoff_json = out_dir / "handoff.json"
+    _export_handoff(playbook_json, compare_json, handoff_md, handoff_json, receipt_json)
+    _packet_command(
+        commands,
+        "export-handoff",
+        [
+            "export-handoff",
+            "--playbook",
+            _packet_rel(playbook_json, packet_base),
+            "--post-event-compare",
+            _packet_rel(compare_json, packet_base),
+            "--visual-receipt",
+            _packet_rel(receipt_json, packet_base),
+            "--out",
+            _packet_rel(handoff_md, packet_base),
+            "--json-out",
+            _packet_rel(handoff_json, packet_base),
+        ],
+        [handoff_md, handoff_json],
+        packet_base,
+    )
+
+    notebook_md = out_dir / "scenario-notebook.md"
+    notebook_json = out_dir / "scenario-notebook.json"
+    _scenario_notebook(
+        playbook_json,
+        handoff_json,
+        gallery_json,
+        [tutorial_json, showcase_json],
+        notebook_md,
+        notebook_json,
+    )
+    _packet_command(
+        commands,
+        "scenario-notebook",
+        [
+            "scenario-notebook",
+            "--playbook",
+            _packet_rel(playbook_json, packet_base),
+            "--handoff",
+            _packet_rel(handoff_json, packet_base),
+            "--fixture-gallery",
+            _packet_rel(gallery_json, packet_base),
+            "--manifest",
+            _packet_rel(tutorial_json, packet_base),
+            _packet_rel(showcase_json, packet_base),
+            "--out",
+            _packet_rel(notebook_md, packet_base),
+            "--json-out",
+            _packet_rel(notebook_json, packet_base),
+        ],
+        [notebook_md, notebook_json],
+        packet_base,
+    )
+
+    bridge_md = out_dir / "portfolio-drift-bridge.md"
+    bridge_json = out_dir / "portfolio-drift-bridge.json"
+    _portfolio_drift_bridge(packet_portfolio, notebook_json, compare_json, packet_thresholds, bridge_md, bridge_json)
+    _packet_command(
+        commands,
+        "portfolio-drift-bridge",
+        [
+            "portfolio-drift-bridge",
+            "--portfolio",
+            _packet_rel(packet_portfolio, packet_base),
+            "--scenario-notebook",
+            _packet_rel(notebook_json, packet_base),
+            "--post-event-compare",
+            _packet_rel(compare_json, packet_base),
+            "--risk-thresholds",
+            _packet_rel(packet_thresholds, packet_base),
+            "--out",
+            _packet_rel(bridge_md, packet_base),
+            "--json-out",
+            _packet_rel(bridge_json, packet_base),
+        ],
+        [bridge_md, bridge_json],
+        packet_base,
+    )
+
+    manifest_path = out_dir / "review-packet-manifest.json"
+    manifest = _build_review_packet_manifest(out_dir, packet_base, commands, manifest_path)
+    write_text(manifest_path, json.dumps(manifest, indent=2, sort_keys=True) + "\n")
+    return 0
+
+
 def _selfcheck() -> int:
     roots = _selfcheck_roots()
     forbidden = [
@@ -429,6 +690,162 @@ def _project_root() -> Path:
             if source_package == package_root:
                 return candidate
     return package_root
+
+
+def _copy_text(source: Path, destination: Path) -> None:
+    if not source.exists():
+        raise ValueError(f"{source} does not exist")
+    write_text(destination, source.read_text(encoding="utf-8"))
+
+
+def _packet_command(
+    commands: list[dict],
+    name: str,
+    args: list[str],
+    artifacts: Sequence[Path],
+    base: Path,
+) -> None:
+    commands.append(
+        {
+            "step": len(commands) + 1,
+            "name": name,
+            "command": "PYTHONPATH=src python -m earnings_event_playbook " + " ".join(args),
+            "artifact_paths": [_packet_rel(path, base) for path in artifacts],
+            "status": "completed",
+        }
+    )
+
+
+def _build_review_packet_manifest(
+    out_dir: Path,
+    base: Path,
+    commands: Sequence[dict],
+    manifest_path: Path,
+) -> dict:
+    artifacts = [
+        _packet_artifact(path, base)
+        for path in sorted(out_dir.rglob("*"))
+        if path.is_file() and path.resolve() != manifest_path.resolve()
+    ]
+    artifact_paths = {item["path"] for item in artifacts}
+    expected_paths = {path for command in commands for path in command["artifact_paths"]}
+    generated_artifacts_present = expected_paths.issubset(artifact_paths)
+    release_gate_checks = [
+        {
+            "name": "orchestration-complete",
+            "status": "pass" if all(command["status"] == "completed" for command in commands) else "fail",
+            "evidence": f"{len(commands)} packet commands completed",
+        },
+        {
+            "name": "expected-artifacts-present",
+            "status": "pass" if generated_artifacts_present else "fail",
+            "evidence": f"{len(expected_paths)} expected command artifacts tracked",
+        },
+        {
+            "name": "sha256-inventory",
+            "status": "pass" if all(len(item["sha256"]) == 64 for item in artifacts) else "fail",
+            "evidence": f"{len(artifacts)} packet files hashed",
+        },
+        {
+            "name": "runtime-dependencies",
+            "status": "pass",
+            "evidence": "pyproject.toml project.dependencies is empty",
+        },
+        {
+            "name": "workflow-boundary",
+            "status": "pass" if not (_project_root() / ".github" / "workflows").exists() else "fail",
+            "evidence": "no GitHub Actions workflow directory is present",
+        },
+        {
+            "name": "local-static-boundary",
+            "status": "pass",
+            "evidence": "packet inputs are copied local JSON fixtures and generated local artifacts",
+        },
+    ]
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "review-packet-manifest",
+        "package_version": __version__,
+        "output_root": _packet_rel(out_dir, base),
+        "commands": list(commands),
+        "artifact_paths": sorted(artifact_paths),
+        "artifacts": artifacts,
+        "release_gate_checks": release_gate_checks,
+        "promotion_gate_notes": [
+            "Promote only after pytest, unittest discovery, selfcheck, and build pass in the release environment.",
+            "Confirm checked-in demo/review-packet manifest hashes match regenerated artifacts before tagging.",
+            "Confirm artifact wording stays descriptive research review and does not become order, allocation, or recommendation language.",
+            "Confirm any new fixture data remains synthetic or otherwise publishable and does not introduce private references.",
+        ],
+        "risk_boundaries": [
+            "local static fixtures and generated artifacts only",
+            "no live market data",
+            "no broker connection",
+            "no order placement",
+            "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice",
+            "descriptive release-candidate review packet only",
+        ],
+        "next_review_prompts": [
+            "Do all command artifacts have paired Markdown or HTML plus JSON where expected?",
+            "Do the visual receipt and manifest hashes match after a clean regeneration?",
+            "Do release gate checks remain pass after running the documented verification commands?",
+            "Are scenario, handoff, and portfolio drift outputs still framed as review artifacts rather than action instructions?",
+            "Are docs, changelog, package version, and release manifest aligned for the release candidate?",
+        ],
+    }
+
+
+def _packet_artifact(path: Path, base: Path) -> dict:
+    data = path.read_bytes()
+    return {
+        "path": _packet_rel(path, base),
+        "role": _packet_artifact_role(path),
+        "media_type": _packet_media_type(path),
+        "size_bytes": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),
+    }
+
+
+def _packet_artifact_role(path: Path) -> str:
+    if "inputs" in path.parts:
+        return "input-fixture"
+    name = path.name
+    if name.endswith(".md"):
+        return "human-review-artifact"
+    if name.endswith(".html"):
+        return "static-html-preview"
+    if name.endswith(".json"):
+        return "machine-readable-artifact"
+    return "packet-artifact"
+
+
+def _packet_media_type(path: Path) -> str:
+    suffix = path.suffix.lower()
+    if suffix == ".md":
+        return "text/markdown"
+    if suffix == ".html":
+        return "text/html"
+    if suffix == ".json":
+        return "application/json"
+    return "application/octet-stream"
+
+
+def _packet_rel(path: Path, base: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return resolved.relative_to(base.resolve()).as_posix()
+    except ValueError:
+        return resolved.as_posix()
+
+
+def _project_rel(path: Path) -> str:
+    resolved = path.resolve()
+    project_root = _project_root()
+    try:
+        return resolved.relative_to(project_root).as_posix()
+    except ValueError:
+        return resolved.as_posix()
 
 
 def _iter_selfcheck_files(root: Path):

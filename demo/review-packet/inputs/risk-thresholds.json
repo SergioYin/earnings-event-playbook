@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "generated_by": "earnings-event-playbook",
+  "artifact": "risk-thresholds",
+  "thresholds": {
+    "max_position_weight_percent": 4.0,
+    "max_exposure_share_percent": 50.0,
+    "post_event_move_watch_percent": 6.0,
+    "post_event_exposure_drift_amount": 900.0,
+    "max_open_review_items": 6
+  },
+  "safety_boundaries": [
+    "local static thresholds only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice"
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "artifact": "showcase-page",
+  "case_gallery_highlights": [
+    "software: two events with post-event actuals for CloudLedger Systems and DevSuite Analytics.",
+    "retail: two-event case without actuals to show pre-event review coverage and skipped post-event steps.",
+    "semiconductor: three-event case with matched post-event actuals for hardware-cycle review coverage."
+  ],
+  "demo_artifact_links": [
+    {
+      "label": "Showcase landing page",
+      "path": "demo/showcase.html",
+      "role": "no-JS landing page"
+    },
+    {
+      "label": "Showcase manifest",
+      "path": "demo/showcase.json",
+      "role": "machine-readable summary"
+    },
+    {
+      "label": "Static preview",
+      "path": "demo/index.html",
+      "role": "generated HTML playbook preview"
+    },
+    {
+      "label": "Pre-event playbook",
+      "path": "demo/playbook.md",
+      "role": "human review artifact"
+    },
+    {
+      "label": "Pre-event playbook JSON",
+      "path": "demo/playbook.json",
+      "role": "machine artifact"
+    },
+    {
+      "label": "Post-event compare",
+      "path": "demo/post-event-compare.md",
+      "role": "human review artifact"
+    },
+    {
+      "label": "Visual receipt",
+      "path": "demo/visual-receipt.md",
+      "role": "release evidence hashes"
+    },
+    {
+      "label": "Handoff pack",
+      "path": "demo/handoff.md",
+      "role": "thesis-ledger and risk-map handoff"
+    },
+    {
+      "label": "Fixture gallery",
+      "path": "demo/fixture-gallery.md",
+      "role": "multi-case comparison"
+    },
+    {
+      "label": "Tutorial bundle",
+      "path": "demo/tutorial-bundle.md",
+      "role": "ordered reviewer packet"
+    },
+    {
+      "label": "Scenario notebook",
+      "path": "demo/scenario-notebook.md",
+      "role": "combined reviewer notebook"
+    },
+    {
+      "label": "Portfolio drift bridge",
+      "path": "demo/portfolio-drift-bridge.md",
+      "role": "exposure and post-event drift bridge"
+    }
+  ],
+  "generated_by": "earnings-event-playbook",
+  "maturity_rubric": [
+    {
+      "area": "cold-user clarity",
+      "evidence": "README, docs/showcase.md, demo/showcase.html, and demo/showcase.json explain the fastest path without requiring external services."
+    },
+    {
+      "area": "artifact completeness",
+      "evidence": "Playbook, compare, receipt, handoff, gallery, tutorial, scenario notebook, and showcase artifacts are generated as deterministic Markdown, JSON, or no-JS HTML."
+    },
+    {
+      "area": "package hygiene",
+      "evidence": "Runtime dependency count is zero, workflows are absent, fixtures are local, and selfcheck scans public files."
+    },
+    {
+      "area": "safety posture",
+      "evidence": "Every public path frames outputs as descriptive research review and excludes live data, broker connectivity, orders, and personalized advice."
+    }
+  ],
+  "quickstart_commands": [
+    "PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo",
+    "PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json",
+    "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json",
+    "PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json",
+    "PYTHONPATH=src python -m earnings_event_playbook scenario-notebook --playbook demo/playbook.json --handoff demo/handoff.json --fixture-gallery demo/fixture-gallery.json --manifest demo/tutorial-bundle.json demo/showcase.json --out demo/scenario-notebook.md --json-out demo/scenario-notebook.json",
+    "PYTHONPATH=src python -m earnings_event_playbook portfolio-drift-bridge --portfolio examples/portfolio.json --scenario-notebook demo/scenario-notebook.json --post-event-compare demo/post-event-compare.json --risk-thresholds examples/risk-thresholds.json --out demo/portfolio-drift-bridge.md --json-out demo/portfolio-drift-bridge.json",
+    "PYTHONPATH=src python -m earnings_event_playbook selfcheck"
+  ],
+  "release_evidence": [
+    "README first screen names the target user, quickstart, demo path, and star reason.",
+    "docs/release-readiness.md records verification commands, asset inventory, risk boundaries, and maturity status.",
+    "release_manifest.json lists generated artifacts, verification commands, zero runtime dependencies, and workflow absence.",
+    "demo/scenario-notebook.md and demo/scenario-notebook.json combine playbook, handoff, gallery, tutorial, and showcase evidence for reviewers.",
+    "demo/portfolio-drift-bridge.md and demo/portfolio-drift-bridge.json bridge portfolio exposure, scenario notebook mismatches, post-event drift, risk prompts, and no-trade boundaries.",
+    "selfcheck scans public package files for private markers and verifies workflow absence.",
+    "pytest and unittest cover parsing, scoring, rendering, CLI outputs, public hygiene, and smoke import behavior."
+  ],
+  "risk_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, legal, tax, or accounting advice",
+    "descriptive research review and release evidence only"
+  ],
+  "schema_version": "1.0",
+  "star_worthy_differentiation": [
+    "A small public package that demonstrates release-grade evidence around a domain-specific CLI, not just a one-off script.",
+    "Every major artifact has a human-readable form and a deterministic JSON form for local downstream tooling.",
+    "The portfolio drift bridge adds exposure concentration and post-event watchlists without crossing into trading advice or order workflows.",
+    "The showcase page is self-contained HTML with no JavaScript, server, network, database, credentials, or data-vendor setup.",
+    "The repository models a careful public boundary for finance-adjacent tooling without presenting itself as a trading system."
+  ],
+  "tagline": "Zero-dependency local earnings-event research artifacts with static demo evidence.",
+  "title": "Earnings Event Playbook Showcase",
+  "tutorial_path": [
+    "Read docs/tutorial-software-case.md.",
+    "Run tutorial-bundle for examples/cases/software.",
+    "Regenerate the software playbook, post-event compare, visual receipt, handoff, and fixture gallery commands listed in the bundle.",
+    "Run scenario-notebook to combine playbook, handoff, gallery, tutorial, and showcase artifacts.",
+    "Run portfolio-drift-bridge to connect scenario mismatches and post-event drift back to static portfolio exposure.",
+    "Use demo/tutorial-bundle.json as the machine-readable reviewer checklist."
+  ],
+  "value_proposition": [
+    "Turns local earnings-calendar, consensus, portfolio, and actuals fixtures into Markdown, JSON, and static HTML review artifacts.",
+    "Gives a cold reviewer a complete path from fixtures to playbook, post-event compare, visual receipt, handoff pack, case gallery, tutorial packet, scenario notebook, and portfolio drift bridge.",
+    "Keeps the package auditable: no runtime dependencies, no network clients, no workflow files, and deterministic outputs."
+  ]
+}

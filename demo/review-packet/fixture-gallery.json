@@ -1,0 +1,127 @@
+{
+  "artifact": "fixture-gallery",
+  "cases": [
+    {
+      "case_id": "retail",
+      "case_path": "examples/cases/retail",
+      "event_count": 3,
+      "high_attention_scores": [],
+      "post_event_available": false,
+      "post_event_match_count": 0,
+      "safety_boundaries": [
+        "local static fixtures only",
+        "no live market data",
+        "no broker connection",
+        "no order placement",
+        "no personalized investment advice"
+      ],
+      "stale_sources": [
+        "GROC:stale>45d"
+      ],
+      "supported_demo_commands": [
+        "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/cases/retail/events.json --portfolio examples/cases/retail/portfolio.json --out demo/cases/retail/playbook.md --json-out demo/cases/retail/playbook.json"
+      ],
+      "tickers": [
+        "FASH",
+        "GROC",
+        "HOME"
+      ]
+    },
+    {
+      "case_id": "semiconductor",
+      "case_path": "examples/cases/semiconductor",
+      "event_count": 2,
+      "high_attention_scores": [
+        {
+          "fiscal_period": "FY2026 Q2",
+          "score": 70,
+          "ticker": "AICH"
+        },
+        {
+          "fiscal_period": "FY2026 Q3",
+          "score": 70,
+          "ticker": "MEMR"
+        }
+      ],
+      "post_event_available": true,
+      "post_event_match_count": 1,
+      "safety_boundaries": [
+        "local static fixtures only",
+        "no live market data",
+        "no broker connection",
+        "no order placement",
+        "no personalized investment advice"
+      ],
+      "stale_sources": [
+        "MEMR:stale>45d"
+      ],
+      "supported_demo_commands": [
+        "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/cases/semiconductor/events.json --portfolio examples/cases/semiconductor/portfolio.json --out demo/cases/semiconductor/playbook.md --json-out demo/cases/semiconductor/playbook.json",
+        "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/cases/semiconductor/playbook.json --actuals examples/cases/semiconductor/actuals.json --out demo/cases/semiconductor/post-event-compare.md --json-out demo/cases/semiconductor/post-event-compare.json"
+      ],
+      "tickers": [
+        "AICH",
+        "MEMR"
+      ]
+    },
+    {
+      "case_id": "software",
+      "case_path": "examples/cases/software",
+      "event_count": 2,
+      "high_attention_scores": [
+        {
+          "fiscal_period": "FY2026 Q2",
+          "score": 71,
+          "ticker": "SECX"
+        }
+      ],
+      "post_event_available": true,
+      "post_event_match_count": 2,
+      "safety_boundaries": [
+        "local static fixtures only",
+        "no live market data",
+        "no broker connection",
+        "no order placement",
+        "no personalized investment advice"
+      ],
+      "stale_sources": [
+        "SECX:stale>45d"
+      ],
+      "supported_demo_commands": [
+        "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/cases/software/events.json --portfolio examples/cases/software/portfolio.json --out demo/cases/software/playbook.md --json-out demo/cases/software/playbook.json",
+        "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/cases/software/playbook.json --actuals examples/cases/software/actuals.json --out demo/cases/software/post-event-compare.md --json-out demo/cases/software/post-event-compare.json"
+      ],
+      "tickers": [
+        "CLDW",
+        "SECX"
+      ]
+    }
+  ],
+  "cases_root": "examples/cases",
+  "generated_by": "earnings-event-playbook",
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0",
+  "summary": {
+    "case_count": 3,
+    "event_count": 7,
+    "high_attention_count": 3,
+    "post_event_case_count": 2,
+    "stale_source_count": 3,
+    "ticker_count": 7,
+    "tickers": [
+      "AICH",
+      "CLDW",
+      "FASH",
+      "GROC",
+      "HOME",
+      "MEMR",
+      "SECX"
+    ]
+  }
+}

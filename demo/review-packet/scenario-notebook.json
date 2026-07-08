@@ -1,0 +1,603 @@
+{
+  "artifact": "scenario-notebook",
+  "comparison_aftermath": [
+    {
+      "catalyst_follow_up": [
+        "Carry forward unresolved EXM FY2026 Q2 review items into the next catalyst log.",
+        "Attach source artifacts and notes before marking the event review closed.",
+        "Review actuals note for catalyst context: Revenue and margin comments require ledger follow-up against pre-event sensitivities.",
+        "Update thesis sensitivity evidence for: gross margin, demand durability."
+      ],
+      "company": "Example Machines Inc.",
+      "fiscal_period": "FY2026 Q2",
+      "review_status": "needs-review",
+      "risk_map_prompts": [
+        "Map EXM FY2026 Q2 source freshness (fresh<=14d) to the call-risk log.",
+        "Identify which thesis sensitivities need updated evidence after the earnings call.",
+        "Call-risk prompt: Did management change full-year guidance assumptions?",
+        "Call-risk prompt: Were one-time items separated from recurring demand signals?",
+        "Compare EPS band beat, revenue band base, and move scenario beat for divergence."
+      ],
+      "thesis_note_draft": "EXM FY2026 Q2 handoff: review status needs-review. EPS band beat; revenue band base; post-event move matched beat. Pre-event source freshness was fresh<=14d; actuals source was Static post-event fixture. Use this as a thesis-ledger draft note after source review; it is not an action recommendation.",
+      "ticker": "EXM"
+    },
+    {
+      "catalyst_follow_up": [
+        "Carry forward unresolved NXT FY2026 Q1 review items into the next catalyst log.",
+        "Attach source artifacts and notes before marking the event review closed.",
+        "Review actuals note for catalyst context: Management commentary should be attached before closing the review queue.",
+        "Update thesis sensitivity evidence for: gross margin, demand durability."
+      ],
+      "company": "Next Retail Group",
+      "fiscal_period": "FY2026 Q1",
+      "review_status": "needs-review",
+      "risk_map_prompts": [
+        "Map NXT FY2026 Q1 source freshness (stale>45d) to the call-risk log.",
+        "Identify which thesis sensitivities need updated evidence after the earnings call.",
+        "Call-risk prompt: Did management change full-year guidance assumptions?",
+        "Call-risk prompt: Were one-time items separated from recurring demand signals?",
+        "Compare EPS band base, revenue band base, and move scenario miss for divergence."
+      ],
+      "thesis_note_draft": "NXT FY2026 Q1 handoff: review status needs-review. EPS band base; revenue band base; post-event move matched miss. Pre-event source freshness was stale>45d; actuals source was Static post-event fixture. Use this as a thesis-ledger draft note after source review; it is not an action recommendation.",
+      "ticker": "NXT"
+    }
+  ],
+  "evidence_hashes": [
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/fixture-gallery.json",
+      "role": "json-artifact",
+      "sha256": "3965bf845ee22791be53507c37fe709cebc83111960b10b6614144a1a6c8c35d",
+      "size_bytes": 4139,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "text/markdown",
+      "path": "review-packet/fixture-gallery.md",
+      "role": "markdown-artifact",
+      "sha256": "85245a266cacca9861b74e9b9fa097f0982c97bcfebbf140b0fa55326d81f607",
+      "size_bytes": 2308,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/inputs/actuals.json",
+      "role": "input-fixture",
+      "sha256": "d6008a8d2888aaf3d9efab7d9b84d5179cf4298428156ecb0a9d46f5a9a59e79",
+      "size_bytes": 810,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/inputs/events.json",
+      "role": "input-fixture",
+      "sha256": "972654c17ac4816435cbf28207f69822a5acff8db7ef352d7677b3ccb93827cc",
+      "size_bytes": 1211,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/inputs/portfolio.json",
+      "role": "input-fixture",
+      "sha256": "552f2e7c3fec4cd7bc32b642eec760706200adb3d567225dcb15fa981f299e00",
+      "size_bytes": 442,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/inputs/risk-thresholds.json",
+      "role": "json-artifact",
+      "sha256": "eb05108dbc8bde62cfe54b9a3e4688711ab1c5eb60c7e8b320695aecd9a8bc42",
+      "size_bytes": 591,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/playbook.json",
+      "role": "playbook-json",
+      "sha256": "3c94be26c733282f91ddf58012aa8fe93aedd8fe077fff7b7c9bc665169d2b34",
+      "size_bytes": 6263,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "text/markdown",
+      "path": "review-packet/playbook.md",
+      "role": "playbook-markdown",
+      "sha256": "59d9451b5206bfa979f0ee224214b1aed2501485246ec230805c982c29354a47",
+      "size_bytes": 2856,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/post-event-compare.json",
+      "role": "post-event-json",
+      "sha256": "72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79",
+      "size_bytes": 5099,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "text/markdown",
+      "path": "review-packet/post-event-compare.md",
+      "role": "post-event-markdown",
+      "sha256": "a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb",
+      "size_bytes": 3035,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "text/html",
+      "path": "review-packet/showcase.html",
+      "role": "html-artifact",
+      "sha256": "8ae30d2072c9eda4af70b2d21d3d4c9ca895076d68d55500fb409cd0da60a9ca",
+      "size_bytes": 10879,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/showcase.json",
+      "role": "json-artifact",
+      "sha256": "e45ee457692a55de5eaf0a5c3e3ac9f89ac623a3287dbcd62bbf986a2d6d659a",
+      "size_bytes": 7351,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "application/json",
+      "path": "review-packet/tutorial-bundle.json",
+      "role": "json-artifact",
+      "sha256": "43fe3db28198add8399d23a5898b5393cb9510ec1209a81a177b53b8655a8c47",
+      "size_bytes": 4938,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "media_type": "text/markdown",
+      "path": "review-packet/tutorial-bundle.md",
+      "role": "markdown-artifact",
+      "sha256": "d22f4698d14eaffe4e69dc148466c2d1d5d47166c282beeca50a101e734e30a1",
+      "size_bytes": 4236,
+      "ticker": "EXM, NXT",
+      "tickers": [
+        "EXM",
+        "NXT"
+      ]
+    }
+  ],
+  "fixture_gallery": {
+    "cases": [
+      {
+        "case_id": "retail",
+        "event_count": 3,
+        "high_attention_scores": [],
+        "post_event_available": false,
+        "post_event_match_count": 0,
+        "stale_sources": [
+          "GROC:stale>45d"
+        ],
+        "tickers": [
+          "FASH",
+          "GROC",
+          "HOME"
+        ]
+      },
+      {
+        "case_id": "semiconductor",
+        "event_count": 2,
+        "high_attention_scores": [
+          {
+            "fiscal_period": "FY2026 Q2",
+            "score": 70,
+            "ticker": "AICH"
+          },
+          {
+            "fiscal_period": "FY2026 Q3",
+            "score": 70,
+            "ticker": "MEMR"
+          }
+        ],
+        "post_event_available": true,
+        "post_event_match_count": 1,
+        "stale_sources": [
+          "MEMR:stale>45d"
+        ],
+        "tickers": [
+          "AICH",
+          "MEMR"
+        ]
+      },
+      {
+        "case_id": "software",
+        "event_count": 2,
+        "high_attention_scores": [
+          {
+            "fiscal_period": "FY2026 Q2",
+            "score": 71,
+            "ticker": "SECX"
+          }
+        ],
+        "post_event_available": true,
+        "post_event_match_count": 2,
+        "stale_sources": [
+          "SECX:stale>45d"
+        ],
+        "tickers": [
+          "CLDW",
+          "SECX"
+        ]
+      }
+    ],
+    "summary": {
+      "case_count": 3,
+      "event_count": 7,
+      "high_attention_count": 3,
+      "post_event_case_count": 2,
+      "stale_source_count": 3,
+      "ticker_count": 7,
+      "tickers": [
+        "AICH",
+        "CLDW",
+        "FASH",
+        "GROC",
+        "HOME",
+        "MEMR",
+        "SECX"
+      ]
+    }
+  },
+  "generated_by": "earnings-event-playbook",
+  "inputs": {
+    "fixture_gallery_artifact": "fixture-gallery",
+    "handoff_artifact": "cross-asset-handoff",
+    "optional_manifest_artifacts": [
+      "tutorial-bundle",
+      "showcase-page"
+    ],
+    "playbook_artifact": "playbook"
+  },
+  "next_action_queue": [
+    {
+      "fiscal_period": "FY2026 Q2",
+      "item": "Attach actuals source for EXM FY2026 Q2 to the thesis ledger.",
+      "priority": 1,
+      "ticker": "EXM"
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "item": "EPS and revenue landed in different bands; document which thesis sensitivity changed.",
+      "priority": 2,
+      "ticker": "EXM"
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "item": "Answer after-call question: Did management change full-year guidance assumptions?",
+      "priority": 3,
+      "ticker": "EXM"
+    },
+    {
+      "fiscal_period": "FY2026 Q2",
+      "item": "Answer after-call question: Were one-time items separated from recurring demand signals?",
+      "priority": 4,
+      "ticker": "EXM"
+    },
+    {
+      "fiscal_period": "FY2026 Q1",
+      "item": "Attach actuals source for NXT FY2026 Q1 to the thesis ledger.",
+      "priority": 1,
+      "ticker": "NXT"
+    },
+    {
+      "fiscal_period": "FY2026 Q1",
+      "item": "Price move scenario differs from fundamentals bands; add market-reaction context.",
+      "priority": 2,
+      "ticker": "NXT"
+    },
+    {
+      "fiscal_period": "FY2026 Q1",
+      "item": "Answer after-call question: Did management change full-year guidance assumptions?",
+      "priority": 3,
+      "ticker": "NXT"
+    },
+    {
+      "fiscal_period": "FY2026 Q1",
+      "item": "Answer after-call question: Were one-time items separated from recurring demand signals?",
+      "priority": 4,
+      "ticker": "NXT"
+    },
+    {
+      "fiscal_period": "FY2026 Q1",
+      "item": "Refresh source freshness for NXT before closing handoff.",
+      "priority": 5,
+      "ticker": "NXT"
+    }
+  ],
+  "optional_manifests": [
+    {
+      "artifact": "tutorial-bundle",
+      "path_count": 5,
+      "paths_or_commands": [
+        "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/cases/software/events.json --portfolio examples/cases/software/portfolio.json --out review-packet/cases/software/playbook.md --json-out review-packet/cases/software/playbook.json",
+        "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook review-packet/cases/software/playbook.json --actuals examples/cases/software/actuals.json --out review-packet/cases/software/post-event-compare.md --json-out review-packet/cases/software/post-event-compare.json",
+        "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts review-packet/cases/software --out review-packet/cases/software/visual-receipt.md --json-out review-packet/cases/software/visual-receipt.json",
+        "PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook review-packet/cases/software/playbook.json --post-event-compare review-packet/cases/software/post-event-compare.json --visual-receipt review-packet/cases/software/visual-receipt.json --out review-packet/cases/software/handoff.md --json-out review-packet/cases/software/handoff.json",
+        "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out review-packet/fixture-gallery.md --json-out review-packet/fixture-gallery.json"
+      ],
+      "risk_boundaries": [
+        "local static fixtures only",
+        "no live market data",
+        "no broker connection",
+        "no order placement",
+        "no personalized investment, legal, tax, accounting, buy, sell, or hold advice",
+        "descriptive research review only"
+      ],
+      "title": "tutorial-bundle"
+    },
+    {
+      "artifact": "showcase-page",
+      "path_count": 12,
+      "paths_or_commands": [
+        "demo/showcase.html",
+        "demo/showcase.json",
+        "demo/index.html",
+        "demo/playbook.md",
+        "demo/playbook.json",
+        "demo/post-event-compare.md",
+        "demo/visual-receipt.md",
+        "demo/handoff.md",
+        "demo/fixture-gallery.md",
+        "demo/tutorial-bundle.md",
+        "demo/scenario-notebook.md",
+        "demo/portfolio-drift-bridge.md"
+      ],
+      "risk_boundaries": [
+        "local static fixtures only",
+        "no live market data",
+        "no broker connection",
+        "no order placement",
+        "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, legal, tax, or accounting advice",
+        "descriptive research review and release evidence only"
+      ],
+      "title": "Earnings Event Playbook Showcase"
+    }
+  ],
+  "reusable_agent_prompts": [
+    {
+      "name": "thesis ledger updater",
+      "prompt": "Using the scenario notebook JSON, draft concise thesis-ledger notes grouped by ticker, source freshness, scenario band, review status, open queue item, and evidence hash. Keep the output descriptive and do not include action language."
+    },
+    {
+      "name": "earnings call risk mapper",
+      "prompt": "Using the scenario notebook JSON, convert risk questions and handoff prompts into an earnings-call risk map with source freshness, unresolved assumptions, and follow-up evidence fields."
+    },
+    {
+      "name": "release reviewer",
+      "prompt": "Using the scenario notebook JSON, verify artifact completeness, local-only boundaries, evidence hashes, optional manifests, and open review items before release."
+    }
+  ],
+  "risk_boundary_checklist": [
+    "Confirm every source date is acceptable for the review window.",
+    "Confirm scenario bands are treated as deterministic fixture calculations, not forecasts.",
+    "Confirm handoff packs have matching playbook tickers and fiscal periods.",
+    "Confirm evidence hashes point to local generated artifacts.",
+    "Confirm optional tutorial and showcase manifests reference local public paths only.",
+    "Confirm unresolved review queue items stay open until source materials are attached."
+  ],
+  "safety_boundaries": [
+    "local static artifacts only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice",
+    "descriptive reviewer notebook only"
+  ],
+  "scenario_bands": [
+    {
+      "bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 1170.0,
+          "name": "beat",
+          "price_move_percent": 6.5,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -1170.0,
+          "name": "miss",
+          "price_move_percent": -6.5,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "fiscal_period": "FY2026 Q2",
+      "ticker": "EXM"
+    },
+    {
+      "bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 699.2,
+          "name": "beat",
+          "price_move_percent": 9.2,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -699.2,
+          "name": "miss",
+          "price_move_percent": -9.2,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "fiscal_period": "FY2026 Q1",
+      "ticker": "NXT"
+    }
+  ],
+  "schema_version": "1.0",
+  "source_freshness": [
+    {
+      "event_source": "Static consensus fixture",
+      "event_source_date": "2026-07-05",
+      "fiscal_period": "FY2026 Q2",
+      "freshness": "fresh<=14d",
+      "review_status": "needs-review",
+      "ticker": "EXM"
+    },
+    {
+      "event_source": "Static calendar fixture",
+      "event_source_date": "2026-05-12",
+      "fiscal_period": "FY2026 Q1",
+      "freshness": "stale>45d",
+      "review_status": "needs-review",
+      "ticker": "NXT"
+    }
+  ],
+  "summary": {
+    "case_count": 3,
+    "evidence_hash_count": 14,
+    "handoff_pack_count": 2,
+    "mismatched_handoff_keys": [],
+    "open_review_item_count": 9,
+    "optional_manifest_count": 2,
+    "playbook_count": 2
+  },
+  "thesis_assumptions": [
+    {
+      "attention_score": 46,
+      "company": "Example Machines Inc.",
+      "fiscal_period": "FY2026 Q2",
+      "portfolio_weight_percent": 4.5,
+      "position_exposure": 18000.0,
+      "risk_questions": [
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "sensitivities": [
+        "gross margin (3): Margin guide and inventory commentary can change confidence in the near-term thesis.",
+        "demand durability (2): Backlog quality and repeat-order language should be reviewed after the call."
+      ],
+      "ticker": "EXM"
+    },
+    {
+      "attention_score": 48,
+      "company": "Next Retail Group",
+      "fiscal_period": "FY2026 Q1",
+      "portfolio_weight_percent": 1.9,
+      "position_exposure": 7600.0,
+      "risk_questions": [
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "sensitivities": [
+        "gross margin (3): Margin guide and inventory commentary can change confidence in the near-term thesis.",
+        "demand durability (2): Backlog quality and repeat-order language should be reviewed after the call."
+      ],
+      "ticker": "NXT"
+    }
+  ]
+}

@@ -1,0 +1,165 @@
+{
+  "artifact": "portfolio-drift-bridge",
+  "event_linked_tickers": [
+    {
+      "company": "Example Machines Inc.",
+      "exposure": 18000.0,
+      "fiscal_period": "FY2026 Q2",
+      "portfolio_weight_percent": 4.5,
+      "review_status": "needs-review",
+      "risk_questions": [
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "source_freshness": "fresh<=14d",
+      "ticker": "EXM"
+    },
+    {
+      "company": "Next Retail Group",
+      "exposure": 7600.0,
+      "fiscal_period": "FY2026 Q1",
+      "portfolio_weight_percent": 1.9,
+      "review_status": "needs-review",
+      "risk_questions": [
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "source_freshness": "stale>45d",
+      "ticker": "NXT"
+    }
+  ],
+  "exposure_concentration": [
+    {
+      "event_linked": true,
+      "exposure": 18000.0,
+      "exposure_share_percent": 70.31,
+      "flags": [
+        "weight-threshold",
+        "exposure-share-threshold",
+        "event-linked"
+      ],
+      "notes": "Core watch position for industrial automation thesis.",
+      "portfolio_weight_percent": 4.5,
+      "shares": 120.0,
+      "ticker": "EXM"
+    },
+    {
+      "event_linked": true,
+      "exposure": 7600.0,
+      "exposure_share_percent": 29.69,
+      "flags": [
+        "event-linked"
+      ],
+      "notes": "Smaller discretionary retail exposure.",
+      "portfolio_weight_percent": 1.9,
+      "shares": 85.0,
+      "ticker": "NXT"
+    }
+  ],
+  "generated_by": "earnings-event-playbook",
+  "inputs": {
+    "portfolio_as_of": "2026-07-08",
+    "portfolio_base_currency": "USD",
+    "post_event_compare_artifact": "post-event-compare",
+    "scenario_notebook_artifact": "scenario-notebook",
+    "threshold_source": "provided-static-json"
+  },
+  "next_risk_review_prompts": [
+    "Review EXM FY2026 Q2 mismatch reasons before closing the event packet: eps-revenue-band-divergence, review-status:needs-review.",
+    "Review NXT FY2026 Q1 mismatch reasons before closing the event packet: move-fundamental-band-divergence, review-status:needs-review.",
+    "Check EXM post-event drift evidence against portfolio exposure and source notes before the next risk review.",
+    "Check NXT post-event drift evidence against portfolio exposure and source notes before the next risk review.",
+    "Carry forward EXM risk questions: Did management change full-year guidance assumptions?; Were one-time items separated from recurring demand signals?",
+    "Carry forward NXT risk questions: Did management change full-year guidance assumptions?; Were one-time items separated from recurring demand signals?",
+    "Notebook has 9 open review items; triage before the next risk review packet is archived.",
+    "Open notebook queue item for EXM: Attach actuals source for EXM FY2026 Q2 to the thesis ledger.",
+    "Open notebook queue item for EXM: EPS and revenue landed in different bands; document which thesis sensitivity changed.",
+    "Open notebook queue item for EXM: Answer after-call question: Did management change full-year guidance assumptions?",
+    "Open notebook queue item for EXM: Answer after-call question: Were one-time items separated from recurring demand signals?",
+    "Open notebook queue item for NXT: Attach actuals source for NXT FY2026 Q1 to the thesis ledger.",
+    "Open notebook queue item for NXT: Price move scenario differs from fundamentals bands; add market-reaction context."
+  ],
+  "no_trade_safety_boundaries": [
+    "Do not treat concentration flags as trade instructions.",
+    "Do not convert scenario mismatch alerts into buy, sell, hold, hedge, rebalance, or allocation actions.",
+    "Do not place, route, stage, or simulate orders from this packet.",
+    "Do not use this packet without independent source review and suitability review outside this package."
+  ],
+  "post_event_drift_watchlist": [
+    {
+      "actual_move_percent": 7.1,
+      "estimated_exposure_drift": 1278.0,
+      "fiscal_period": "FY2026 Q2",
+      "matched_scenario": "beat",
+      "position_exposure": 18000.0,
+      "review_status": "needs-review",
+      "ticker": "EXM",
+      "triggers": [
+        "move-threshold",
+        "exposure-drift-threshold"
+      ]
+    },
+    {
+      "actual_move_percent": -8.4,
+      "estimated_exposure_drift": -638.4,
+      "fiscal_period": "FY2026 Q1",
+      "matched_scenario": "miss",
+      "position_exposure": 7600.0,
+      "review_status": "needs-review",
+      "ticker": "NXT",
+      "triggers": [
+        "move-threshold"
+      ]
+    }
+  ],
+  "safety_boundaries": [
+    "local static fixtures and generated artifacts only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice",
+    "descriptive portfolio drift review only"
+  ],
+  "scenario_mismatch_alerts": [
+    {
+      "eps_band": "beat",
+      "fiscal_period": "FY2026 Q2",
+      "move_scenario": "beat",
+      "reasons": [
+        "eps-revenue-band-divergence",
+        "review-status:needs-review"
+      ],
+      "revenue_band": "base",
+      "review_status": "needs-review",
+      "ticker": "EXM"
+    },
+    {
+      "eps_band": "base",
+      "fiscal_period": "FY2026 Q1",
+      "move_scenario": "miss",
+      "reasons": [
+        "move-fundamental-band-divergence",
+        "review-status:needs-review"
+      ],
+      "revenue_band": "base",
+      "review_status": "needs-review",
+      "ticker": "NXT"
+    }
+  ],
+  "schema_version": "1.0",
+  "summary": {
+    "event_linked_ticker_count": 2,
+    "position_count": 2,
+    "post_event_drift_watch_count": 2,
+    "scenario_mismatch_alert_count": 2,
+    "top_exposure_ticker": "EXM",
+    "total_abs_exposure": 25600.0
+  },
+  "thresholds": {
+    "max_exposure_share_percent": 50.0,
+    "max_open_review_items": 6,
+    "max_position_weight_percent": 4.0,
+    "post_event_exposure_drift_amount": 900.0,
+    "post_event_move_watch_percent": 6.0
+  }
+}

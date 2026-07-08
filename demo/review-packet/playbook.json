@@ -1,0 +1,182 @@
+{
+  "generated_by": "earnings-event-playbook",
+  "playbooks": [
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 46,
+      "event": {
+        "company": "Example Machines Inc.",
+        "consensus_eps": 1.42,
+        "consensus_revenue": 3250.0,
+        "date": "2026-07-24",
+        "fiscal_period": "FY2026 Q2",
+        "implied_move_percent": 6.5,
+        "source_date": "2026-07-05",
+        "source_name": "Static consensus fixture",
+        "ticker": "EXM"
+      },
+      "freshness": "fresh<=14d",
+      "position": {
+        "exposure": 18000.0,
+        "notes": "Core watch position for industrial automation thesis.",
+        "portfolio_weight_percent": 4.5,
+        "shares": 120.0,
+        "ticker": "EXM"
+      },
+      "review_queue": [
+        "Confirm EXM report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for Example Machines Inc. FY2026 Q2.",
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "risk_questions": [
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 1170.0,
+          "name": "beat",
+          "price_move_percent": 6.5,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -1170.0,
+          "name": "miss",
+          "price_move_percent": -6.5,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Margin guide and inventory commentary can change confidence in the near-term thesis.",
+          "risk_weight": 3,
+          "topic": "gross margin"
+        },
+        {
+          "note": "Backlog quality and repeat-order language should be reviewed after the call.",
+          "risk_weight": 2,
+          "topic": "demand durability"
+        }
+      ]
+    },
+    {
+      "as_of": "2026-07-08",
+      "attention_score": 48,
+      "event": {
+        "company": "Next Retail Group",
+        "consensus_eps": 0.78,
+        "consensus_revenue": 1840.0,
+        "date": "2026-08-01",
+        "fiscal_period": "FY2026 Q1",
+        "implied_move_percent": 9.2,
+        "source_date": "2026-05-12",
+        "source_name": "Static calendar fixture",
+        "ticker": "NXT"
+      },
+      "freshness": "stale>45d",
+      "position": {
+        "exposure": 7600.0,
+        "notes": "Smaller discretionary retail exposure.",
+        "portfolio_weight_percent": 1.9,
+        "shares": 85.0,
+        "ticker": "NXT"
+      },
+      "review_queue": [
+        "Confirm NXT report timing and source freshness before the event.",
+        "Prepare beat/base/miss notes for Next Retail Group FY2026 Q1.",
+        "Refresh static source fields before using the playbook in review.",
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "risk_questions": [
+        "Did management change full-year guidance assumptions?",
+        "Were one-time items separated from recurring demand signals?"
+      ],
+      "safety_notice": "Educational research review only. Uses local static fixtures only; no live data, broker connection, orders, or investment advice.",
+      "scenario_bands": [
+        {
+          "eps_delta_percent": 8.0,
+          "exposure_delta": 699.2,
+          "name": "beat",
+          "price_move_percent": 9.2,
+          "revenue_delta_percent": 5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": 0.0,
+          "exposure_delta": 0.0,
+          "name": "base",
+          "price_move_percent": 0.0,
+          "revenue_delta_percent": 0.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        },
+        {
+          "eps_delta_percent": -8.0,
+          "exposure_delta": -699.2,
+          "name": "miss",
+          "price_move_percent": -9.2,
+          "revenue_delta_percent": -5.0,
+          "watch_items": [
+            "compare actual EPS to consensus",
+            "compare actual revenue to consensus",
+            "check guidance tone before changing thesis notes"
+          ]
+        }
+      ],
+      "thesis_sensitivities": [
+        {
+          "note": "Margin guide and inventory commentary can change confidence in the near-term thesis.",
+          "risk_weight": 3,
+          "topic": "gross margin"
+        },
+        {
+          "note": "Backlog quality and repeat-order language should be reviewed after the call.",
+          "risk_weight": 2,
+          "topic": "demand durability"
+        }
+      ]
+    }
+  ],
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0"
+}

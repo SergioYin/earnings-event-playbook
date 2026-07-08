@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Earnings Event Playbook Demo</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; color: #1f2933; background: #f7f8fa; }
+    header { background: #12343b; color: white; padding: 32px max(24px, 8vw); }
+    main { max-width: 1040px; margin: 0 auto; padding: 24px; }
+    .notice { border-left: 4px solid #d9822b; background: #fff8f0; padding: 12px 16px; }
+    .card { background: white; border: 1px solid #d9e2ec; border-radius: 8px; padding: 18px; margin: 18px 0; }
+    .summary { display: flex; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+    .summary div { background: white; border: 1px solid #d9e2ec; padding: 12px 14px; min-width: 150px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 16px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 12px; }
+    th, td { border-bottom: 1px solid #e4e7eb; padding: 8px; text-align: left; }
+    th { background: #f0f4f8; }
+    h3 { margin-bottom: 8px; }
+    ul { margin-top: 0; padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Earnings Event Playbook Demo</h1>
+    <p>Static local-fixture preview. No JavaScript, live data, broker connection, orders, or advice.</p>
+  </header>
+  <main>
+    <p class="notice">Use this page as a review artifact only. Verify any fixture data against source materials before making decisions.</p>
+    <section class="summary" aria-label="Demo summary">
+      <div><strong>Events</strong><br>2</div>
+      <div><strong>Review items</strong><br>9</div>
+      <div><strong>Runtime deps</strong><br>0</div>
+      <div><strong>Data mode</strong><br>local fixtures</div>
+    </section>
+    <section class="card"><h2>EXM - Example Machines Inc.</h2><p><strong>Event:</strong> 2026-07-24 | <strong>Period:</strong> FY2026 Q2 | <strong>Freshness:</strong> fresh&lt;=14d</p><p><strong>Attention:</strong> 46/100 | <strong>Implied move:</strong> 6.50%</p><table><thead><tr><th>Scenario</th><th>Price move</th><th>Exposure delta</th></tr></thead><tbody><tr><td>beat</td><td>6.50%</td><td>1170.00</td></tr><tr><td>base</td><td>0.00%</td><td>0.00</td></tr><tr><td>miss</td><td>-6.50%</td><td>-1170.00</td></tr></tbody></table><div class="grid"><div><h3>Risk questions</h3><ul><li>Did management change full-year guidance assumptions?</li><li>Were one-time items separated from recurring demand signals?</li></ul></div><div><h3>Review queue</h3><ul><li>Confirm EXM report timing and source freshness before the event.</li><li>Prepare beat/base/miss notes for Example Machines Inc. FY2026 Q2.</li><li>Did management change full-year guidance assumptions?</li><li>Were one-time items separated from recurring demand signals?</li></ul></div></div></section>
+    <section class="card"><h2>NXT - Next Retail Group</h2><p><strong>Event:</strong> 2026-08-01 | <strong>Period:</strong> FY2026 Q1 | <strong>Freshness:</strong> stale&gt;45d</p><p><strong>Attention:</strong> 48/100 | <strong>Implied move:</strong> 9.20%</p><table><thead><tr><th>Scenario</th><th>Price move</th><th>Exposure delta</th></tr></thead><tbody><tr><td>beat</td><td>9.20%</td><td>699.20</td></tr><tr><td>base</td><td>0.00%</td><td>0.00</td></tr><tr><td>miss</td><td>-9.20%</td><td>-699.20</td></tr></tbody></table><div class="grid"><div><h3>Risk questions</h3><ul><li>Did management change full-year guidance assumptions?</li><li>Were one-time items separated from recurring demand signals?</li></ul></div><div><h3>Review queue</h3><ul><li>Confirm NXT report timing and source freshness before the event.</li><li>Prepare beat/base/miss notes for Next Retail Group FY2026 Q1.</li><li>Refresh static source fields before using the playbook in review.</li><li>Did management change full-year guidance assumptions?</li><li>Were one-time items separated from recurring demand signals?</li></ul></div></div></section>
+  </main>
+</body>
+</html>

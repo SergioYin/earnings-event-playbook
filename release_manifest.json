@@ -1,0 +1,50 @@
+{
+  "project": "earnings-event-playbook",
+  "version": "0.1.0",
+  "runtime_dependencies": 0,
+  "workflow_files": "none",
+  "generated_artifacts": [
+    "demo/events.json",
+    "demo/portfolio.json",
+    "demo/playbook.md",
+    "demo/playbook.json",
+    "demo/index.html"
+  ],
+  "verification_commands": [
+    {
+      "command": "PYTHONPATH=src python -m pytest",
+      "result": "14 passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m unittest discover",
+      "result": "1 passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo",
+      "result": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json",
+      "result": "passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
+      "result": "selfcheck ok"
+    },
+    {
+      "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
+      "result": "passed without setuptools license deprecation warnings"
+    },
+    {
+      "command": "python -m venv /tmp/eep-release-venv2 && /tmp/eep-release-venv2/bin/python -m pip install --no-index --find-links dist earnings-event-playbook && mkdir -p /tmp/eep-empty-cwd && cd /tmp/eep-empty-cwd && /tmp/eep-release-venv2/bin/python -m earnings_event_playbook selfcheck",
+      "result": "selfcheck ok from installed package; scanned packaged module root"
+    }
+  ],
+  "safety_boundaries": [
+    "local static fixtures only",
+    "no live data",
+    "no broker connection",
+    "no orders",
+    "no investment advice"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "as_of": "2026-07-08",
+  "base_currency": "USD",
+  "positions": [
+    {
+      "ticker": "EXM",
+      "shares": 120,
+      "exposure": 18000,
+      "portfolio_weight_percent": 4.5,
+      "notes": "Core watch position for industrial automation thesis."
+    },
+    {
+      "ticker": "NXT",
+      "shares": 85,
+      "exposure": 7600,
+      "portfolio_weight_percent": 1.9,
+      "notes": "Smaller discretionary retail exposure."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "as_of": "2026-07-08",
+  "events": [
+    {
+      "date": "2026-07-24",
+      "ticker": "EXM",
+      "company": "Example Machines Inc.",
+      "fiscal_period": "FY2026 Q2",
+      "consensus_eps": 1.42,
+      "consensus_revenue": 3250.0,
+      "implied_move_percent": 6.5,
+      "source_date": "2026-07-05",
+      "source_name": "Static consensus fixture"
+    },
+    {
+      "date": "2026-08-01",
+      "ticker": "NXT",
+      "company": "Next Retail Group",
+      "fiscal_period": "FY2026 Q1",
+      "consensus_eps": 0.78,
+      "consensus_revenue": 1840.0,
+      "implied_move_percent": 9.2,
+      "source_date": "2026-05-12",
+      "source_name": "Static calendar fixture"
+    }
+  ],
+  "thesis_sensitivities": [
+    {
+      "topic": "gross margin",
+      "note": "Margin guide and inventory commentary can change confidence in the near-term thesis.",
+      "risk_weight": 3
+    },
+    {
+      "topic": "demand durability",
+      "note": "Backlog quality and repeat-order language should be reviewed after the call.",
+      "risk_weight": 2
+    }
+  ],
+  "risk_questions": [
+    "Did management change full-year guidance assumptions?",
+    "Were one-time items separated from recurring demand signals?"
+  ]
+}

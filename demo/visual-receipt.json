@@ -1,0 +1,96 @@
+{
+  "artifact": "visual-receipt",
+  "artifact_root": "demo",
+  "files": [
+    {
+      "media_type": "application/json",
+      "path": "demo/actuals.json",
+      "role": "input-fixture",
+      "sha256": "d6008a8d2888aaf3d9efab7d9b84d5179cf4298428156ecb0a9d46f5a9a59e79",
+      "size_bytes": 810
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/events.json",
+      "role": "input-fixture",
+      "sha256": "972654c17ac4816435cbf28207f69822a5acff8db7ef352d7677b3ccb93827cc",
+      "size_bytes": 1211
+    },
+    {
+      "media_type": "text/html",
+      "path": "demo/index.html",
+      "role": "static-html-preview",
+      "sha256": "2e61b1da39ce3fbd6b67f66141a71de9c1995546f2bdf310c081e3a89dec735b",
+      "size_bytes": 4028
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/playbook.json",
+      "role": "playbook-json",
+      "sha256": "3c94be26c733282f91ddf58012aa8fe93aedd8fe077fff7b7c9bc665169d2b34",
+      "size_bytes": 6263
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/playbook.md",
+      "role": "playbook-markdown",
+      "sha256": "59d9451b5206bfa979f0ee224214b1aed2501485246ec230805c982c29354a47",
+      "size_bytes": 2856
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/portfolio.json",
+      "role": "input-fixture",
+      "sha256": "552f2e7c3fec4cd7bc32b642eec760706200adb3d567225dcb15fa981f299e00",
+      "size_bytes": 442
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/post-event-compare.json",
+      "role": "post-event-json",
+      "sha256": "72265335193bb1660508c0d39467c47b718fe85abb0a197da773f4067f26bf79",
+      "size_bytes": 5099
+    },
+    {
+      "media_type": "text/markdown",
+      "path": "demo/post-event-compare.md",
+      "role": "post-event-markdown",
+      "sha256": "a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb",
+      "size_bytes": 3035
+    }
+  ],
+  "generated_by": "earnings-event-playbook",
+  "regeneration_commands": [
+    "PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo",
+    "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json",
+    "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json",
+    "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json"
+  ],
+  "review_checklist": [
+    "Open demo/index.html directly in a browser and confirm the static preview renders.",
+    "Review demo/playbook.md for event fields, scenario bands, risk questions, and review queue items.",
+    "Review demo/post-event-compare.md for actuals comparisons, matched scenarios, and ledger handoff notes.",
+    "Compare JSON artifacts against Markdown outputs for matching tickers, periods, and review counts.",
+    "Confirm receipt hashes after regenerating the demo artifacts."
+  ],
+  "safety_boundaries": [
+    "local static artifacts only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice"
+  ],
+  "schema_version": "1.0",
+  "summary": {
+    "file_count": 8,
+    "roles": {
+      "input-fixture": 3,
+      "playbook-json": 1,
+      "playbook-markdown": 1,
+      "post-event-json": 1,
+      "post-event-markdown": 1,
+      "static-html-preview": 1
+    },
+    "total_bytes": 23744
+  }
+}

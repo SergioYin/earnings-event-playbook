@@ -17,8 +17,13 @@ def test_cli_demo_bundle(tmp_path):
     assert (tmp_path / "playbook.md").exists()
     assert (tmp_path / "playbook.json").exists()
     assert (tmp_path / "index.html").exists()
+    assert (tmp_path / "visual-receipt.md").exists()
+    assert (tmp_path / "visual-receipt.json").exists()
     data = json.loads((tmp_path / "playbook.json").read_text(encoding="utf-8"))
     assert data["generated_by"] == "earnings-event-playbook"
+    receipt = json.loads((tmp_path / "visual-receipt.json").read_text(encoding="utf-8"))
+    assert receipt["artifact"] == "visual-receipt"
+    assert receipt["summary"]["file_count"] == 8
 
 
 def test_cli_build_playbook(tmp_path):
@@ -93,6 +98,41 @@ def test_cli_compare_post_event(tmp_path):
     data = json.loads(json_out.read_text(encoding="utf-8"))
     assert data["artifact"] == "post-event-compare"
     assert data["comparisons"][0]["thesis_ledger_handoff"]
+
+
+def test_cli_visual_receipt(tmp_path):
+    subprocess.run(
+        [sys.executable, "-m", "earnings_event_playbook", "demo-bundle", "--out", str(tmp_path)],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    out = tmp_path / "receipt.md"
+    json_out = tmp_path / "receipt.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "visual-receipt",
+            "--artifacts",
+            str(tmp_path),
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert "Visual Evidence Receipt" in text
+    assert data["summary"]["roles"]["static-html-preview"] == 1
+    assert data["summary"]["roles"]["input-fixture"] == 3
+    assert all(len(item["sha256"]) == 64 for item in data["files"])
+    assert not any(item["path"].endswith("visual-receipt.json") for item in data["files"])
 
 
 def test_cli_selfcheck_scans_package_boundaries_from_other_cwd(tmp_path):

@@ -19,6 +19,7 @@ python -m pip install -e .
 earnings-event-playbook demo-bundle --out demo
 earnings-event-playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json
 earnings-event-playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json
+earnings-event-playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 earnings-event-playbook selfcheck
 ```
 
@@ -28,9 +29,10 @@ Without installation:
 PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json
 PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json
+PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json
 ```
 
-Open `demo/index.html` in a browser for the static preview, or read `demo/playbook.md`, `demo/playbook.json`, `demo/post-event-compare.md`, and `demo/post-event-compare.json`.
+Open `demo/index.html` in a browser for the static preview, or read `demo/playbook.md`, `demo/playbook.json`, `demo/post-event-compare.md`, `demo/post-event-compare.json`, `demo/visual-receipt.md`, and `demo/visual-receipt.json`.
 
 Expected output: a review packet for the bundled EXM and NXT example events with beat/base/miss exposure bands, stale-source warnings, risk questions, and deterministic JSON for downstream local tooling.
 
@@ -65,7 +67,7 @@ Generate a complete local demo bundle:
 PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo
 ```
 
-That writes `events.json`, `portfolio.json`, `actuals.json`, `playbook.md`, `playbook.json`, `post-event-compare.md`, `post-event-compare.json`, and `index.html`.
+That writes `events.json`, `portfolio.json`, `actuals.json`, `playbook.md`, `playbook.json`, `post-event-compare.md`, `post-event-compare.json`, `index.html`, `visual-receipt.md`, and `visual-receipt.json`.
 
 Compare a pre-event playbook to local post-event actuals:
 
@@ -78,6 +80,17 @@ PYTHONPATH=src python -m earnings_event_playbook compare-post-event \
 ```
 
 That writes a descriptive post-event comparison with EPS, revenue, and move outcomes, matched scenario bands, thesis-ledger handoff notes, and review status. It does not recommend any action.
+
+Create a visual evidence receipt for checked-in demo artifacts:
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook visual-receipt \
+  --artifacts demo \
+  --out demo/visual-receipt.md \
+  --json-out demo/visual-receipt.json
+```
+
+The receipt scans local HTML, Markdown, and JSON demo artifacts, records each file role, byte size, SHA-256 hash, regeneration commands, review checklist, and safety boundaries. Receipt outputs are excluded from their own inventory so reruns stay deterministic.
 
 ## Safety Boundaries
 

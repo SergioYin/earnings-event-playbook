@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0
+
+- Added `visual-receipt` CLI command for local demo artifact evidence receipts.
+- Added deterministic Markdown and JSON receipt renderers with file roles, sizes, SHA-256 hashes, regeneration commands, review checklist, and safety boundaries.
+- Added checked-in `demo/visual-receipt.md` and `demo/visual-receipt.json`, docs, release evidence, manifest updates, and CLI tests.
+
 ## 0.2.0
 
 - Added `compare-post-event` CLI command for local post-event actuals comparison.

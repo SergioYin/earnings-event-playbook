@@ -1,10 +1,47 @@
 from __future__ import annotations
 
 import html
+import hashlib
 import json
+from pathlib import Path
 from typing import Iterable, List
 
 from .models import EventPlaybook, PostEventComparison
+
+
+VISUAL_RECEIPT_SAFETY_BOUNDARIES = [
+    "local static artifacts only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment advice",
+]
+
+VISUAL_RECEIPT_REVIEW_CHECKLIST = [
+    "Open demo/index.html directly in a browser and confirm the static preview renders.",
+    "Review demo/playbook.md for event fields, scenario bands, risk questions, and review queue items.",
+    "Review demo/post-event-compare.md for actuals comparisons, matched scenarios, and ledger handoff notes.",
+    "Compare JSON artifacts against Markdown outputs for matching tickers, periods, and review counts.",
+    "Confirm receipt hashes after regenerating the demo artifacts.",
+]
+
+VISUAL_RECEIPT_REGENERATION_COMMANDS = [
+    "PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo",
+    (
+        "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json "
+        "--portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json"
+    ),
+    (
+        "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json "
+        "--actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json"
+    ),
+    (
+        "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo "
+        "--out demo/visual-receipt.md --json-out demo/visual-receipt.json"
+    ),
+]
+
+VISUAL_RECEIPT_SUFFIXES = {".html", ".md", ".json"}
 
 
 def playbooks_to_dict(playbooks: Iterable[EventPlaybook]) -> dict:
@@ -46,6 +83,84 @@ def post_event_to_dict(comparisons: Iterable[PostEventComparison]) -> dict:
 
 def render_post_event_json(comparisons: Iterable[PostEventComparison]) -> str:
     return json.dumps(post_event_to_dict(comparisons), indent=2, sort_keys=True) + "\n"
+
+
+def build_visual_receipt(artifact_root: Path, project_root: Path | None = None) -> dict:
+    root = artifact_root.resolve()
+    if not root.exists():
+        raise ValueError(f"{artifact_root} does not exist")
+    if not root.is_dir():
+        raise ValueError(f"{artifact_root} must be a directory")
+
+    base = project_root.resolve() if project_root is not None else root.parent
+    files = [_visual_receipt_file(path, base) for path in sorted(root.rglob("*")) if _is_visual_artifact(path)]
+    role_counts: dict[str, int] = {}
+    for file_item in files:
+        role_counts[file_item["role"]] = role_counts.get(file_item["role"], 0) + 1
+
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "visual-receipt",
+        "artifact_root": _relative_path(root, base),
+        "summary": {
+            "file_count": len(files),
+            "total_bytes": sum(file_item["size_bytes"] for file_item in files),
+            "roles": dict(sorted(role_counts.items())),
+        },
+        "files": files,
+        "regeneration_commands": VISUAL_RECEIPT_REGENERATION_COMMANDS,
+        "review_checklist": VISUAL_RECEIPT_REVIEW_CHECKLIST,
+        "safety_boundaries": VISUAL_RECEIPT_SAFETY_BOUNDARIES,
+    }
+
+
+def render_visual_receipt_json(receipt: dict) -> str:
+    return json.dumps(receipt, indent=2, sort_keys=True) + "\n"
+
+
+def render_visual_receipt_markdown(receipt: dict) -> str:
+    summary = receipt["summary"]
+    lines: List[str] = [
+        "# Visual Evidence Receipt",
+        "",
+        "> Deterministic receipt for local demo artifacts. Static files only; no live data, broker connection, orders, or recommendations.",
+        "",
+        "## Summary",
+        "",
+        f"- Artifact root: `{receipt['artifact_root']}`",
+        f"- Files scanned: {summary['file_count']}",
+        f"- Total bytes: {summary['total_bytes']}",
+        "",
+        "## File Roles",
+        "",
+    ]
+    for role, count in summary["roles"].items():
+        lines.append(f"- {role}: {count}")
+    if not summary["roles"]:
+        lines.append("- None")
+    lines.extend(
+        [
+            "",
+            "## Artifact Inventory",
+            "",
+            "| Path | Role | Bytes | SHA-256 |",
+            "| --- | --- | ---: | --- |",
+        ]
+    )
+    for file_item in receipt["files"]:
+        lines.append(
+            f"| `{file_item['path']}` | {file_item['role']} | {file_item['size_bytes']} | "
+            f"`{file_item['sha256']}` |"
+        )
+    lines.extend(["", "## Regeneration Commands", ""])
+    for command in receipt["regeneration_commands"]:
+        lines.extend(["```bash", command, "```", ""])
+    lines.extend(["## Review Checklist", ""])
+    lines.extend(f"- [ ] {item}" for item in receipt["review_checklist"])
+    lines.extend(["", "## Safety Boundaries", ""])
+    lines.extend(f"- {item}" for item in receipt["safety_boundaries"])
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def render_markdown(playbooks: Iterable[EventPlaybook]) -> str:
@@ -112,6 +227,59 @@ def render_markdown(playbooks: Iterable[EventPlaybook]) -> str:
         lines.extend(f"- {entry}" for entry in item.review_queue)
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _is_visual_artifact(path: Path) -> bool:
+    return path.is_file() and path.suffix.lower() in VISUAL_RECEIPT_SUFFIXES and not path.name.startswith("visual-receipt.")
+
+
+def _visual_receipt_file(path: Path, base: Path) -> dict:
+    data = path.read_bytes()
+    return {
+        "path": _relative_path(path.resolve(), base),
+        "role": _visual_receipt_role(path),
+        "media_type": _visual_receipt_media_type(path),
+        "size_bytes": len(data),
+        "sha256": hashlib.sha256(data).hexdigest(),
+    }
+
+
+def _visual_receipt_role(path: Path) -> str:
+    name = path.name.lower()
+    suffix = path.suffix.lower()
+    if name == "index.html":
+        return "static-html-preview"
+    if suffix == ".html":
+        return "html-artifact"
+    if suffix == ".md" and "post-event" in name:
+        return "post-event-markdown"
+    if suffix == ".json" and "post-event" in name:
+        return "post-event-json"
+    if suffix == ".md" and "playbook" in name:
+        return "playbook-markdown"
+    if suffix == ".json" and "playbook" in name:
+        return "playbook-json"
+    if suffix == ".json" and name in {"events.json", "portfolio.json", "actuals.json"}:
+        return "input-fixture"
+    if suffix == ".md":
+        return "markdown-artifact"
+    return "json-artifact"
+
+
+def _visual_receipt_media_type(path: Path) -> str:
+    suffix = path.suffix.lower()
+    if suffix == ".html":
+        return "text/html"
+    if suffix == ".md":
+        return "text/markdown"
+    return "application/json"
+
+
+def _relative_path(path: Path, base: Path) -> str:
+    try:
+        return path.relative_to(base).as_posix()
+    except ValueError:
+        return path.name
 
 
 def render_post_event_markdown(comparisons: Iterable[PostEventComparison]) -> str:

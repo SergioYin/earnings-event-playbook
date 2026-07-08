@@ -1,6 +1,6 @@
 {
   "project": "earnings-event-playbook",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "runtime_dependencies": 0,
   "workflow_files": "none",
   "generated_artifacts": [
@@ -11,12 +11,14 @@
     "demo/playbook.json",
     "demo/post-event-compare.md",
     "demo/post-event-compare.json",
-    "demo/index.html"
+    "demo/index.html",
+    "demo/visual-receipt.md",
+    "demo/visual-receipt.json"
   ],
   "verification_commands": [
     {
       "command": "PYTHONPATH=src python -m pytest",
-      "result": "18 passed"
+      "result": "19 passed"
     },
     {
       "command": "PYTHONPATH=src python -m unittest discover",
@@ -35,12 +37,16 @@
       "result": "passed"
     },
     {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json",
+      "result": "passed"
+    },
+    {
       "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok; scanned 35 public files"
+      "result": "selfcheck ok; scanned 37 public files"
     },
     {
       "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
-      "result": "built dist/earnings_event_playbook-0.2.0.tar.gz and dist/earnings_event_playbook-0.2.0-py3-none-any.whl"
+      "result": "built dist/earnings_event_playbook-0.3.0.tar.gz and dist/earnings_event_playbook-0.3.0-py3-none-any.whl"
     }
   ],
   "safety_boundaries": [

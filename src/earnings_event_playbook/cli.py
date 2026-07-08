@@ -8,7 +8,16 @@ from . import __version__
 from .core import build_playbooks, compare_post_event
 from .io import read_json, write_text
 from .models import FixtureError, parse_actuals_fixture, parse_events_fixture, parse_playbook_json, parse_portfolio_fixture
-from .render import render_html_index, render_json, render_markdown, render_post_event_json, render_post_event_markdown
+from .render import (
+    build_visual_receipt,
+    render_html_index,
+    render_json,
+    render_markdown,
+    render_post_event_json,
+    render_post_event_markdown,
+    render_visual_receipt_json,
+    render_visual_receipt_markdown,
+)
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -39,6 +48,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     demo = subparsers.add_parser("demo-bundle", help="Generate demo fixtures and static outputs.")
     demo.add_argument("--out", required=True, type=Path)
 
+    receipt = subparsers.add_parser("visual-receipt", help="Create Markdown and JSON evidence receipts for demo artifacts.")
+    receipt.add_argument("--artifacts", required=True, type=Path)
+    receipt.add_argument("--out", required=True, type=Path)
+    receipt.add_argument("--json-out", required=True, type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -49,6 +63,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _compare_post_event(args.before_playbook, args.actuals, args.out, args.json_out)
         if args.command == "demo-bundle":
             return _demo_bundle(args.out)
+        if args.command == "visual-receipt":
+            return _visual_receipt(args.artifacts, args.out, args.json_out)
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -93,6 +109,15 @@ def _demo_bundle(out_dir: Path) -> int:
     write_text(out_dir / "post-event-compare.md", render_post_event_markdown(comparisons))
     write_text(out_dir / "post-event-compare.json", render_post_event_json(comparisons))
     write_text(out_dir / "index.html", render_html_index(playbooks))
+    _visual_receipt(out_dir, out_dir / "visual-receipt.md", out_dir / "visual-receipt.json")
+    return 0
+
+
+def _visual_receipt(artifacts_dir: Path, out_path: Path, json_path: Path) -> int:
+    receipt = build_visual_receipt(artifacts_dir)
+    write_text(out_path, render_visual_receipt_markdown(receipt))
+    receipt = build_visual_receipt(artifacts_dir)
+    write_text(json_path, render_visual_receipt_json(receipt))
     return 0
 
 
@@ -124,13 +149,17 @@ def _selfcheck() -> int:
 
 
 def _selfcheck_roots() -> list[Path]:
+    return [_project_root()]
+
+
+def _project_root() -> Path:
     package_root = PACKAGE_ROOT.resolve()
     for candidate in package_root.parents:
         if all((candidate / marker).exists() for marker in PROJECT_MARKER_FILES):
             source_package = candidate / "src" / package_root.name
             if source_package == package_root:
-                return [candidate]
-    return [package_root]
+                return candidate
+    return package_root
 
 
 def _iter_selfcheck_files(root: Path):

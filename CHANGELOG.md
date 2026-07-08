@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+- Added `showcase-page` CLI command for a self-contained no-JavaScript showcase landing page plus JSON manifest.
+- Added `docs/showcase.md`, checked-in `demo/showcase.html`, and checked-in `demo/showcase.json` covering value proposition, quickstart commands, demo links, release evidence, maturity rubric, case highlights, tutorial path, risk boundaries, and star-worthy differentiation.
+- Updated README first screen, usage docs, release evidence, release manifest, agent skill, demo bundle generation, version metadata, and CLI tests.
+
 ## 0.6.0
 
 - Added `tutorial-bundle` CLI command for deterministic case-study reviewer packets with ordered commands, expected artifact paths, reviewer checklist, maturity rubric evidence, and no-advice safety boundaries.

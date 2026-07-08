@@ -2,14 +2,15 @@
 
 Build deterministic earnings event playbooks from local JSON fixtures for analysts, investors, and research teams who want repeatable pre-earnings and post-event review packets without wiring up data vendors or broker systems.
 
-Star this repo if you want a small, auditable example of turning static earnings-calendar, consensus, and portfolio fixtures into Markdown, JSON, and a no-JavaScript HTML review artifact.
+Star this repo if you want a small, auditable example of turning static earnings-calendar, consensus, and portfolio fixtures into Markdown, JSON, no-JavaScript HTML review artifacts, and release-evidence manifests.
 
 Zero-dependency Python package and CLI. No API keys, no live market data, no broker connection, no order placement, no database, no JavaScript requirement for the demo page, and no investment advice.
 
 ## First Look
 
 - Target user: a research operator who wants a local, deterministic checklist before earnings events.
-- Value in 2 minutes: open `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, or open `demo/index.html`, `demo/playbook.md`, `demo/post-event-compare.md`, and `demo/handoff.md` to see the generated review artifacts.
+- Value in 2 minutes: open `demo/showcase.html` and `docs/showcase.md` for the complete landing overview, then open `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough.
+- Showcase manifest: read `demo/showcase.json` for value proposition, quickstart commands, artifact links, release evidence, maturity rubric, case highlights, tutorial path, risk boundaries, and star-worthy differentiation.
 - Tutorial CTA: run `earnings-event-playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json` to regenerate the ordered software case packet.
 - Multi-case fixture gallery: open `demo/fixture-gallery.md` or `demo/fixture-gallery.json` to compare the software, retail, and semiconductor case fixtures.
 - Star reason: useful as a public, dependency-free template for finance research artifacts with explicit safety boundaries and release evidence.
@@ -25,6 +26,7 @@ earnings-event-playbook visual-receipt --artifacts demo --out demo/visual-receip
 earnings-event-playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json
 earnings-event-playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json
 earnings-event-playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json
+earnings-event-playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json
 earnings-event-playbook selfcheck
 ```
 
@@ -38,9 +40,10 @@ PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo
 PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json
 PYTHONPATH=src python -m earnings_event_playbook fixture-gallery --cases examples/cases/software examples/cases/retail examples/cases/semiconductor --out demo/fixture-gallery.md --json-out demo/fixture-gallery.json
 PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json
+PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json
 ```
 
-Open `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, open `demo/index.html` in a browser for the static preview, or read `demo/playbook.md`, `demo/playbook.json`, `demo/post-event-compare.md`, `demo/post-event-compare.json`, `demo/visual-receipt.md`, `demo/visual-receipt.json`, `demo/handoff.md`, and `demo/handoff.json`.
+Open `demo/showcase.html` for the no-JavaScript landing page, `demo/showcase.json` for the manifest, `docs/tutorial-software-case.md` and `demo/tutorial-bundle.md` for the software case walkthrough, `demo/index.html` for the static preview, or read `demo/playbook.md`, `demo/playbook.json`, `demo/post-event-compare.md`, `demo/post-event-compare.json`, `demo/visual-receipt.md`, `demo/visual-receipt.json`, `demo/handoff.md`, and `demo/handoff.json`.
 
 Expected output: a review packet for the bundled EXM and NXT example events with beat/base/miss exposure bands, stale-source warnings, risk questions, and deterministic JSON for downstream local tooling.
 
@@ -60,6 +63,7 @@ Expected output: a review packet for the bundled EXM and NXT example events with
 - Optional evidence artifact hashes carried from a local visual receipt.
 - Multi-case fixture gallery summaries for checked-in case directories.
 - Deterministic tutorial packets with ordered commands, expected artifact paths, reviewer checklist, maturity rubric evidence, and safety boundaries.
+- Showcase landing pages with value proposition, artifact map, release evidence, maturity rubric, tutorial path, risk boundaries, and star-worthy differentiation.
 
 ## Examples
 
@@ -140,6 +144,16 @@ PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle \
 
 The packet lists the tutorial article, static fixtures, ordered commands from playbook through fixture gallery, expected artifact paths, reviewer checklist, maturity rubric evidence, and no-advice safety boundaries.
 
+Generate the showcase landing page and manifest:
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook showcase-page \
+  --out demo/showcase.html \
+  --json-out demo/showcase.json
+```
+
+The showcase is a self-contained no-JavaScript HTML landing page plus JSON manifest summarizing the value proposition, quickstart commands, demo artifact links, release evidence, maturity rubric, case gallery highlights, tutorial path, risk boundaries, and star-worthy differentiation.
+
 ## Safety Boundaries
 
 This project is a local research organization tool.
@@ -166,6 +180,8 @@ It is intentionally not a trading bot, data vendor client, portfolio optimizer, 
 `fixture-gallery.json` contains `schema_version`, `artifact`, summary counts, root-level safety boundaries, and `cases` with tickers, event count, stale source labels, high attention scores, post-event availability, supported demo commands, and per-case safety boundaries.
 
 `tutorial-bundle.json` contains `schema_version`, `artifact`, `case_id`, fixture paths, ordered commands, expected artifacts, reviewer checklist, maturity rubric evidence, and safety boundaries.
+
+`showcase.json` contains `schema_version`, `artifact`, title, tagline, value proposition, quickstart commands, demo artifact links, release evidence, maturity rubric, case gallery highlights, tutorial path, risk boundaries, and star-worthy differentiation.
 
 The parser is intentionally small and strict so fixture errors fail early.
 

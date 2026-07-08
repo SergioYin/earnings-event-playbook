@@ -54,6 +54,14 @@ PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle --case examples
 
 The tutorial bundle records the tutorial article path, static fixture paths, ordered commands from case playbook through fixture gallery, expected artifact paths, reviewer checklist, maturity rubric evidence, and no-advice safety boundaries. It is a planning and review packet; it does not execute the ordered commands.
 
+`showcase-page` writes a self-contained no-JavaScript landing page plus JSON manifest for the public demo surface.
+
+```bash
+PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json
+```
+
+The showcase manifest summarizes value proposition, quickstart commands, demo artifact links, release evidence, maturity rubric, case gallery highlights, tutorial path, risk boundaries, and star-worthy differentiation. It is static release collateral; it does not fetch data or provide advice.
+
 `selfcheck` scans public package files for private markers and confirms no workflow directory is required.
 When run from an installed package, it scans the packaged module boundary instead of the caller's current directory.
 
@@ -71,6 +79,7 @@ PYTHONPATH=src python -m earnings_event_playbook selfcheck
 - Handoff output is deterministic and carries optional receipt hashes for local evidence traceability.
 - Fixture gallery output is deterministic and only scans local public case fixture directories.
 - Tutorial bundle output is deterministic and only references local public case fixture directories.
+- Showcase output is deterministic, self-contained, and does not require JavaScript or a server.
 
 ## Boundary
 

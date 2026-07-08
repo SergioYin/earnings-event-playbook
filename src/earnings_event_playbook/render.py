@@ -36,6 +36,10 @@ VISUAL_RECEIPT_REGENERATION_COMMANDS = [
         "--actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json"
     ),
     (
+        "PYTHONPATH=src python -m earnings_event_playbook showcase-page "
+        "--out demo/showcase.html --json-out demo/showcase.json"
+    ),
+    (
         "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo "
         "--out demo/visual-receipt.md --json-out demo/visual-receipt.json"
     ),
@@ -103,6 +107,189 @@ TUTORIAL_SAFETY_BOUNDARIES = [
     "no personalized investment, legal, tax, accounting, buy, sell, or hold advice",
     "descriptive research review only",
 ]
+
+SHOWCASE_SAFETY_BOUNDARIES = [
+    "local static fixtures only",
+    "no live market data",
+    "no broker connection",
+    "no order placement",
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, legal, tax, or accounting advice",
+    "descriptive research review and release evidence only",
+]
+
+
+def build_showcase_manifest() -> dict:
+    quickstart = [
+        "PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo",
+        (
+            "PYTHONPATH=src python -m earnings_event_playbook showcase-page "
+            "--out demo/showcase.html --json-out demo/showcase.json"
+        ),
+        (
+            "PYTHONPATH=src python -m earnings_event_playbook fixture-gallery "
+            "--cases examples/cases/software examples/cases/retail examples/cases/semiconductor "
+            "--out demo/fixture-gallery.md --json-out demo/fixture-gallery.json"
+        ),
+        (
+            "PYTHONPATH=src python -m earnings_event_playbook tutorial-bundle "
+            "--case examples/cases/software --out demo/tutorial-bundle.md --json-out demo/tutorial-bundle.json"
+        ),
+        "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
+    ]
+    return {
+        "schema_version": "1.0",
+        "generated_by": "earnings-event-playbook",
+        "artifact": "showcase-page",
+        "title": "Earnings Event Playbook Showcase",
+        "tagline": "Zero-dependency local earnings-event research artifacts with static demo evidence.",
+        "value_proposition": [
+            "Turns local earnings-calendar, consensus, portfolio, and actuals fixtures into Markdown, JSON, and static HTML review artifacts.",
+            "Gives a cold reviewer a complete path from fixtures to playbook, post-event compare, visual receipt, handoff pack, case gallery, and tutorial packet.",
+            "Keeps the package auditable: no runtime dependencies, no network clients, no workflow files, and deterministic outputs.",
+        ],
+        "quickstart_commands": quickstart,
+        "demo_artifact_links": [
+            {"label": "Showcase landing page", "path": "demo/showcase.html", "role": "no-JS landing page"},
+            {"label": "Showcase manifest", "path": "demo/showcase.json", "role": "machine-readable summary"},
+            {"label": "Static preview", "path": "demo/index.html", "role": "generated HTML playbook preview"},
+            {"label": "Pre-event playbook", "path": "demo/playbook.md", "role": "human review artifact"},
+            {"label": "Pre-event playbook JSON", "path": "demo/playbook.json", "role": "machine artifact"},
+            {"label": "Post-event compare", "path": "demo/post-event-compare.md", "role": "human review artifact"},
+            {"label": "Visual receipt", "path": "demo/visual-receipt.md", "role": "release evidence hashes"},
+            {"label": "Handoff pack", "path": "demo/handoff.md", "role": "thesis-ledger and risk-map handoff"},
+            {"label": "Fixture gallery", "path": "demo/fixture-gallery.md", "role": "multi-case comparison"},
+            {"label": "Tutorial bundle", "path": "demo/tutorial-bundle.md", "role": "ordered reviewer packet"},
+        ],
+        "release_evidence": [
+            "README first screen names the target user, quickstart, demo path, and star reason.",
+            "docs/release-readiness.md records verification commands, asset inventory, risk boundaries, and maturity status.",
+            "release_manifest.json lists generated artifacts, verification commands, zero runtime dependencies, and workflow absence.",
+            "selfcheck scans public package files for private markers and verifies workflow absence.",
+            "pytest and unittest cover parsing, scoring, rendering, CLI outputs, public hygiene, and smoke import behavior.",
+        ],
+        "maturity_rubric": [
+            {
+                "area": "cold-user clarity",
+                "evidence": "README, docs/showcase.md, demo/showcase.html, and demo/showcase.json explain the fastest path without requiring external services.",
+            },
+            {
+                "area": "artifact completeness",
+                "evidence": "Playbook, compare, receipt, handoff, gallery, tutorial, and showcase artifacts are generated as deterministic Markdown, JSON, or no-JS HTML.",
+            },
+            {
+                "area": "package hygiene",
+                "evidence": "Runtime dependency count is zero, workflows are absent, fixtures are local, and selfcheck scans public files.",
+            },
+            {
+                "area": "safety posture",
+                "evidence": "Every public path frames outputs as descriptive research review and excludes live data, broker connectivity, orders, and personalized advice.",
+            },
+        ],
+        "case_gallery_highlights": [
+            "software: two events with post-event actuals for CloudLedger Systems and DevSuite Analytics.",
+            "retail: two-event case without actuals to show pre-event review coverage and skipped post-event steps.",
+            "semiconductor: three-event case with matched post-event actuals for hardware-cycle review coverage.",
+        ],
+        "tutorial_path": [
+            "Read docs/tutorial-software-case.md.",
+            "Run tutorial-bundle for examples/cases/software.",
+            "Regenerate the software playbook, post-event compare, visual receipt, handoff, and fixture gallery commands listed in the bundle.",
+            "Use demo/tutorial-bundle.json as the machine-readable reviewer checklist.",
+        ],
+        "risk_boundaries": SHOWCASE_SAFETY_BOUNDARIES,
+        "star_worthy_differentiation": [
+            "A small public package that demonstrates release-grade evidence around a domain-specific CLI, not just a one-off script.",
+            "Every major artifact has a human-readable form and a deterministic JSON form for local downstream tooling.",
+            "The showcase page is self-contained HTML with no JavaScript, server, network, database, credentials, or data-vendor setup.",
+            "The repository models a careful public boundary for finance-adjacent tooling without presenting itself as a trading system.",
+        ],
+    }
+
+
+def render_showcase_json(manifest: dict) -> str:
+    return json.dumps(manifest, indent=2, sort_keys=True) + "\n"
+
+
+def render_showcase_html(manifest: dict) -> str:
+    return """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>""" + html.escape(manifest["title"]) + """</title>
+  <style>
+    :root { color-scheme: light; --ink: #17202a; --muted: #53616f; --line: #d8dee6; --panel: #ffffff; --wash: #f4f7f9; --accent: #0f6b63; --warn: #8a5a12; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--ink); background: var(--wash); line-height: 1.5; }
+    header { background: #14313a; color: white; padding: 36px max(20px, 7vw) 28px; }
+    header p { max-width: 760px; color: #dbe8ec; font-size: 1.05rem; }
+    main { max-width: 1120px; margin: 0 auto; padding: 24px 20px 44px; }
+    section { margin: 22px 0; }
+    h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.05; letter-spacing: 0; }
+    h2 { margin: 0 0 12px; font-size: 1.35rem; }
+    h3 { margin: 0 0 6px; font-size: 1rem; }
+    a { color: #0d5f8b; }
+    .notice { border-left: 4px solid var(--warn); background: #fff8e8; padding: 12px 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(245px, 1fr)); gap: 14px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+    .metric { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .metric div { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 13px; }
+    .metric strong { display: block; color: var(--accent); font-size: 1.45rem; }
+    ul, ol { padding-left: 20px; margin-top: 8px; }
+    li { margin: 5px 0; }
+    code { background: #edf2f4; border: 1px solid #d8dee6; border-radius: 5px; padding: 2px 5px; overflow-wrap: anywhere; }
+    pre { overflow-x: auto; background: #17202a; color: #f7fbfc; border-radius: 8px; padding: 14px; }
+    pre code { background: transparent; border: 0; color: inherit; padding: 0; }
+    .links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .linkrow { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+    .role { color: var(--muted); font-size: .92rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>""" + html.escape(manifest["title"]) + """</h1>
+    <p>""" + html.escape(manifest["tagline"]) + """</p>
+  </header>
+  <main>
+    <p class="notice">Local static fixtures only. No live market data, broker connection, order placement, or personalized investment, legal, tax, accounting, buy, sell, hold, or allocation advice.</p>
+    <section class="metric" aria-label="Project summary">
+      <div><strong>0</strong>runtime dependencies</div>
+      <div><strong>0</strong>workflow files</div>
+      <div><strong>3</strong>case fixture families</div>
+      <div><strong>2</strong>showcase artifact formats</div>
+    </section>
+    <section class="card">
+      <h2>Value Proposition</h2>
+      <ul>""" + _html_list(manifest["value_proposition"]) + """</ul>
+    </section>
+    <section class="card">
+      <h2>Quickstart</h2>
+      <pre><code>""" + html.escape("\n".join(manifest["quickstart_commands"])) + """</code></pre>
+    </section>
+    <section>
+      <h2>Demo Artifacts</h2>
+      <div class="links">""" + _showcase_links(manifest["demo_artifact_links"]) + """</div>
+    </section>
+    <section class="grid">
+      <div class="card"><h2>Release Evidence</h2><ul>""" + _html_list(manifest["release_evidence"]) + """</ul></div>
+      <div class="card"><h2>Case Gallery Highlights</h2><ul>""" + _html_list(manifest["case_gallery_highlights"]) + """</ul></div>
+    </section>
+    <section class="grid">
+      <div class="card"><h2>Tutorial Path</h2><ol>""" + _html_list(manifest["tutorial_path"]) + """</ol></div>
+      <div class="card"><h2>Risk Boundaries</h2><ul>""" + _html_list(manifest["risk_boundaries"]) + """</ul></div>
+    </section>
+    <section class="card">
+      <h2>Maturity Rubric</h2>
+      <div class="grid">""" + _showcase_rubric(manifest["maturity_rubric"]) + """</div>
+    </section>
+    <section class="card">
+      <h2>Star-Worthy Differentiation</h2>
+      <ul>""" + _html_list(manifest["star_worthy_differentiation"]) + """</ul>
+    </section>
+  </main>
+</body>
+</html>
+"""
 
 
 def playbooks_to_dict(playbooks: Iterable[EventPlaybook]) -> dict:
@@ -799,6 +986,36 @@ def _gallery_post_event(case: dict) -> str:
     if not case["post_event_available"]:
         return "No actuals fixture"
     return f"{case['post_event_match_count']}/{case['event_count']} matched"
+
+
+def _html_list(items: Iterable[str]) -> str:
+    return "".join(f"<li>{html.escape(item)}</li>" for item in items)
+
+
+def _showcase_links(links: Iterable[dict]) -> str:
+    rows = []
+    for link in links:
+        path = html.escape(link["path"])
+        href_value = link["path"][len("demo/") :] if link["path"].startswith("demo/") else link["path"]
+        href = html.escape(href_value)
+        label = html.escape(link["label"])
+        role = html.escape(link["role"])
+        rows.append(
+            f'<div class="linkrow"><a href="{href}">{label}</a><div class="role">{role}</div><code>{path}</code></div>'
+        )
+    return "".join(rows)
+
+
+def _showcase_rubric(items: Iterable[dict]) -> str:
+    cards = []
+    for item in items:
+        cards.append(
+            '<div class="card">'
+            f"<h3>{html.escape(item['area'])}</h3>"
+            f"<p>{html.escape(item['evidence'])}</p>"
+            "</div>"
+        )
+    return "".join(cards)
 
 
 def _metric_row(label: str, comparison) -> str:

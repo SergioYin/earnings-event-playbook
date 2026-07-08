@@ -160,6 +160,20 @@
           "size_bytes": 3035
         },
         {
+          "media_type": "text/html",
+          "path": "demo/showcase.html",
+          "role": "html-artifact",
+          "sha256": "96a49ab0e2caf3b391f8ab9e9fcbf4f244066a027433681f41d6c8d5298a1639",
+          "size_bytes": 9117
+        },
+        {
+          "media_type": "application/json",
+          "path": "demo/showcase.json",
+          "role": "json-artifact",
+          "sha256": "e9540b8e05163bd0f503e328ae787190ac34bbf212fb964be9d062e954215d85",
+          "size_bytes": 5649
+        },
+        {
           "media_type": "application/json",
           "path": "demo/tutorial-bundle.json",
           "role": "json-artifact",
@@ -350,6 +364,20 @@
           "role": "post-event-markdown",
           "sha256": "a512dad6c3e4b30322103162bdf56041de775aa52e1a82072edf0b04c95fd1eb",
           "size_bytes": 3035
+        },
+        {
+          "media_type": "text/html",
+          "path": "demo/showcase.html",
+          "role": "html-artifact",
+          "sha256": "96a49ab0e2caf3b391f8ab9e9fcbf4f244066a027433681f41d6c8d5298a1639",
+          "size_bytes": 9117
+        },
+        {
+          "media_type": "application/json",
+          "path": "demo/showcase.json",
+          "role": "json-artifact",
+          "sha256": "e9540b8e05163bd0f503e328ae787190ac34bbf212fb964be9d062e954215d85",
+          "size_bytes": 5649
         },
         {
           "media_type": "application/json",

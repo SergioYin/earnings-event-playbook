@@ -17,6 +17,7 @@ from .models import (
     parse_visual_receipt_hashes,
 )
 from .render import (
+    build_showcase_manifest,
     build_tutorial_bundle,
     build_visual_receipt,
     render_handoff_json,
@@ -28,6 +29,8 @@ from .render import (
     render_markdown,
     render_post_event_json,
     render_post_event_markdown,
+    render_showcase_html,
+    render_showcase_json,
     render_tutorial_bundle_json,
     render_tutorial_bundle_markdown,
     render_visual_receipt_json,
@@ -92,6 +95,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     tutorial.add_argument("--json-out", required=True, type=Path)
     tutorial.add_argument("--output-root", default="demo", help="Artifact root shown in ordered tutorial commands.")
 
+    showcase = subparsers.add_parser(
+        "showcase-page", help="Generate a self-contained no-JS showcase landing page and JSON manifest."
+    )
+    showcase.add_argument("--out", required=True, type=Path)
+    showcase.add_argument("--json-out", required=True, type=Path)
+
     subparsers.add_parser("selfcheck", help="Verify package boundaries and fixture parsing.")
 
     args = parser.parse_args(argv)
@@ -110,6 +119,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _fixture_gallery(args.cases, args.out, args.json_out)
         if args.command == "tutorial-bundle":
             return _tutorial_bundle(args.case, args.out, args.json_out, args.output_root)
+        if args.command == "showcase-page":
+            return _showcase_page(args.out, args.json_out)
         if args.command == "selfcheck":
             return _selfcheck()
     except (FixtureError, OSError, ValueError) as exc:
@@ -154,6 +165,7 @@ def _demo_bundle(out_dir: Path) -> int:
     write_text(out_dir / "post-event-compare.md", render_post_event_markdown(comparisons))
     write_text(out_dir / "post-event-compare.json", render_post_event_json(comparisons))
     write_text(out_dir / "index.html", render_html_index(playbooks))
+    _showcase_page(out_dir / "showcase.html", out_dir / "showcase.json")
     _visual_receipt(out_dir, out_dir / "visual-receipt.md", out_dir / "visual-receipt.json")
     _export_handoff(
         out_dir / "playbook.json",
@@ -252,6 +264,13 @@ def _tutorial_bundle(case_dir: Path, out_path: Path, json_path: Path, output_roo
     bundle = build_tutorial_bundle(resolved.name, case_path, output_root.rstrip("/"), has_actuals)
     write_text(out_path, render_tutorial_bundle_markdown(bundle))
     write_text(json_path, render_tutorial_bundle_json(bundle))
+    return 0
+
+
+def _showcase_page(out_path: Path, json_path: Path) -> int:
+    manifest = build_showcase_manifest()
+    write_text(out_path, render_showcase_html(manifest))
+    write_text(json_path, render_showcase_json(manifest))
     return 0
 
 

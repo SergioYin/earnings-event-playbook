@@ -143,6 +143,20 @@
       "size_bytes": 3035
     },
     {
+      "media_type": "text/html",
+      "path": "demo/showcase.html",
+      "role": "html-artifact",
+      "sha256": "96a49ab0e2caf3b391f8ab9e9fcbf4f244066a027433681f41d6c8d5298a1639",
+      "size_bytes": 9117
+    },
+    {
+      "media_type": "application/json",
+      "path": "demo/showcase.json",
+      "role": "json-artifact",
+      "sha256": "e9540b8e05163bd0f503e328ae787190ac34bbf212fb964be9d062e954215d85",
+      "size_bytes": 5649
+    },
+    {
       "media_type": "application/json",
       "path": "demo/tutorial-bundle.json",
       "role": "json-artifact",
@@ -162,6 +176,7 @@
     "PYTHONPATH=src python -m earnings_event_playbook demo-bundle --out demo",
     "PYTHONPATH=src python -m earnings_event_playbook build-playbook --events examples/events.json --portfolio examples/portfolio.json --out demo/playbook.md --json-out demo/playbook.json",
     "PYTHONPATH=src python -m earnings_event_playbook compare-post-event --before-playbook demo/playbook.json --actuals examples/actuals.json --out demo/post-event-compare.md --json-out demo/post-event-compare.json",
+    "PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json",
     "PYTHONPATH=src python -m earnings_event_playbook visual-receipt --artifacts demo --out demo/visual-receipt.md --json-out demo/visual-receipt.json",
     "PYTHONPATH=src python -m earnings_event_playbook export-handoff --playbook demo/playbook.json --post-event-compare demo/post-event-compare.json --visual-receipt demo/visual-receipt.json --out demo/handoff.md --json-out demo/handoff.json"
   ],
@@ -181,10 +196,11 @@
   ],
   "schema_version": "1.0",
   "summary": {
-    "file_count": 22,
+    "file_count": 24,
     "roles": {
+      "html-artifact": 1,
       "input-fixture": 3,
-      "json-artifact": 2,
+      "json-artifact": 3,
       "markdown-artifact": 2,
       "playbook-json": 4,
       "playbook-markdown": 4,
@@ -192,6 +208,6 @@
       "post-event-markdown": 3,
       "static-html-preview": 1
     },
-    "total_bytes": 86221
+    "total_bytes": 100987
   }
 }

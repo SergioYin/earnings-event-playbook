@@ -1,6 +1,6 @@
 {
   "project": "earnings-event-playbook",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "runtime_dependencies": 0,
   "workflow_files": "none",
   "generated_artifacts": [
@@ -16,6 +16,8 @@
     "demo/visual-receipt.json",
     "demo/handoff.md",
     "demo/handoff.json",
+    "demo/showcase.html",
+    "demo/showcase.json",
     "demo/fixture-gallery.md",
     "demo/fixture-gallery.json",
     "demo/tutorial-bundle.md",
@@ -34,7 +36,7 @@
   "verification_commands": [
     {
       "command": "PYTHONPATH=src python -m pytest",
-      "result": "26 passed"
+      "result": "27 passed"
     },
     {
       "command": "PYTHONPATH=src python -m unittest discover",
@@ -69,12 +71,16 @@
       "result": "passed"
     },
     {
+      "command": "PYTHONPATH=src python -m earnings_event_playbook showcase-page --out demo/showcase.html --json-out demo/showcase.json",
+      "result": "passed"
+    },
+    {
       "command": "PYTHONPATH=src python -m earnings_event_playbook selfcheck",
-      "result": "selfcheck ok; scanned 62 public files"
+      "result": "selfcheck ok; scanned 65 public files"
     },
     {
       "command": "UV_CACHE_DIR=/tmp/uv-cache uv build --no-build-isolation",
-      "result": "built dist/earnings_event_playbook-0.6.0.tar.gz and dist/earnings_event_playbook-0.6.0-py3-none-any.whl"
+      "result": "built dist/earnings_event_playbook-0.7.0.tar.gz and dist/earnings_event_playbook-0.7.0-py3-none-any.whl"
     }
   ],
   "safety_boundaries": [
@@ -82,6 +88,6 @@
     "no live data",
     "no broker connection",
     "no orders",
-    "no investment advice"
+    "no personalized investment, legal, tax, accounting, buy, sell, hold, allocation, or other financial advice"
   ]
 }

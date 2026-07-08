@@ -17,6 +17,8 @@ def test_cli_demo_bundle(tmp_path):
     assert (tmp_path / "playbook.md").exists()
     assert (tmp_path / "playbook.json").exists()
     assert (tmp_path / "index.html").exists()
+    assert (tmp_path / "showcase.html").exists()
+    assert (tmp_path / "showcase.json").exists()
     assert (tmp_path / "visual-receipt.md").exists()
     assert (tmp_path / "visual-receipt.json").exists()
     assert (tmp_path / "handoff.md").exists()
@@ -25,7 +27,8 @@ def test_cli_demo_bundle(tmp_path):
     assert data["generated_by"] == "earnings-event-playbook"
     receipt = json.loads((tmp_path / "visual-receipt.json").read_text(encoding="utf-8"))
     assert receipt["artifact"] == "visual-receipt"
-    assert receipt["summary"]["file_count"] == 8
+    assert receipt["summary"]["file_count"] == 10
+    assert receipt["summary"]["roles"]["html-artifact"] == 1
     handoff = json.loads((tmp_path / "handoff.json").read_text(encoding="utf-8"))
     assert handoff["artifact"] == "cross-asset-handoff"
     assert handoff["handoff_packs"][0]["evidence_artifact_hashes"]
@@ -129,6 +132,40 @@ def test_cli_tutorial_bundle(tmp_path):
     assert data["reviewer_checklist"]
     assert data["maturity_rubric_evidence"]
     assert any("no broker connection" == item for item in data["safety_boundaries"])
+
+
+def test_cli_showcase_page(tmp_path):
+    out = tmp_path / "showcase.html"
+    json_out = tmp_path / "showcase.json"
+    subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "earnings_event_playbook",
+            "showcase-page",
+            "--out",
+            str(out),
+            "--json-out",
+            str(json_out),
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    text = out.read_text(encoding="utf-8")
+    data = json.loads(json_out.read_text(encoding="utf-8"))
+    assert "Earnings Event Playbook Showcase" in text
+    assert "<script" not in text.lower()
+    assert data["artifact"] == "showcase-page"
+    assert data["quickstart_commands"][1].startswith("PYTHONPATH=src python -m earnings_event_playbook showcase-page")
+    assert any(item["path"] == "demo/showcase.html" for item in data["demo_artifact_links"])
+    assert data["release_evidence"]
+    assert data["maturity_rubric"]
+    assert data["case_gallery_highlights"]
+    assert data["tutorial_path"]
+    assert data["risk_boundaries"]
+    assert data["star_worthy_differentiation"]
+    assert all("financial advice" not in item.lower() for item in data["star_worthy_differentiation"])
 
 
 def test_cli_compare_post_event(tmp_path):

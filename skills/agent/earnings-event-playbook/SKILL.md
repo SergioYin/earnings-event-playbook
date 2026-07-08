@@ -11,8 +11,9 @@ Use this skill when a user wants to build or review a local earnings event playb
 5. Use `earnings-event-playbook export-handoff --playbook <playbook.json> --post-event-compare <compare.json> --visual-receipt <receipt.json> --out <handoff.md> --json-out <handoff.json>` for thesis-ledger and earnings-call-risk-map style handoff packs.
 6. Use `earnings-event-playbook fixture-gallery --cases <case-dir>... --out <gallery.md> --json-out <gallery.json>` to compare checked-in local case fixtures.
 7. Use `earnings-event-playbook tutorial-bundle --case <case-dir> --out <tutorial.md> --json-out <tutorial.json>` when the user needs a deterministic tutorial packet with ordered commands, expected artifact paths, reviewer checklist, maturity rubric evidence, and safety boundaries.
-8. Use `earnings-event-playbook demo-bundle --out <dir>` when the user needs a complete example bundle.
-9. Keep all language framed as research review, not advice.
+8. Use `earnings-event-playbook showcase-page --out <showcase.html> --json-out <showcase.json>` when the user needs a no-JavaScript landing page and manifest summarizing value proposition, quickstart commands, demo links, release evidence, maturity rubric, case highlights, tutorial path, risk boundaries, and star-worthy differentiation.
+9. Use `earnings-event-playbook demo-bundle --out <dir>` when the user needs a complete example bundle.
+10. Keep all language framed as research review, not advice.
 
 ## Boundaries
 
